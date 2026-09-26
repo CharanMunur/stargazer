@@ -57,15 +57,21 @@ func (ct *CounterTemplate) Render(data *github.RepoData, opts RenderOptions) ([]
 		return stargazers[i].StarredAt.After(stargazers[j].StarredAt)
 	})
 
+	theme := opts.Theme
+	if theme != "dark" && theme != "light" {
+		theme = "light"
+	}
+	isDark := theme == "dark"
+
 	title := fmt.Sprintf("%s/%s", data.Owner, data.Name)
 
 	stars := data.StarsCount
 	forks := data.ForksCount
 	days := data.DaysCount
 
-	// Rasterize SVG (Original logic)
-	sw := 140
-	leafImg := image.NewRGBA(image.Rect(0, 0, sw, 280))
+	// Rasterize laurel leaf SVG
+	sw := 130
+	leafImg := image.NewRGBA(image.Rect(0, 0, sw, 260))
 	leafPath := resolveAsset("assets/svg/leaf.svg")
 	icon, err := oksvg.ReadIcon(leafPath, oksvg.IgnoreErrorMode)
 	if err == nil {
@@ -85,7 +91,11 @@ func (ct *CounterTemplate) Render(data *github.RepoData, opts RenderOptions) ([]
 						maskAlpha = 1.0 - (progress-0.55)/0.45
 					}
 					newA := uint8(float64(c.A) * 0.15 * maskAlpha)
-					leafImg.SetRGBA(x, y, color.RGBA{0, 0, 0, newA})
+					if isDark {
+						leafImg.SetRGBA(x, y, color.RGBA{255, 255, 255, newA})
+					} else {
+						leafImg.SetRGBA(x, y, color.RGBA{0, 0, 0, newA})
+					}
 				}
 			}
 		}
@@ -98,13 +108,13 @@ func (ct *CounterTemplate) Render(data *github.RepoData, opts RenderOptions) ([]
 		}
 	}
 
-	// Fetch Avatars
-	avatarSize := 140
+	// Fetch Avatars for exactly 2 rows (8 per row = 16 avatars)
+	avatarSize := 120
 	avatarMap := make(map[int]image.Image)
 	var wgAvatars sync.WaitGroup
 	var mu sync.Mutex
 
-	limit := 32
+	limit := 16
 	if len(stargazers) < limit {
 		limit = len(stargazers)
 	}
@@ -127,11 +137,11 @@ func (ct *CounterTemplate) Render(data *github.RepoData, opts RenderOptions) ([]
 	regularFont := resolveAsset("assets/fonts/DMSans-Regular.ttf")
 
 	dcMeasure := gg.NewContext(1, 1)
-	dcMeasure.LoadFontFace(boldFont, 96)
+	dcMeasure.LoadFontFace(boldFont, 78)
 	tw, _ := dcMeasure.MeasureString(title)
 
 	if opts.Format == "png" {
-		img := ct.renderFrame(60, stars, forks, days, stargazers, avatarMap, leftLeaf, leafImg, title, tw, regularFont, boldFont)
+		img := ct.renderFrame(60, stars, forks, days, stargazers, avatarMap, leftLeaf, leafImg, title, tw, regularFont, boldFont, theme)
 		var buf bytes.Buffer
 		if err := png.Encode(&buf, img); err != nil {
 			return nil, fmt.Errorf("png encode error: %w", err)
@@ -154,7 +164,7 @@ func (ct *CounterTemplate) Render(data *github.RepoData, opts RenderOptions) ([]
 			sem <- struct{}{}
 			defer func() { <-sem }()
 
-			img := ct.renderFrame(frame, stars, forks, days, stargazers, avatarMap, leftLeaf, leafImg, title, tw, regularFont, boldFont)
+			img := ct.renderFrame(frame, stars, forks, days, stargazers, avatarMap, leftLeaf, leafImg, title, tw, regularFont, boldFont, theme)
 			frames[frame] = RgbaToPaletted(img)
 			delays[frame] = 4
 		}(i)
@@ -188,9 +198,22 @@ func (ct *CounterTemplate) renderFrame(
 	title string,
 	tw float64,
 	regularFontPath, boldFontPath string,
+	theme string,
 ) image.Image {
-	dc := gg.NewContext(1600, 1156)
-	dc.SetHexColor("#edecea")
+	// Standard 16:9 canvas dimensions (1600x900)
+	width := 1600
+	height := 900
+	dc := gg.NewContext(width, height)
+
+	isDark := theme == "dark"
+	var bgR, bgG, bgB uint8
+	if isDark {
+		bgR, bgG, bgB = 9, 8, 9
+		dc.SetHexColor("#090809")
+	} else {
+		bgR, bgG, bgB = 237, 236, 234
+		dc.SetHexColor("#edecea")
+	}
 	dc.Clear()
 
 	t := float64(frame) / 60.0
@@ -208,27 +231,35 @@ func (ct *CounterTemplate) renderFrame(
 	}
 	tTitle = easeOut(tTitle)
 
-	titleY := 250.0 + 50.0*(1.0-tTitle)
+	titleY := 185.0 + 25.0*(1.0-tTitle)
 
 	if tTitle > 0 {
 		currLeft := ApplyAlpha(leftLeaf, tTitle)
 		currRight := ApplyAlpha(leafImg, tTitle)
 
-		leafGap := 50.0
+		leafGap := 45.0
 		leftX := 800.0 - tw/2.0 - leafGap - float64(leftLeaf.Bounds().Dx())
 		rightX := 800.0 + tw/2.0 + leafGap
-		laurelY := int(titleY) - 190
+		laurelY := int(titleY) - 150
 
 		dc.DrawImage(currLeft, int(leftX), laurelY)
 		dc.DrawImage(currRight, int(rightX), laurelY)
 	}
 
-	dc.LoadFontFace(regularFontPath, 34)
-	dc.SetRGBA255(85, 85, 85, int(255*tTitle))
-	DrawSpacedText(dc, "STARGAZERS · 2026", 800, titleY-90, 6)
+	dc.LoadFontFace(regularFontPath, 28)
+	if isDark {
+		dc.SetRGBA255(158, 152, 149, int(255*tTitle))
+	} else {
+		dc.SetRGBA255(85, 85, 85, int(255*tTitle))
+	}
+	DrawSpacedText(dc, "STARGAZERS · 2026", 800, titleY-65, 6)
 
-	dc.LoadFontFace(boldFontPath, 96)
-	dc.SetRGBA255(17, 17, 17, int(255*tTitle))
+	dc.LoadFontFace(boldFontPath, 78)
+	if isDark {
+		dc.SetRGBA255(251, 247, 243, int(255*tTitle))
+	} else {
+		dc.SetRGBA255(17, 17, 17, int(255*tTitle))
+	}
 	dc.DrawStringAnchored(title, 800, titleY, 0.5, 0.5)
 
 	// 2. Counters animate from 0 to target
@@ -246,20 +277,28 @@ func (ct *CounterTemplate) renderFrame(
 	curDays := int(float64(days) * tCount)
 
 	if tCount > 0 {
-		dc.SetRGBA255(17, 17, 17, int(255*tCount))
-		dc.LoadFontFace(regularFontPath, 160)
-		dc.DrawStringAnchored(FormatComma(curStars), 400, 480, 0.5, 0.5)
-		dc.DrawStringAnchored(FormatComma(curForks), 800, 480, 0.5, 0.5)
-		dc.DrawStringAnchored(FormatComma(curDays), 1200, 480, 0.5, 0.5)
+		if isDark {
+			dc.SetRGBA255(251, 247, 243, int(255*tCount))
+		} else {
+			dc.SetRGBA255(17, 17, 17, int(255*tCount))
+		}
+		dc.LoadFontFace(regularFontPath, 125)
+		dc.DrawStringAnchored(FormatComma(curStars), 400, 350, 0.5, 0.5)
+		dc.DrawStringAnchored(FormatComma(curForks), 800, 350, 0.5, 0.5)
+		dc.DrawStringAnchored(FormatComma(curDays), 1200, 350, 0.5, 0.5)
 
-		dc.SetRGBA255(136, 136, 136, int(255*tCount))
-		dc.LoadFontFace(regularFontPath, 26)
-		DrawSpacedText(dc, "STARS", 400, 600, 8)
-		DrawSpacedText(dc, "FORKS", 800, 600, 8)
-		DrawSpacedText(dc, "DAYS", 1200, 600, 8)
+		if isDark {
+			dc.SetRGBA255(158, 152, 149, int(255*tCount))
+		} else {
+			dc.SetRGBA255(136, 136, 136, int(255*tCount))
+		}
+		dc.LoadFontFace(regularFontPath, 22)
+		DrawSpacedText(dc, "STARS", 400, 445, 8)
+		DrawSpacedText(dc, "FORKS", 800, 445, 8)
+		DrawSpacedText(dc, "DAYS", 1200, 445, 8)
 	}
 
-	// 3. Avatars staggered pop-in
+	// 3. Exactly 2 rows of avatars (8 avatars per row = 16 total)
 	tAvatar := (t - 0.2) / 0.8
 	if tAvatar < 0 {
 		tAvatar = 0
@@ -268,15 +307,15 @@ func (ct *CounterTemplate) renderFrame(
 		tAvatar = 1
 	}
 
-	avatarSize := 140
-	ringPadding := 6.0
-	gapX := 50.0
-	gapY := 55.0
+	avatarSize := 120
+	ringPadding := 5.0
+	gapX := 45.0
+	gapY := 35.0
 	startX := 800.0 - (8*float64(avatarSize)+7*gapX)/2.0 + float64(avatarSize)/2.0
-	startY := 740.0
+	startY := 545.0
 
-	dc.LoadFontFace(boldFontPath, 40)
-	limit := 32
+	dc.LoadFontFace(boldFontPath, 34)
+	limit := 16
 	if len(stargazers) < limit {
 		limit = len(stargazers)
 	}
@@ -305,7 +344,7 @@ func (ct *CounterTemplate) renderFrame(
 
 		dc.DrawCircle(x, y, curSize/2+ringPadding)
 		dc.SetHexColor(ringColors[i%len(ringColors)])
-		dc.SetLineWidth(5 * localT)
+		dc.SetLineWidth(4.5 * localT)
 		dc.Stroke()
 
 		img := avatarMap[i]
@@ -314,9 +353,17 @@ func (ct *CounterTemplate) renderFrame(
 				dc.DrawImageAnchored(img, int(x), int(y), 0.5, 0.5)
 			} else {
 				dc.DrawCircle(x, y, float64(avatarSize)/2)
-				dc.SetHexColor("#e2e2e2")
+				if isDark {
+					dc.SetHexColor("#222023")
+				} else {
+					dc.SetHexColor("#e2e2e2")
+				}
 				dc.Fill()
-				dc.SetHexColor("#666666")
+				if isDark {
+					dc.SetHexColor("#9E9895")
+				} else {
+					dc.SetHexColor("#666666")
+				}
 				initials := GetInitials(stargazers[i].User.Login)
 				dc.DrawStringAnchored(initials, x, y, 0.5, 0.5)
 			}
@@ -330,17 +377,22 @@ func (ct *CounterTemplate) renderFrame(
 				}
 			} else {
 				dc.DrawCircle(x, y, curSize/2)
-				dc.SetHexColor("#e2e2e2")
+				if isDark {
+					dc.SetHexColor("#222023")
+				} else {
+					dc.SetHexColor("#e2e2e2")
+				}
 				dc.Fill()
 			}
 		}
 	}
 
-	grad := gg.NewLinearGradient(0, 1156-300, 0, 1156)
-	grad.AddColorStop(0, color.NRGBA{237, 236, 234, 0})
-	grad.AddColorStop(1, color.NRGBA{237, 236, 234, 255})
+	// 4. Light fade on bottom (from y=730 to y=900)
+	grad := gg.NewLinearGradient(0, 730, 0, 900)
+	grad.AddColorStop(0, color.NRGBA{bgR, bgG, bgB, 0})
+	grad.AddColorStop(1, color.NRGBA{bgR, bgG, bgB, 255})
 	dc.SetFillStyle(grad)
-	dc.DrawRectangle(0, 1156-300, 1600, 300)
+	dc.DrawRectangle(0, 730, 1600, 170)
 	dc.Fill()
 
 	return dc.Image()

@@ -1,125 +1,136 @@
 <p align="center">
-  <img src="client/public/stargazer-logo.svg" alt="stargazer logo" width="520" align="center" />
+  <img src="client/public/stargazer.svg" alt="stargazer logo" width="520" align="center" />
 </p>
 
 <p align="center">
-  <strong>Built with Go 2D Engine, Astro, React, Tailwind CSS, shadcn/ui</strong>
+  <strong>Open-Source GitHub Stargazer Cards & 60fps MP4 Videos</strong>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go" />
-  <img src="https://img.shields.io/badge/Astro-BC52EE?style=for-the-badge&logo=astro&logoColor=white" alt="Astro" />
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white" alt="Framer Motion" />
+  <img src="https://img.shields.io/badge/Astro-BC52EE?style=for-the-badge&logo=astro&logoColor=white" alt="Astro" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/shadcn%2Fui-000000?style=for-the-badge&logo=shadcnui&logoColor=white" alt="shadcn/ui" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go" />
 </p>
 
 ---
 
-## How It Works
+## Overview
 
-stargazer generates customized GitHub repository stargazer cards and animated GIFs for README profiles.
+Stargazer turns your GitHub repository's community milestones into high-resolution cards (1600 × 900) and 60fps MP4 videos. 
 
-### Architecture Overview
-
-1. **Frontend Request**: The Astro + React web interface collects the repository name (`owner/repo`), GitHub Personal Access Token (PAT), template design, background style, and desired output format (PNG or GIF).
-2. **Backend API Execution**: The request is submitted to the Go backend API server (`server/cmd/api`).
-3. **Stargazer Data & Avatar Fetching**: The backend uses the GitHub REST API client (`internal/github`) to fetch the list of stargazers for the specified repository and concurrently downloads their profile avatars.
-4. **2D Graphics Rendering Engine**: The Go 2D rendering package (`internal/render`) computes layout positions and renders pixel-perfect graphics using vector mathematics:
-   - **Constellation Template**: Dynamically scatters avatars outward from the canvas center. An oval whitespace keep-clear zone preserves legibility around the central title, repo name, mascot, and star count. Radial opacity falloff computes Euclidean distance from center to corners, smoothly fading avatars near the whitespace boundary while keeping corner avatars vivid.
-   - **Ticker / Marquee Template**: Computes seamless horizontal scrolling of avatar rows and counter badges frame-by-frame.
-   - **Counter Template**: Renders avatar grid layouts with repo statistics.
-5. **GIF Animation & Palette Quantization**: For GIF exports, the engine renders individual frames, applies color palette quantization, and encodes a high-efficiency animated GIF stream.
-6. **Direct Binary Delivery**: The output image stream (`image/png` or `image/gif`) is returned to the client browser for live preview and direct download.
+The application runs entirely in the browser with zero backend server dependencies required. Community data is fetched directly from the GitHub REST API, animated with Framer Motion, and exported to crystal-clear PNG images or hardware-accelerated MP4 videos.
 
 ---
 
-## Repository Architecture
+## Templates
 
-```text
-stargazer/
-├── client/              # Astro + React + Tailwind CSS + shadcn frontend
-│   ├── src/
-│   │   ├── components/  # React CardGenerator component & UI elements
-│   │   ├── pages/       # Astro index page
-│   │   └── styles/      # Global Tailwind styles
-│   ├── astro.config.mjs
-│   └── package.json
-├── server/              # Go API Server & 2D Rendering Engine
-│   ├── cmd/api/         # HTTP API Server entrypoint
-│   ├── internal/
-│   │   ├── github/      # GitHub REST API Stargazers client
-│   │   └── render/      # Template engines & graphics utils
-│   └── assets/          # Fonts & SVG vectors
-└── README.md
-```
+### 1. Counter Template
+A classical layout designed for milestones, repository anniversaries, and release announcements:
+* Symmetrical laurel wreath branches flanking the repository title.
+* Dynamic counting animation for Stars, Forks, and Days metrics in DM Sans Regular.
+* Structured 2-row grid of 16 stargazers with colored ring borders.
+* Subtle bottom gradient fade to ground the card composition.
+
+### 2. Ticker Template (Marquee)
+An energetic avatar marquee designed for README headers and dynamic feeds:
+* Top-left repository hierarchy header (`owner / repo`) with owner avatar.
+* Physics-driven horizontal marquee stream with continuous 60fps looping.
+* 5-pointed yellow star anchored directly beneath each community avatar.
+* Bottom-right live metric counter readout.
+
+### 3. 3D Orbit Template
+A spherical carousel with dynamic depth and radial lighting:
+* Curved spherical arc trajectory with depth-sorted z-index layering.
+* Dynamic scale magnification (0.7x background up to 1.35x foreground).
+* Ambient radial glow centered on the focal gravitational point.
+* Primary coral accent ring on active focus member and star metrics.
+
+### 4. Constellation Template
+An organic point-cloud cluster designed for contributor appreciation and showcase banners:
+* Centered stacked layout: 100px mascot avatar, repository title, and plain text star count.
+* Strict horizontal whitespace ellipse (560px × 240px keep-clear zone) preserving center legibility.
+* Deterministic PRNG scatter of 48+ non-overlapping avatars across outer margins and corners.
+* Radial Euclidean distance opacity falloff: faint avatars (~0.35 opacity) near the oval boundary, brightening to full opacity (1.0) at the canvas perimeter.
 
 ---
 
 ## Quick Start
 
-### 1. Run the Backend API (`server/`)
+### Prerequisites
+* [Bun](https://bun.sh) 1.0+ (or Node.js 20+)
 
-Prerequisites: Go 1.22+
-
-```bash
-cd server
-go run ./cmd/api
-```
-
-The server listens on `http://localhost:8080`.
-
-### 2. Run the Frontend (`client/`)
-
-Prerequisites: Bun 1.0+ (or Node.js 20+)
+### Run the Studio Locally
 
 ```bash
-cd client
+# Clone the repository
+git clone https://github.com/CharanMunur/stargazer.git
+cd stargazer/client
+
+# Install dependencies
 bun install
-bun run dev
+
+# Start the local development server
+bun dev
 ```
 
-Open `http://localhost:3000` in your browser.
+Open `http://localhost:4321` in your browser.
+
+* Navigate to `/` for the landing page overview and workflow guide.
+* Navigate to `/templates` to view the dedicated template documentation and live 60fps previews.
+* Navigate to `/generate` to launch the interactive studio (supports deep-linking, e.g. `/generate?generate=ticker`).
 
 ---
 
-## HTTP API Contract
+## Architecture & Export Pipeline
 
-### `POST /api/generate`
+1. **Client-Side Data Fetching**: Stargazer queries GitHub's public API (`https://api.github.com/repos/{owner}/{repo}`) directly from the client. Unauthenticated requests support public repositories; optional Personal Access Tokens (PAT) can be provided to bypass rate limits.
+2. **Real-Time 60fps Rendering**: Templates are constructed as pure React components animated via Framer Motion springs, scaled deterministically to a 1600 × 900 virtual canvas.
+3. **PNG Image Export**: High-resolution DOM capture executed in milliseconds via the HTML5 Canvas API (`html-to-image`).
+4. **MP4 Video Export**: 60fps video encoding executed directly in the browser via WebCodecs `VideoEncoder` and `mp4-muxer` (with standard `MediaRecorder` fallback).
 
-Generates a stargazer image or animation card.
+---
 
-#### Request Body (JSON)
+## Project Structure
 
-```json
-{
-  "token": "ghp_your_github_personal_access_token",
-  "repo": "owner/repository",
-  "template": "constellation",
-  "format": "png"
-}
+```text
+stargazer/
+├── client/                              # Modern React + Framer Motion frontend
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── CardGenerator.tsx        # Interactive Studio interface
+│   │   │   ├── Hero.tsx                 # Landing page hero showcase
+│   │   │   ├── Navbar.tsx               # Fixed header with theme toggle
+│   │   │   ├── StudioHeader.tsx         # Studio navigation bar
+│   │   │   ├── TemplateCatalog.tsx      # Docs-style template catalogue
+│   │   │   ├── templates/               # React + Framer Motion templates
+│   │   │   │   ├── ConstellationCard.tsx# Constellation template
+│   │   │   │   ├── CounterCard.tsx      # Counter template
+│   │   │   │   ├── TickerCard.tsx       # Ticker template
+│   │   │   │   └── types.ts             # Template TypeScript interfaces
+│   │   │   └── ui/                      # Official shadcn/ui components
+│   │   ├── lib/
+│   │   │   └── videoExporter.ts         # In-browser MP4 video exporter
+│   │   └── pages/
+│   │       ├── generate.astro           # Studio route (/generate)
+│   │       └── index.astro              # Documentation landing page (/)
+│   └── public/                          # Static assets and DM Sans font files
+├── server/                              # Reference Go 2D render engine
+└── README.md
 ```
-
-#### Parameters
-
-| Field | Type | Options | Description |
-| :--- | :--- | :--- | :--- |
-| `token` | `string` | *(Required)* | GitHub Personal Access Token (PAT) with `read:user` or public access. |
-| `repo` | `string` | *(Required)* | Repository path in `owner/repo` format. |
-| `template` | `string` | `"counter"` \| `"ticker"` \| `"orbit"` \| `"constellation"` | Design template type. Defaults to `"counter"`. |
-| `format` | `string` | `"png"` \| `"gif"` | Export format. Defaults to `"png"`. |
-
-#### Responses
-
-- **200 OK**: Binary image stream (`image/png` or `image/gif`).
-- **400 Bad Request**: Missing required parameters.
-- **401 Unauthorized**: Invalid or expired GitHub token.
-- **404 Not Found**: Repository not found.
-- **429 Too Many Requests**: GitHub API rate limit reached.
 
 ---
 
 ## Security & Privacy
 
-- **No Data Persistence**: The server contains no database layer.
-- **Zero Token Logging**: Tokens are passed directly to GitHub API request headers in memory and discarded immediately after rendering.
+* **Zero Server Persistence**: No database, no logging server, and no analytics tracking.
+* **In-Memory Token Processing**: GitHub Personal Access Tokens are handled strictly in the user's browser memory and are never transmitted to external servers.
+
+---
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.

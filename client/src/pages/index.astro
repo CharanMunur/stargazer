@@ -1,5 +1,8 @@
 ---
-import NavbarDemo from '../components/NavbarDemo';
+import Navbar from '../components/Navbar';
+import Hero from '../components/Hero';
+import { Separator } from '../components/ui/separator';
+import { templatesList } from '../lib/templatesData';
 import '../styles/globals.css';
 ---
 
@@ -9,164 +12,98 @@ import '../styles/globals.css';
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <title>stargazer — Open-Source GitHub Star Animations & Cards</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300;1,9..40,400;1,9..40,500&display=swap" rel="stylesheet">
+    <title>Stargazer — Open-Source GitHub Stargazer Cards & MP4 Videos</title>
+    <meta name="description" content="Turn your GitHub stargazers into living art. Generate high-definition cards and 60fps MP4 videos directly in your browser." />
+    <script is:inline>
+      const savedTheme = localStorage.getItem('stargazer-theme') || 'dark';
+      document.documentElement.classList[savedTheme === 'dark' ? 'add' : 'remove']('dark');
+    </script>
   </head>
-  <body class="min-h-screen bg-[#0F0E10] text-[#F5EDE7] flex flex-col justify-between font-sans selection:bg-[#2A1B17] selection:text-[#F5EDE7]">
-    {/* Resizable Navbar */}
-    <NavbarDemo client:load />
+  <body class="min-h-screen bg-background text-foreground flex flex-col justify-between font-sans antialiased">
+    <Navbar client:load showAction={false} />
 
-    {/* Hero Section */}
-    <section class="relative w-full overflow-hidden border-b border-[#342A27]/60 pt-32 pb-24 sm:pt-40 sm:pb-28 md:pt-48 md:pb-36">
-      {/* Background Image */}
-      <div class="absolute inset-0 z-0 select-none pointer-events-none">
-        <img
-          src="/stargazer.png"
-          alt="stargazer hero background"
-          class="w-full h-full object-cover object-center opacity-85"
-        />
-        <div class="absolute inset-0 bg-gradient-to-b from-[#0F0E10]/70 via-transparent to-[#0F0E10]" />
-        <div class="absolute inset-0 bg-gradient-to-r from-[#0F0E10]/50 via-transparent to-[#0F0E10]/50" />
+    <main class="flex-1 w-full">
+      <Hero client:load />
+
+      <div class="max-w-5xl mx-auto px-6 space-y-16 pb-24">
+        <Separator />
+
+        {/* Layout Architectures Overview */}
+        <section class="space-y-8">
+          <div class="space-y-2">
+            <h2 class="text-2xl font-bold tracking-tight">Architectures</h2>
+            <p class="text-sm text-muted-foreground">
+              Mathematical layouts rendered at 60fps in the browser, exportable as PNG cards or MP4 video loops.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {templatesList.map((tmpl) => (
+              <div key={tmpl.id} class="space-y-2">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-base font-semibold tracking-tight">{tmpl.name}</h3>
+                  <a
+                    href={`/templates/${tmpl.id}`}
+                    class="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    View specifications →
+                  </a>
+                </div>
+                <p class="text-sm text-muted-foreground leading-relaxed">
+                  {tmpl.summary}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <Separator />
+
+        {/* Workflow Guide */}
+        <section class="space-y-8">
+          <div class="space-y-2">
+            <h2 class="text-2xl font-bold tracking-tight">Workflow</h2>
+            <p class="text-sm text-muted-foreground">
+              Generate community cards in three steps.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="space-y-2">
+              <span class="text-xs text-muted-foreground">01</span>
+              <h3 class="text-base font-semibold tracking-tight">Select architecture</h3>
+              <p class="text-sm text-muted-foreground leading-relaxed">
+                Choose between Counter, Ticker, 3D Orbit, or Constellation based on your milestone or audience size.
+              </p>
+            </div>
+
+            <div class="space-y-2">
+              <span class="text-xs text-muted-foreground">02</span>
+              <h3 class="text-base font-semibold tracking-tight">Provide repository</h3>
+              <p class="text-sm text-muted-foreground leading-relaxed">
+                Enter any public GitHub repository. Stargazer fetches live community metrics and contributor avatars directly.
+              </p>
+            </div>
+
+            <div class="space-y-2">
+              <span class="text-xs text-muted-foreground">03</span>
+              <h3 class="text-base font-semibold tracking-tight">Export media</h3>
+              <p class="text-sm text-muted-foreground leading-relaxed">
+                Download crystal-clear 1600 × 900 PNG cards or encode 60fps MP4 video loops instantly within your browser.
+              </p>
+            </div>
+          </div>
+        </section>
       </div>
-
-      {/* Hero Content with Clean Spacing & Zero Overlap */}
-      <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
-        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#342A27] bg-[#18181B]/95 backdrop-blur-md text-[#E8B083] text-xs font-medium shadow-2xl mb-8">
-          <span class="w-2 h-2 rounded-full bg-[#E87443] animate-pulse"></span>
-          Open-Source Stargazer Animation Studio
-        </div>
-
-        <h1 class="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight text-[#F5EDE7] leading-[1.25] sm:leading-[1.2] mb-8 drop-shadow-lg">
-          Turn GitHub Stars Into <span class="text-[#E87443]">Dynamic Cards</span>
-        </h1>
-
-        <p class="text-[#B8AAA3] text-sm sm:text-lg md:text-xl leading-relaxed max-w-2xl mx-auto font-normal mb-10 drop-shadow-md">
-          Generate high-fps GIF marquee animations and pixel-perfect PNG cards of your stargazers for your README repository profiles.
-        </p>
-
-        <div class="flex items-center justify-center gap-4">
-          <a
-            href="/generate"
-            class="px-7 py-3.5 rounded-xl bg-[#E87443] hover:bg-[#F08A55] text-[#0F0E10] font-bold text-xs sm:text-sm transition-all shadow-xl shadow-[#E87443]/30"
-          >
-            Create Stargazer Card →
-          </a>
-
-          <a
-            href="#features"
-            class="px-7 py-3.5 rounded-xl bg-[#18181B]/90 hover:bg-[#2A1B17] text-[#F5EDE7] font-semibold text-xs sm:text-sm transition-all border border-[#342A27] backdrop-blur-md"
-          >
-            Explore Features
-          </a>
-        </div>
-      </div>
-    </section>
-
-    {/* Main Body Content */}
-    <main class="max-w-6xl mx-auto px-6 py-16 w-full flex-1 space-y-24">
-      {/* Features Section */}
-      <section id="features" class="space-y-12">
-        <div class="text-center space-y-3 max-w-xl mx-auto">
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-[#F5EDE7] tracking-tight">
-            Engineered for Speed & Aesthetics
-          </h2>
-          <p class="text-xs sm:text-sm text-[#B8AAA3]">
-            Everything you need to create custom stargazer cards for your open-source projects.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Feature 1 */}
-          <div class="p-6 rounded-2xl bg-[#18181B] border border-[#342A27] space-y-4 shadow-lg hover:border-[#E87443]/50 transition-all">
-            <div class="w-10 h-10 rounded-xl bg-[#2A1B17] border border-[#342A27] flex items-center justify-center text-[#E87443]">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-              </svg>
-            </div>
-            <h3 class="text-base font-bold text-[#F5EDE7]">Physics Marquee</h3>
-            <p class="text-xs text-[#B8AAA3] leading-relaxed">
-              Cubic ease-out physics deceleration with center-focus avatar scaling from 216px down to 160px.
-            </p>
-          </div>
-
-          {/* Feature 2 */}
-          <div class="p-6 rounded-2xl bg-[#18181B] border border-[#342A27] space-y-4 shadow-lg hover:border-[#E87443]/50 transition-all">
-            <div class="w-10 h-10 rounded-xl bg-[#2A1B17] border border-[#342A27] flex items-center justify-center text-[#F2C879]">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
-              </svg>
-            </div>
-            <h3 class="text-base font-bold text-[#F5EDE7]">Dual Templates</h3>
-            <p class="text-xs text-[#B8AAA3] leading-relaxed">
-              Choose between classic leaf counter grid layout and modern marquee ticker styling.
-            </p>
-          </div>
-
-          {/* Feature 3 */}
-          <div class="p-6 rounded-2xl bg-[#18181B] border border-[#342A27] space-y-4 shadow-lg hover:border-[#E87443]/50 transition-all">
-            <div class="w-10 h-10 rounded-xl bg-[#2A1B17] border border-[#342A27] flex items-center justify-center text-[#E8B083]">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-              </svg>
-            </div>
-            <h3 class="text-base font-bold text-[#F5EDE7]">Zero Persistence</h3>
-            <p class="text-xs text-[#B8AAA3] leading-relaxed">
-              In-memory token processing per request. No database, zero token logging, zero server caching.
-            </p>
-          </div>
-
-          {/* Feature 4 */}
-          <div class="p-6 rounded-2xl bg-[#18181B] border border-[#342A27] space-y-4 shadow-lg hover:border-[#E87443]/50 transition-all">
-            <div class="w-10 h-10 rounded-xl bg-[#2A1B17] border border-[#342A27] flex items-center justify-center text-[#C94F35]">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-            </div>
-            <h3 class="text-base font-bold text-[#F5EDE7]">REST API Included</h3>
-            <p class="text-xs text-[#B8AAA3] leading-relaxed">
-              Direct Go HTTP API endpoint (<code class="text-[#E87443] font-mono">POST /api/generate</code>) for seamless CI/CD integration.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Bottom CTA Banner */}
-      <section class="rounded-3xl bg-[#2A1B17]/60 border border-[#342A27] p-8 md:p-12 text-center space-y-6 max-w-4xl mx-auto shadow-2xl relative overflow-hidden">
-        <div class="space-y-3 max-w-xl mx-auto">
-          <h2 class="text-2xl sm:text-3xl font-extrabold text-[#F5EDE7] tracking-tight">
-            Ready to Showcase Your Repository Stars?
-          </h2>
-          <p class="text-xs sm:text-sm text-[#B8AAA3]">
-            Generate your custom stargazer GIF or PNG in seconds with zero configuration required.
-          </p>
-        </div>
-
-        <div class="flex justify-center">
-          <a
-            href="/generate"
-            class="px-8 py-4 rounded-xl bg-[#E87443] hover:bg-[#F08A55] text-[#0F0E10] font-bold text-sm transition-all shadow-xl shadow-[#E87443]/20 flex items-center gap-2"
-          >
-            Launch Generator Studio
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-            </svg>
-          </a>
-        </div>
-      </section>
     </main>
 
-    {/* Footer */}
-    <footer class="border-t border-[#342A27] bg-[#0F0E10] py-8 text-center text-xs text-[#756B67]">
-      <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p>© 2026 stargazer • Built with Go 2D Engine & Astro</p>
-        <div class="flex items-center gap-4 text-[#B8AAA3]">
-          <a href="/" class="hover:text-[#F5EDE7] transition-colors">Home</a>
-          <span>•</span>
-          <a href="/generate" class="hover:text-[#F5EDE7] transition-colors">Studio</a>
-          <span>•</span>
-          <a href="https://github.com/charanmunur/portfolio" target="_blank" rel="noreferrer" class="hover:text-[#F5EDE7] transition-colors">GitHub</a>
+    <footer class="border-t py-6 text-sm text-muted-foreground">
+      <div class="max-w-5xl mx-auto px-6 flex items-center justify-between">
+        <span>Stargazer</span>
+        <div class="flex items-center gap-6 text-sm">
+          <a href="/templates" class="hover:text-foreground transition-colors">Templates</a>
+          <a href="/generate" class="hover:text-foreground transition-colors">Studio</a>
+          <a href="https://github.com/charanmunur/stargazer" target="_blank" rel="noreferrer" class="hover:text-foreground transition-colors">GitHub</a>
         </div>
       </div>
     </footer>
