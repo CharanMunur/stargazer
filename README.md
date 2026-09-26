@@ -13,7 +13,6 @@
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/shadcn%2Fui-000000?style=for-the-badge&logo=shadcnui&logoColor=white" alt="shadcn/ui" />
   <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go" />
 </p>
 
 ---
@@ -47,7 +46,7 @@ A spherical carousel with dynamic depth and radial lighting:
 * Curved spherical arc trajectory with depth-sorted z-index layering.
 * Dynamic scale magnification (0.7x background up to 1.35x foreground).
 * Ambient radial glow centered on the focal gravitational point.
-* Primary coral accent ring on active focus member and star metrics.
+* Primary accent ring on active focus member and star metrics.
 
 ### 4. Constellation Template
 An organic point-cloud cluster designed for contributor appreciation and showcase banners:
@@ -104,21 +103,24 @@ stargazer/
 │   │   │   ├── CardGenerator.tsx        # Interactive Studio interface
 │   │   │   ├── Hero.tsx                 # Landing page hero showcase
 │   │   │   ├── Navbar.tsx               # Fixed header with theme toggle
-│   │   │   ├── StudioHeader.tsx         # Studio navigation bar
-│   │   │   ├── TemplateCatalog.tsx      # Docs-style template catalogue
+│   │   │   ├── TemplateDetail.tsx       # Three-column template documentation view
+│   │   │   ├── TemplatesSidebar.tsx     # Clean documentation sidebar
 │   │   │   ├── templates/               # React + Framer Motion templates
 │   │   │   │   ├── ConstellationCard.tsx# Constellation template
 │   │   │   │   ├── CounterCard.tsx      # Counter template
+│   │   │   │   ├── OrbitCard.tsx        # 3D Orbit template
 │   │   │   │   ├── TickerCard.tsx       # Ticker template
 │   │   │   │   └── types.ts             # Template TypeScript interfaces
 │   │   │   └── ui/                      # Official shadcn/ui components
 │   │   ├── lib/
+│   │   │   ├── canvasRenderer.ts        # Canvas rendering engine
+│   │   │   ├── templatesData.ts         # Centralized template metadata & specs
 │   │   │   └── videoExporter.ts         # In-browser MP4 video exporter
 │   │   └── pages/
 │   │       ├── generate.astro           # Studio route (/generate)
-│   │       └── index.astro              # Documentation landing page (/)
+│   │       ├── index.astro              # Landing page (/)
+│   │       └── templates/               # Template docs routes (/templates, /templates/[id])
 │   └── public/                          # Static assets and DM Sans font files
-├── server/                              # Reference Go 2D render engine
 └── README.md
 ```
 
