@@ -1,0 +1,14 @@
+/**
+ * @license @tabler/icons-react v3.48.0 - MIT
+ *
+ * This source code is licensed under the MIT license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+
+import createReactComponent from '../createReactComponent.mjs';
+
+const __iconNode = [["path", { "d": "M21 12a9 9 0 1 1 -18 0a9 9 0 0 1 18 0", "key": "svg-0" }], ["path", { "d": "M7.02 12h-.01", "key": "svg-1" }], ["path", { "d": "M12.02 7h-.01", "key": "svg-2" }], ["path", { "d": "M17.02 12h-.01", "key": "svg-3" }], ["path", { "d": "M12.02 17h-.01", "key": "svg-4" }], ["path", { "d": "M8.483 8.468l-.007 -.007", "key": "svg-5" }], ["path", { "d": "M15.554 8.468l-.007 -.007", "key": "svg-6" }], ["path", { "d": "M15.554 15.539l-.007 -.007", "key": "svg-7" }], ["path", { "d": "M8.483 15.539l-.007 -.007", "key": "svg-8" }]];
+const IconVignette = createReactComponent("outline", "vignette", "Vignette", __iconNode);
+
+export { __iconNode, IconVignette as default };
+//# sourceMappingURL=IconVignette.mjs.map

@@ -1,0 +1,14 @@
+/**
+ * @license @tabler/icons-react v3.48.0 - MIT
+ *
+ * This source code is licensed under the MIT license.
+ * See the LICENSE file in the root directory of this source tree.
+ */
+
+import createReactComponent from '../createReactComponent.mjs';
+
+const __iconNode = [["path", { "d": "M12 21v-3m6.36 .36l-2.12 -2.12m4.76 -4.24h-3m.36 -6.36l-2.12 2.12m-4.24 -4.76v3m-6.36 -.36l2.12 2.12m-3.76 4.24h2m1 4.95l.71 -.71", "key": "svg-0" }]];
+const IconLoader4 = createReactComponent("outline", "loader-4", "Loader4", __iconNode);
+
+export { __iconNode, IconLoader4 as default };
+//# sourceMappingURL=IconLoader4.mjs.map
