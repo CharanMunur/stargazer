@@ -19,9 +19,22 @@
 
 ## Overview
 
-Stargazer turns your GitHub repository's community milestones into high-resolution cards (1600 × 900) and 60fps MP4 videos. 
+Stargazer turns your GitHub repository's community milestones into high-resolution cards (1600 × 900) and 60fps MP4 videos directly in the browser. 
 
-The application runs entirely in the browser with zero backend server dependencies required. Community data is fetched directly from the GitHub REST API, animated with Framer Motion, and exported to crystal-clear PNG images or hardware-accelerated MP4 videos.
+The application runs entirely client-side with zero backend server dependencies. Community data is fetched directly from the GitHub REST API, animated with Framer Motion, and exported to crystal-clear PNG images or hardware-accelerated MP4 videos.
+
+---
+
+## Features & Design Highlights
+
+* **Pill & Rounded Geometry**: Complete consistency across interactive controls—inputs, segmented tabs, and primary action buttons utilize `rounded-full` pills.
+* **4-Layer Animation Pipeline**:
+  * **Staggered Entrance**: Framer Motion `<FadeIn>` wraps cards, sections, and headers with subtle offsets and dynamic delays.
+  * **Smooth Inertia Scrolling**: Powered by Lenis with continuous RAF loop (`lerp: 0.15`), giving smooth deceleration without blocking native touch scrolling.
+  * **Tailwind Keyframes**: High-performance CSS keyframe animations for marquee streams (`marquee-left`, `marquee-right`) and status dot pulses.
+  * **Scroll Restoration**: Seamless route and navigation transitions resetting window scroll to `(0, 0)`.
+* **Editorial Documentation**: Built-in `/how-to` guide structured after shadcn/ui documentation with a sticky "On This Page" table of contents and live scrollspy.
+* **Ephemeral Security**: Zero token caching in `localStorage`. Personal Access Tokens (PAT) remain strictly in ephemeral React memory for the active browser session.
 
 ---
 
@@ -78,8 +91,8 @@ bun dev
 
 Open `http://localhost:4321` in your browser.
 
-* Navigate to `/` for the landing page overview and workflow guide.
-* Navigate to `/templates` to view the dedicated template documentation and live 60fps previews.
+* Navigate to `/` for the landing page overview and template showcase.
+* Navigate to `/how-to` for the step-by-step PAT guide and export walkthrough.
 * Navigate to `/generate` to launch the interactive studio (supports deep-linking, e.g. `/generate?generate=ticker`).
 
 ---
@@ -97,14 +110,17 @@ Open `http://localhost:4321` in your browser.
 
 ```text
 stargazer/
-├── client/                              # Modern React + Framer Motion frontend
+├── AGENTS.md                            # Design rules & architecture guidelines
+├── client/                              # Astro + React + Tailwind frontend
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── CardGenerator.tsx        # Interactive Studio interface
-│   │   │   ├── Hero.tsx                 # Landing page hero showcase
-│   │   │   ├── Navbar.tsx               # Fixed header with theme toggle
-│   │   │   ├── TemplateDetail.tsx       # Three-column template documentation view
-│   │   │   ├── TemplatesSidebar.tsx     # Clean documentation sidebar
+│   │   │   ├── FadeIn.tsx               # Entrance & scroll animation wrapper
+│   │   │   ├── GitHubStars.tsx          # Real-time repository star badge
+│   │   │   ├── HowToGuide.tsx           # shadcn-style documentation with scrollspy
+│   │   │   ├── SmoothScroll.tsx         # Lenis smooth inertia scrolling
+│   │   │   ├── TemplatesGallery.tsx     # Homepage template gallery
+│   │   │   ├── ThemeToggle.tsx          # Theme switcher with observer protection
 │   │   │   ├── templates/               # React + Framer Motion templates
 │   │   │   │   ├── ConstellationCard.tsx# Constellation template
 │   │   │   │   ├── CounterCard.tsx      # Counter template
@@ -112,14 +128,16 @@ stargazer/
 │   │   │   │   ├── TickerCard.tsx       # Ticker template
 │   │   │   │   └── types.ts             # Template TypeScript interfaces
 │   │   │   └── ui/                      # Official shadcn/ui components
+│   │   ├── data/
+│   │   │   └── howToData.ts             # Structured documentation content
 │   │   ├── lib/
 │   │   │   ├── canvasRenderer.ts        # Canvas rendering engine
 │   │   │   ├── templatesData.ts         # Centralized template metadata & specs
 │   │   │   └── videoExporter.ts         # In-browser MP4 video exporter
 │   │   └── pages/
 │   │       ├── generate.astro           # Studio route (/generate)
-│   │       ├── index.astro              # Landing page (/)
-│   │       └── templates/               # Template docs routes (/templates, /templates/[id])
+│   │       ├── how-to.astro             # How to guide route (/how-to)
+│   │       └── index.astro              # Landing page (/)
 │   └── public/                          # Static assets and DM Sans font files
 └── README.md
 ```
@@ -129,7 +147,7 @@ stargazer/
 ## Security & Privacy
 
 * **Zero Server Persistence**: No database, no logging server, and no analytics tracking.
-* **In-Memory Token Processing**: GitHub Personal Access Tokens are handled strictly in the user's browser memory and are never transmitted to external servers.
+* **In-Memory Token Processing**: GitHub Personal Access Tokens are handled strictly in the user's browser memory and are never saved to `localStorage` or transmitted to external servers.
 
 ---
 

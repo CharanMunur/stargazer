@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { Sun, Moon } from 'lucide-react';
 
-export default function ThemeToggle() {
+export default function ThemeToggle({ className }: { className?: string }) {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   useEffect(() => {
     const isDark = document.documentElement.classList.contains('dark');
     setTheme(isDark ? 'dark' : 'light');
 
+    let lastDark = isDark;
     const observer = new MutationObserver(() => {
       const dark = document.documentElement.classList.contains('dark');
-      setTheme(dark ? 'dark' : 'light');
+      if (dark !== lastDark) {
+        lastDark = dark;
+        setTheme(dark ? 'dark' : 'light');
+      }
     });
     observer.observe(document.documentElement, {
       attributes: true,
@@ -36,12 +40,15 @@ export default function ThemeToggle() {
       onClick={toggleTheme}
       aria-label="Toggle theme"
       title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
-      className="fixed top-5 right-5 md:top-6 md:right-6 z-50 flex items-center justify-center w-9 h-9 rounded-full bg-text-base/[0.04] hover:bg-text-base/[0.09] border border-text-base/10 text-text-base/70 hover:text-text-base transition-colors duration-150 backdrop-blur-md cursor-pointer"
+      className={
+        className ||
+        "flex items-center justify-center w-10 h-10 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/50 text-foreground transition-all hover:border-border cursor-pointer backdrop-blur-md shadow-2xs"
+      }
     >
       {theme === 'dark' ? (
-        <Sun className="w-4 h-4 text-text-base/80" />
+        <Sun className="w-4.5 h-4.5 text-text-base/80" />
       ) : (
-        <Moon className="w-4 h-4 text-text-base/80" />
+        <Moon className="w-4.5 h-4.5 text-text-base/80" />
       )}
     </button>
   );

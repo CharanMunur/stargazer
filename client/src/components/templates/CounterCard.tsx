@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import { LaurelLeaf } from './LaurelLeaf';
 import type { TemplateCardProps } from './types';
+import sampleStargazers from './sampleStargazers.json';
 
 const ringColors = [
   '#f97316', // orange
@@ -75,13 +76,15 @@ export const CounterCard: React.FC<TemplateCardProps> = ({
     return () => observer.disconnect();
   }, []);
 
-  const avatars = (data.stargazers || []).slice(0, 16);
+  const sourceStargazers =
+    data.stargazers && data.stargazers.length > 0
+      ? data.stargazers
+      : sampleStargazers;
+
+  const avatars = sourceStargazers.slice(0, 16);
   const filledAvatars = [...avatars];
   while (filledAvatars.length < 16) {
-    filledAvatars.push({
-      login: `user${filledAvatars.length + 1}`,
-      avatarUrl: '',
-    });
+    filledAvatars.push(sourceStargazers[filledAvatars.length % sourceStargazers.length]);
   }
 
   const repoTitle = data.owner ? `${data.owner}/${data.repo}` : data.repo;
@@ -239,19 +242,19 @@ export const CounterCard: React.FC<TemplateCardProps> = ({
                   >
                     {/* Inner Avatar Image (120px) */}
                     <div className="w-[114px] h-[114px] rounded-full overflow-hidden flex items-center justify-center bg-neutral-200 dark:bg-neutral-800">
-                      {u.avatarUrl ? (
-                        <img
-                          src={u.avatarUrl}
-                          alt={u.login}
-                          className="w-full h-full object-cover rounded-full"
-                          loading="lazy"
-                          crossOrigin="anonymous"
-                        />
-                      ) : (
-                        <span className="text-[28px] font-bold text-neutral-600 dark:text-neutral-300 uppercase">
-                          {u.login.slice(0, 2)}
-                        </span>
-                      )}
+                      <img
+                        src={u.avatarUrl || `https://github.com/${u.login}.png?size=120`}
+                        alt={u.login}
+                        className="w-full h-full object-cover rounded-full"
+                        loading="lazy"
+                        crossOrigin="anonymous"
+                        onError={(e) => {
+                          const img = e.target as HTMLImageElement;
+                          if (!img.src.includes('identicon')) {
+                            img.src = `https://github.com/identicons/${u.login}.png`;
+                          }
+                        }}
+                      />
                     </div>
                   </div>
                 </motion.div>

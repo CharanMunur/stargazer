@@ -1,5 +1,5 @@
 ---
-import TemplatesGallery from '../components/TemplatesGallery';
+import HowToGuide from '../components/HowToGuide';
 import ThemeToggle from '../components/ThemeToggle';
 import GitHubStars from '../components/GitHubStars';
 import SmoothScroll from '../components/SmoothScroll';
@@ -12,10 +12,10 @@ import '../styles/globals.css';
     <link rel="icon" type="image/svg+xml" href="/stargazer.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <title>Stargazer — Turn your GitHub stars into shareable videos and images</title>
+    <title>How to Generate — Stargazer</title>
     <meta
       name="description"
-      content="Turn your GitHub stargazers into living art. Generate high-definition cards and 60fps MP4 videos directly in your browser."
+      content="Step-by-step guide to generating a GitHub Personal Access Token and creating custom stargazer milestone cards and 60fps videos."
     />
     <script is:inline>
       const savedTheme = localStorage.getItem('stargazer-theme') || 'dark';
@@ -28,11 +28,11 @@ import '../styles/globals.css';
       <ThemeToggle client:load />
       <GitHubStars client:load repo="CharanMunur/stargazer" />
     </div>
-    <main class="flex-1 w-full pt-10 md:pt-16 pb-16">
-      <TemplatesGallery client:load />
+
+    <main class="flex-1 w-full pt-8 md:pt-12 pb-16">
+      <HowToGuide client:load />
     </main>
 
-    {/* Clean Minimalist Footer */}
     <footer class="border-t border-text-base/8 py-8 text-base text-text-base/60" role="contentinfo">
       <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-1.5 text-text-base/60">
@@ -48,7 +48,7 @@ import '../styles/globals.css';
         </div>
         <div class="flex items-center gap-6">
           <a href="/generate" class="hover:text-text-base transition-colors">Studio</a>
-          <a href="/how-to" class="hover:text-text-base transition-colors">How to</a>
+          <a href="/" class="hover:text-text-base transition-colors">Templates</a>
           <a
             href="https://github.com/CharanMunur/stargazer"
             target="_blank"
@@ -56,14 +56,6 @@ import '../styles/globals.css';
             class="hover:text-text-base transition-colors"
           >
             GitHub
-          </a>
-          <a
-            href="https://github.com/CharanMunur/stargazer/issues"
-            target="_blank"
-            rel="noreferrer"
-            class="hover:text-text-base transition-colors"
-          >
-            Feedback
           </a>
         </div>
       </div>

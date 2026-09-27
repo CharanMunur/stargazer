@@ -1,6 +1,8 @@
 ---
 import CardGenerator from '../components/CardGenerator';
 import ThemeToggle from '../components/ThemeToggle';
+import GitHubStars from '../components/GitHubStars';
+import SmoothScroll from '../components/SmoothScroll';
 import '../styles/globals.css';
 ---
 
@@ -18,20 +20,31 @@ import '../styles/globals.css';
     </script>
   </head>
   <body class="min-h-screen bg-background text-foreground flex flex-col justify-between font-sans antialiased">
-    <ThemeToggle client:load />
+    <SmoothScroll client:load />
+    <div class="fixed top-5 right-5 md:top-6 md:right-6 z-50 flex items-center gap-2.5">
+      <ThemeToggle client:load />
+      <GitHubStars client:load repo="CharanMunur/stargazer" />
+    </div>
     <main class="flex-1 w-full pt-8 md:pt-12 pb-16">
       <CardGenerator client:load />
     </main>
 
-    <footer class="border-t border-text-base/8 py-8 text-xs text-text-base/50" role="contentinfo">
+    <footer class="border-t border-text-base/8 py-8 text-base text-text-base/60" role="contentinfo">
       <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-2 font-medium text-text-base/70">
-          <span>Stargazer</span>
-          <span className="text-text-base/30">•</span>
-          <span>Studio</span>
+        <div class="flex items-center gap-1.5 text-text-base/60">
+          <span>Designed and developed by</span>
+          <a
+            href="https://charanmunur.in"
+            target="_blank"
+            rel="noreferrer"
+            class="text-text-base hover:underline font-medium transition-colors"
+          >
+            charanmunur
+          </a>
         </div>
         <div class="flex items-center gap-6">
           <a href="/" class="hover:text-text-base transition-colors">Templates</a>
+          <a href="/how-to" class="hover:text-text-base transition-colors">How to</a>
           <a
             href="https://github.com/CharanMunur/stargazer"
             target="_blank"

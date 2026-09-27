@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import type { TemplateCardProps } from './types';
 
 function AnimatedNumber({ value, animated = true }: { value: number; animated?: boolean }) {

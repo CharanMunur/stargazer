@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Search, ArrowRight } from "lucide-react";
+import { FadeIn } from "./FadeIn";
 import {
   CounterCard,
   TickerCard,
@@ -51,12 +52,17 @@ export default function TemplatesGallery() {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
   useEffect(() => {
-    const checkTheme = () => {
+    let lastDark = document.documentElement.classList.contains("dark");
+    setTheme(lastDark ? "dark" : "light");
+
+    const observer = new MutationObserver(() => {
       const isDark = document.documentElement.classList.contains("dark");
-      setTheme(isDark ? "dark" : "light");
-    };
-    checkTheme();
-    const observer = new MutationObserver(checkTheme);
+      if (isDark !== lastDark) {
+        lastDark = isDark;
+        setTheme(isDark ? "dark" : "light");
+      }
+    });
+
     observer.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class"],
@@ -72,9 +78,9 @@ export default function TemplatesGallery() {
   );
 
   return (
-    <section className="w-full max-w-6xl mx-auto px-6 py-8 space-y-12">
+    <section className="w-full max-w-6xl mx-auto px-6 py-6 space-y-8">
       {/* Hero Header matching user reference */}
-      <div className="flex flex-col items-center text-center space-y-4 max-w-2xl mx-auto pt-6">
+      <FadeIn delay={0.05} yOffset={10} duration={0.4} className="flex flex-col items-center text-center space-y-4 max-w-2xl mx-auto pt-6">
         <div className="flex items-center justify-center mb-2">
           <img
             src="/stargazer.svg"
@@ -92,91 +98,92 @@ export default function TemplatesGallery() {
         </p>
 
         {/* Search Pill Bar */}
-        <div className="w-full max-w-md pt-2">
+        <div className="w-full max-w-lg pt-3 pb-1">
           <div className="relative flex items-center">
-            <Search className="absolute left-4 w-4 h-4 text-text-base/40 pointer-events-none" />
+            <Search className="absolute left-4.5 w-5 h-5 text-text-base/40 pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search templates..."
-              className="w-full pl-11 pr-4 py-2.5 bg-text-base/[0.03] border border-text-base/10 rounded-full text-sm text-text-base placeholder:text-text-base/40 outline-none focus:border-text-base/30 transition-all shadow-2xs"
+              className="w-full pl-12 pr-5 py-3.5 bg-text-base/[0.03] hover:bg-text-base/[0.05] border border-text-base/10 rounded-full text-base text-text-base placeholder:text-text-base/40 outline-none focus:border-text-base/30 focus:bg-background transition-all shadow-2xs"
             />
           </div>
         </div>
-      </div>
+      </FadeIn>
 
       {/* Grid of Templates styled with Figma Modern UI Cards design */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-        {filtered.map((tmpl) => (
-          <a
-            key={tmpl.id}
-            href={`/generate?generate=${tmpl.id}`}
-            className="group relative rounded-[28px] bg-text-base/[0.025] hover:bg-text-base/[0.055] border border-text-base/8 p-2 sm:p-2.5 flex flex-col justify-between transition-colors duration-150 cursor-pointer shadow-xs"
-          >
-            {/* Live 16:9 Canvas Preview with ultra-tight sleek border */}
-            <div className="w-full aspect-[16/9] rounded-[20px] overflow-hidden bg-background border border-text-base/8 relative flex items-center justify-center pointer-events-none">
-              <div
-                className="absolute inset-0 pointer-events-none opacity-40"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(to right, var(--border-muted) 1px, transparent 1px), linear-gradient(to bottom, var(--border-muted) 1px, transparent 1px)",
-                  backgroundSize: "16px 16px",
-                }}
-              />
-              <div className="w-full h-full relative z-10">
-                {tmpl.id === "counter" && (
-                  <CounterCard
-                    key={`preview-counter-${theme}`}
-                    data={sampleData}
-                    theme={theme}
-                    animated
-                  />
-                )}
-                {tmpl.id === "ticker" && (
-                  <TickerCard
-                    key={`preview-ticker-${theme}`}
-                    data={sampleData}
-                    theme={theme}
-                    animated
-                  />
-                )}
-                {tmpl.id === "orbit" && (
-                  <OrbitCard
-                    key={`preview-orbit-${theme}`}
-                    data={sampleData}
-                    theme={theme}
-                    animated
-                  />
-                )}
-                {tmpl.id === "constellation" && (
-                  <ConstellationCard
-                    key={`preview-constellation-${theme}`}
-                    data={sampleData}
-                    theme={theme}
-                    animated
-                  />
-                )}
-              </div>
-            </div>
-
-            {/* Content: Name, Tag, and Open in Studio button */}
-            <div className="p-3 pt-3 space-y-2.5">
-              <div className="flex items-center justify-between">
-                <h2 className="text-base font-semibold tracking-tight text-text-base">
-                  {tmpl.name}
-                </h2>
-                <span className="text-[11px] font-medium text-text-base/50 bg-text-base/5 px-2.5 py-0.5 rounded-full border border-text-base/6">
-                  {tmpl.tag}
-                </span>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5">
+        {filtered.map((tmpl, idx) => (
+          <FadeIn key={tmpl.id} delay={0.15 + idx * 0.05} yOffset={20}>
+            <a
+              href={`/generate?generate=${tmpl.id}`}
+              className="group relative rounded-3xl bg-text-base/[0.025] hover:bg-text-base/[0.055] border border-text-base/8 p-2 sm:p-2.5 flex flex-col justify-between transition-colors duration-150 cursor-pointer shadow-xs block h-full"
+            >
+              {/* Live 16:9 Canvas Preview with sleek rounded border */}
+              <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-text-base/8 relative flex items-center justify-center pointer-events-none">
+                <div
+                  className="absolute inset-0 pointer-events-none opacity-40"
+                  style={{
+                    backgroundImage:
+                      "linear-gradient(to right, var(--border-muted) 1px, transparent 1px), linear-gradient(to bottom, var(--border-muted) 1px, transparent 1px)",
+                    backgroundSize: "16px 16px",
+                  }}
+                />
+                <div className="w-full h-full relative z-10">
+                  {tmpl.id === "counter" && (
+                    <CounterCard
+                      key={`preview-counter-${theme}`}
+                      data={sampleData}
+                      theme={theme}
+                      animated
+                    />
+                  )}
+                  {tmpl.id === "ticker" && (
+                    <TickerCard
+                      key={`preview-ticker-${theme}`}
+                      data={sampleData}
+                      theme={theme}
+                      animated
+                    />
+                  )}
+                  {tmpl.id === "orbit" && (
+                    <OrbitCard
+                      key={`preview-orbit-${theme}`}
+                      data={sampleData}
+                      theme={theme}
+                      animated
+                    />
+                  )}
+                  {tmpl.id === "constellation" && (
+                    <ConstellationCard
+                      key={`preview-constellation-${theme}`}
+                      data={sampleData}
+                      theme={theme}
+                      animated
+                    />
+                  )}
+                </div>
               </div>
 
-              <div className="w-full py-2.5 rounded-xl bg-text-base text-background font-medium text-xs flex items-center justify-center gap-1.5 transition-colors">
-                <span>Open in Studio</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+              {/* Content: Name, Tag, and Open in Studio button */}
+              <div className="pt-3.5 pb-0.5 space-y-3">
+                <div className="flex items-center justify-between px-1.5">
+                  <h2 className="text-base sm:text-lg font-bold tracking-tight text-text-base">
+                    {tmpl.name}
+                  </h2>
+                  <span className="text-xs font-semibold text-text-base/60 bg-text-base/5 px-3 py-1 rounded-full border border-text-base/8">
+                    {tmpl.tag}
+                  </span>
+                </div>
+
+                <div className="w-full py-2.5 px-4 rounded-full bg-text-base text-background font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
+                  <span>Open in Studio</span>
+                  <ArrowRight className="w-4 h-4" />
+                </div>
               </div>
-            </div>
-          </a>
+            </a>
+          </FadeIn>
         ))}
       </div>
 
