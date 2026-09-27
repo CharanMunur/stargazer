@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { TemplateCardProps } from './types';
+import sampleStargazers from './sampleStargazers.json';
 
 function AnimatedNumber({ value, animated = true }: { value: number; animated?: boolean }) {
   const [displayValue, setDisplayValue] = useState(animated ? 0 : value);
@@ -77,12 +78,16 @@ export const TickerCard: React.FC<TemplateCardProps> = ({
     return () => observer.disconnect();
   }, []);
 
-  const stargazers = (data.stargazers && data.stargazers.length > 0)
-    ? data.stargazers
-    : Array.from({ length: 24 }, (_, i) => ({
-        login: `user${i + 1}`,
-        avatarUrl: '',
-      }));
+  const sourceStargazers =
+    data.stargazers && data.stargazers.length > 0
+      ? data.stargazers
+      : sampleStargazers;
+
+  const count = Math.min(24, Math.max(8, sourceStargazers.length));
+  const stargazers = sourceStargazers.slice(0, count);
+  while (stargazers.length < count) {
+    stargazers.push(sourceStargazers[stargazers.length % sourceStargazers.length]);
+  }
 
   // Replicate list for seamless infinite loop
   const tickerItems = [...stargazers, ...stargazers, ...stargazers];
@@ -165,19 +170,21 @@ export const TickerCard: React.FC<TemplateCardProps> = ({
                   className="w-[160px] h-[160px] rounded-full overflow-hidden flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 border-[3px]"
                   style={{ borderColor: avatarRingColor }}
                 >
-                  {u.avatarUrl ? (
-                    <img
-                      src={u.avatarUrl}
-                      alt={u.login}
-                      className="w-full h-full object-cover rounded-full pointer-events-none"
-                      loading="lazy"
-                      crossOrigin="anonymous"
-                    />
-                  ) : (
-                    <span className="text-[42px] font-bold text-neutral-500 uppercase">
-                      {u.login.slice(0, 2)}
-                    </span>
-                  )}
+                  <img
+                    src={u.avatarUrl || `https://github.com/${u.login || 'stargazer'}.png?size=160`}
+                    alt={u.login || 'stargazer'}
+                    className="w-full h-full object-cover rounded-full pointer-events-none"
+                    loading="lazy"
+                    crossOrigin="anonymous"
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      if (!img.src.includes('identicon')) {
+                        img.src = `https://github.com/identicons/${u.login || 'stargazer'}.png`;
+                      } else {
+                        img.onerror = null;
+                      }
+                    }}
+                  />
                 </div>
 
                 {/* 5-pointed Yellow Star centered directly under avatar at y + 26px */}

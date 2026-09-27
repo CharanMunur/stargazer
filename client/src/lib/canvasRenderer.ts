@@ -1,4 +1,5 @@
 import type { TemplateData } from '../components/templates/types';
+import sampleStargazers from '../components/templates/sampleStargazers.json';
 
 export type TemplateType = 'counter' | 'ticker' | 'orbit' | 'constellation';
 
@@ -133,16 +134,21 @@ export async function preloadTemplateAssets(
 
   const avatarImages = new Map<string, HTMLImageElement>();
 
+  const sourceStargazers =
+    data.stargazers && data.stargazers.length > 0
+      ? data.stargazers
+      : sampleStargazers;
+
   let avatarUrls: string[] = [];
   if (template === 'counter') {
-    avatarUrls = (data.stargazers || []).slice(0, 16).map((s) => s.avatarUrl).filter(Boolean);
+    avatarUrls = sourceStargazers.slice(0, 16).map((s) => s.avatarUrl).filter(Boolean);
   } else if (template === 'ticker') {
-    avatarUrls = (data.stargazers || []).slice(0, 16).map((s) => s.avatarUrl).filter(Boolean);
+    avatarUrls = sourceStargazers.slice(0, 16).map((s) => s.avatarUrl).filter(Boolean);
   } else if (template === 'orbit') {
-    avatarUrls = (data.stargazers || []).slice(0, 16).map((s) => s.avatarUrl).filter(Boolean);
+    avatarUrls = sourceStargazers.slice(0, 16).map((s) => s.avatarUrl).filter(Boolean);
   } else if (template === 'constellation') {
-    // Top 32 avatars for scatter pool
-    avatarUrls = (data.stargazers || []).slice(0, 32).map((s) => s.avatarUrl).filter(Boolean);
+    // Top 48 avatars for scatter pool
+    avatarUrls = sourceStargazers.slice(0, 48).map((s) => s.avatarUrl).filter(Boolean);
   }
 
   const [leafImg, ownerImg, ...loadedAvatars] = await Promise.all([
@@ -158,7 +164,7 @@ export async function preloadTemplateAssets(
 
   const constellationPoints =
     template === 'constellation'
-      ? generateConstellationPoints(data.repo || 'stargazer', (data.stargazers || []).length)
+      ? generateConstellationPoints(data.repo || 'stargazer', sourceStargazers.length)
       : undefined;
 
   return { avatarImages, leafImg, ownerImg, constellationPoints };
@@ -347,10 +353,14 @@ function renderCounter(
   }
 
   // Avatars (2 rows of 8)
-  const avatars = (data.stargazers || []).slice(0, 16);
+  const allAvatars =
+    data.stargazers && data.stargazers.length > 0
+      ? data.stargazers
+      : sampleStargazers;
+  const avatars = allAvatars.slice(0, 16);
   const filledAvatars = [...avatars];
   while (filledAvatars.length < 16) {
-    filledAvatars.push({ login: `star-${filledAvatars.length}`, avatarUrl: '' });
+    filledAvatars.push(allAvatars[filledAvatars.length % allAvatars.length]);
   }
 
   const avatarSize = 120;
@@ -435,11 +445,14 @@ function renderTicker(
   ctx.restore();
 
   // Moderate readable count of avatars (12 to 14) so motion isn't a dizzying blur
-  const allStargazers = data.stargazers || [];
+  const allStargazers =
+    data.stargazers && data.stargazers.length > 0
+      ? data.stargazers
+      : sampleStargazers;
   const count = Math.min(14, Math.max(6, allStargazers.length));
   const stargazers = allStargazers.slice(0, count);
   while (stargazers.length < count) {
-    stargazers.push({ login: `star-${stargazers.length + 1}`, avatarUrl: '' });
+    stargazers.push(allStargazers[stargazers.length % allStargazers.length]);
   }
 
   const centerX = 800;
@@ -579,11 +592,14 @@ function renderOrbit(
   // 3D Orbit Carousel Physics:
   // Starts fast, avatars sweep across growing big at center and shrinking to edges,
   // then elastically bounces back and locks the final avatar dead-center!
-  const allStargazers = data.stargazers || [];
+  const allStargazers =
+    data.stargazers && data.stargazers.length > 0
+      ? data.stargazers
+      : sampleStargazers;
   const count = Math.min(16, Math.max(8, allStargazers.length));
   const stargazers = allStargazers.slice(0, count);
   while (stargazers.length < count) {
-    stargazers.push({ login: `orbit-${stargazers.length + 1}`, avatarUrl: '' });
+    stargazers.push(allStargazers[stargazers.length % allStargazers.length]);
   }
 
   const centerX = 800.0;
@@ -696,7 +712,11 @@ function renderConstellation(
   ctx.fillStyle = isDark ? '#090809' : '#FFFFFF';
   ctx.fillRect(0, 0, width, height);
 
-  const stargazers = (data.stargazers || []).slice(0, 48);
+  const allStargazers =
+    data.stargazers && data.stargazers.length > 0
+      ? data.stargazers
+      : sampleStargazers;
+  const stargazers = allStargazers.slice(0, 48);
   const points = assets.constellationPoints || [];
 
   // Draw scatter avatars with gentle twinkle / breathing
@@ -707,7 +727,7 @@ function renderConstellation(
     ctx.save();
     ctx.globalAlpha = alpha;
 
-    const u = stargazers[pt.stargazerIndex] || { login: 'star', avatarUrl: '' };
+    const u = stargazers[pt.stargazerIndex % stargazers.length] || { login: 'star', avatarUrl: '' };
     const img = u.avatarUrl ? assets.avatarImages.get(u.avatarUrl) : undefined;
     const r = pt.size / 2;
 

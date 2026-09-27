@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import type { TemplateCardProps } from './types';
+import sampleStargazers from './sampleStargazers.json';
 
 function AnimatedNumber({ value, animated = true }: { value: number; animated?: boolean }) {
   const [displayValue, setDisplayValue] = useState(animated ? 0 : value);
@@ -168,7 +169,7 @@ export const ConstellationCard: React.FC<TemplateCardProps> = ({
 
   // Memoize constellation scatter layout
   const scatters = useMemo(() => {
-    const list = data.stargazers && data.stargazers.length > 0 ? data.stargazers : [];
+    const list = data.stargazers && data.stargazers.length > 0 ? data.stargazers : sampleStargazers;
     return computeConstellationScatter(list, repoFullName);
   }, [repoFullName, data.stargazers]);
 
@@ -210,24 +211,21 @@ export const ConstellationCard: React.FC<TemplateCardProps> = ({
               border: `2px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)'}`,
             }}
           >
-            {scat.avatarUrl ? (
-              <img
-                src={scat.avatarUrl}
-                alt={scat.login}
-                className="w-full h-full object-cover rounded-full pointer-events-none select-none"
-                loading="lazy"
-                crossOrigin="anonymous"
-              />
-            ) : (
-              <div className="w-full h-full rounded-full bg-neutral-200 dark:bg-neutral-800 flex items-center justify-center">
-                <span
-                  className="font-bold text-neutral-600 dark:text-neutral-300 uppercase"
-                  style={{ fontSize: `${scat.size * 0.35}px` }}
-                >
-                  {scat.login.slice(0, 2)}
-                </span>
-              </div>
-            )}
+            <img
+              src={scat.avatarUrl || `https://github.com/${scat.login || 'stargazer'}.png?size=120`}
+              alt={scat.login || 'stargazer'}
+              className="w-full h-full object-cover rounded-full pointer-events-none select-none"
+              loading="lazy"
+              crossOrigin="anonymous"
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                if (!img.src.includes('identicon')) {
+                  img.src = `https://github.com/identicons/${scat.login || 'stargazer'}.png`;
+                } else {
+                  img.onerror = null;
+                }
+              }}
+            />
           </motion.div>
         ))}
 
