@@ -1,13 +1,13 @@
 ---
-import Navbar from '../components/Navbar';
 import CardGenerator from '../components/CardGenerator';
+import ThemeToggle from '../components/ThemeToggle';
 import '../styles/globals.css';
 ---
 
-<html lang="en" class="dark h-full">
+<html lang="en" class="dark">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/stargazer.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
     <title>Studio — Stargazer</title>
@@ -17,10 +17,31 @@ import '../styles/globals.css';
       document.documentElement.classList[savedTheme === 'dark' ? 'add' : 'remove']('dark');
     </script>
   </head>
-  <body class="h-screen w-screen bg-background text-foreground flex flex-col font-sans overflow-hidden antialiased">
-    <Navbar client:load showAction={false} />
-    <div class="flex-1 w-full overflow-hidden h-[calc(100vh-3.5rem)]">
+  <body class="min-h-screen bg-background text-foreground flex flex-col justify-between font-sans antialiased">
+    <ThemeToggle client:load />
+    <main class="flex-1 w-full pt-8 md:pt-12 pb-16">
       <CardGenerator client:load />
-    </div>
+    </main>
+
+    <footer class="border-t border-text-base/8 py-8 text-xs text-text-base/50" role="contentinfo">
+      <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2 font-medium text-text-base/70">
+          <span>Stargazer</span>
+          <span className="text-text-base/30">•</span>
+          <span>Studio</span>
+        </div>
+        <div class="flex items-center gap-6">
+          <a href="/" class="hover:text-text-base transition-colors">Templates</a>
+          <a
+            href="https://github.com/CharanMunur/stargazer"
+            target="_blank"
+            rel="noreferrer"
+            class="hover:text-text-base transition-colors"
+          >
+            GitHub
+          </a>
+        </div>
+      </div>
+    </footer>
   </body>
 </html>

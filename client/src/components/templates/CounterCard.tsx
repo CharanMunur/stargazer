@@ -54,7 +54,7 @@ export const CounterCard: React.FC<TemplateCardProps> = ({
 
   const isDark = theme === 'dark';
   // Exact Go template colors
-  const bgColor = isDark ? '#0F0E10' : '#edecea';
+  const bgColor = isDark ? '#0F0E10' : '#FFFFFF';
   const titleColor = isDark ? '#F5EDE7' : '#111111';
   const subtitleColor = isDark ? '#B8AAA3' : '#555555';
   const countColor = isDark ? '#F5EDE7' : '#111111';

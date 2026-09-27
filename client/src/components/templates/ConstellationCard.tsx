@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
+import { Star } from 'lucide-react';
 import type { TemplateCardProps } from './types';
 
 function AnimatedNumber({ value, animated = true }: { value: number; animated?: boolean }) {
@@ -68,8 +69,8 @@ function computeConstellationScatter(
   const ry = 240.0;
   const maxDEll = Math.sqrt(Math.pow(centerX / rx, 2) + Math.pow(centerY / ry, 2)); // ~2.23
 
-  // Go limit is 50 avatars
-  const targetCount = 48;
+  // Limit to 44 avatars for ideal balance and constellation line connectivity
+  const targetCount = 44;
   const result: ScatterAvatar[] = [];
   const maxAttempts = 90000;
   let attempts = 0;
@@ -186,17 +187,17 @@ export const ConstellationCard: React.FC<TemplateCardProps> = ({
           backgroundColor: bgColor,
         }}
       >
-        {/* 1. Organic Scatter Avatars outside the whitespace oval */}
+        {/* 1. Organic Scatter Avatars popping in one by one */}
         {scatters.map((scat, i) => (
           <motion.div
             key={`${scat.login}-${i}`}
-            initial={animated ? { opacity: 0, scale: 0.5 } : { opacity: scat.alpha, scale: 1 }}
+            initial={animated ? { opacity: 0, scale: 0.3 } : { opacity: scat.alpha, scale: 1 }}
             animate={{ opacity: scat.alpha, scale: 1 }}
             transition={{
               duration: 0.45,
-              delay: animated ? (i / scatters.length) * 0.4 : 0,
+              delay: animated ? (i / scatters.length) * 0.6 : 0,
               type: 'spring',
-              stiffness: 260,
+              stiffness: 240,
               damping: 18,
             }}
             className="absolute rounded-full overflow-hidden"
@@ -206,6 +207,7 @@ export const ConstellationCard: React.FC<TemplateCardProps> = ({
               width: `${scat.size}px`,
               height: `${scat.size}px`,
               transform: 'translate(-50%, -50%)',
+              border: `2px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)'}`,
             }}
           >
             {scat.avatarUrl ? (
@@ -229,13 +231,18 @@ export const ConstellationCard: React.FC<TemplateCardProps> = ({
           </motion.div>
         ))}
 
-        {/* 2. Center Content: Exactly matching Go constellation.go lines 290-348 */}
-        {/* Stacked Mascot Icon (y=340) + Title (y=460) + Plain Text Star Count (y=540) */}
-        <div className="absolute inset-0 pointer-events-none">
-          {/* 2a. Owner Mascot Icon at y = 340 (centerY - 110) */}
-          <div className="absolute left-[800px] top-[340px] -translate-x-1/2 -translate-y-1/2">
+        {/* 2. Center Content */}
+        {/* 2. Center Content - Perfectly Centered */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20">
+          {/* 2a. Owner Mascot Icon */}
+          <motion.div
+            initial={animated ? { opacity: 0, scale: 0.8 } : { opacity: 1, scale: 1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: animated ? 0.2 : 0 }}
+            className="flex items-center justify-center mb-5"
+          >
             <div
-              className="w-[100px] h-[100px] rounded-full border-[3px] overflow-hidden flex items-center justify-center bg-neutral-100 dark:bg-neutral-800"
+              className="w-[108px] h-[108px] rounded-full border-[3px] overflow-hidden flex items-center justify-center bg-neutral-100 dark:bg-neutral-800 shadow-xl"
               style={{ borderColor: avatarBorderColor }}
             >
               {data.ownerAvatarUrl ? (
@@ -246,32 +253,46 @@ export const ConstellationCard: React.FC<TemplateCardProps> = ({
                   crossOrigin="anonymous"
                 />
               ) : (
-                <span className="text-[36px] font-bold" style={{ color: titleColor }}>
+                <span className="text-[38px] font-bold" style={{ color: titleColor }}>
                   {(data.owner || 'C').slice(0, 2).toUpperCase()}
                 </span>
               )}
             </div>
-          </div>
+          </motion.div>
 
-          {/* 2b. Repo Title at y = 460 (centerY + 10) */}
-          <div className="absolute left-[800px] top-[460px] -translate-x-1/2 -translate-y-1/2 text-center max-w-[1000px] px-8">
+          {/* 2b. Repo Title */}
+          <motion.div
+            initial={animated ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: animated ? 0.35 : 0 }}
+            className="text-center max-w-[1100px] px-8 mb-4"
+          >
             <h1
               className="text-[72px] font-bold tracking-tight leading-tight truncate"
               style={{ color: titleColor }}
             >
               {repoFullName}
             </h1>
-          </div>
+          </motion.div>
 
-          {/* 2c. Plain Text Star Count at y = 540 (centerY + 90) */}
-          <div className="absolute left-[800px] top-[540px] -translate-x-1/2 -translate-y-1/2 text-center">
-            <p
-              className="text-[44px] font-normal tracking-normal"
-              style={{ color: subTextColor }}
-            >
-              <AnimatedNumber value={data.stars} animated={animated} /> stars
-            </p>
-          </div>
+          {/* 2c. Star Count with Star Icon */}
+          <motion.div
+            initial={animated ? { opacity: 0, y: 15 } : { opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: animated ? 0.45 : 0 }}
+            className="text-center"
+          >
+            <div className="flex items-center justify-center gap-3.5">
+              <Star className="w-14 h-14 fill-amber-400 text-amber-400 stroke-amber-400 shrink-0 -mt-1" />
+              <p
+                className="text-[64px] font-bold tracking-tight flex items-baseline gap-3"
+                style={{ color: subTextColor }}
+              >
+                <AnimatedNumber value={data.stars} animated={animated} />
+                <span className="text-[44px] font-medium text-text-base/60">stars</span>
+              </p>
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>

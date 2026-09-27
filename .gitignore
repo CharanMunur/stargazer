@@ -1,7 +1,10 @@
 agy.md
+design.md
 node_modules/
 dist/
+client/dist/
 .astro/
+client/.astro/
 .DS_Store
 .env
 .env.*

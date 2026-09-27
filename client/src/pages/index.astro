@@ -1,109 +1,57 @@
 ---
-import Navbar from '../components/Navbar';
-import Hero from '../components/Hero';
-import { Separator } from '../components/ui/separator';
-import { templatesList } from '../lib/templatesData';
+import TemplatesGallery from '../components/TemplatesGallery';
+import ThemeToggle from '../components/ThemeToggle';
 import '../styles/globals.css';
 ---
 
 <html lang="en" class="dark">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/stargazer.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <title>Stargazer — Open-Source GitHub Stargazer Cards & MP4 Videos</title>
-    <meta name="description" content="Turn your GitHub stargazers into living art. Generate high-definition cards and 60fps MP4 videos directly in your browser." />
+    <title>Stargazer — Turn your GitHub stars into shareable videos and images</title>
+    <meta
+      name="description"
+      content="Turn your GitHub stargazers into living art. Generate high-definition cards and 60fps MP4 videos directly in your browser."
+    />
     <script is:inline>
       const savedTheme = localStorage.getItem('stargazer-theme') || 'dark';
       document.documentElement.classList[savedTheme === 'dark' ? 'add' : 'remove']('dark');
     </script>
   </head>
   <body class="min-h-screen bg-background text-foreground flex flex-col justify-between font-sans antialiased">
-    <Navbar client:load showAction={false} />
-
-    <main class="flex-1 w-full">
-      <Hero client:load />
-
-      <div class="max-w-5xl mx-auto px-6 space-y-16 pb-24">
-        <Separator />
-
-        {/* Layout Architectures Overview */}
-        <section class="space-y-8">
-          <div class="space-y-2">
-            <h2 class="text-2xl font-bold tracking-tight">Architectures</h2>
-            <p class="text-sm text-muted-foreground">
-              Mathematical layouts rendered at 60fps in the browser, exportable as PNG cards or MP4 video loops.
-            </p>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {templatesList.map((tmpl) => (
-              <div key={tmpl.id} class="space-y-2">
-                <div class="flex items-center justify-between">
-                  <h3 class="text-base font-semibold tracking-tight">{tmpl.name}</h3>
-                  <a
-                    href={`/templates/${tmpl.id}`}
-                    class="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    View specifications →
-                  </a>
-                </div>
-                <p class="text-sm text-muted-foreground leading-relaxed">
-                  {tmpl.summary}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <Separator />
-
-        {/* Workflow Guide */}
-        <section class="space-y-8">
-          <div class="space-y-2">
-            <h2 class="text-2xl font-bold tracking-tight">Workflow</h2>
-            <p class="text-sm text-muted-foreground">
-              Generate community cards in three steps.
-            </p>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="space-y-2">
-              <span class="text-xs text-muted-foreground">01</span>
-              <h3 class="text-base font-semibold tracking-tight">Select architecture</h3>
-              <p class="text-sm text-muted-foreground leading-relaxed">
-                Choose between Counter, Ticker, 3D Orbit, or Constellation based on your milestone or audience size.
-              </p>
-            </div>
-
-            <div class="space-y-2">
-              <span class="text-xs text-muted-foreground">02</span>
-              <h3 class="text-base font-semibold tracking-tight">Provide repository</h3>
-              <p class="text-sm text-muted-foreground leading-relaxed">
-                Enter any public GitHub repository. Stargazer fetches live community metrics and contributor avatars directly.
-              </p>
-            </div>
-
-            <div class="space-y-2">
-              <span class="text-xs text-muted-foreground">03</span>
-              <h3 class="text-base font-semibold tracking-tight">Export media</h3>
-              <p class="text-sm text-muted-foreground leading-relaxed">
-                Download crystal-clear 1600 × 900 PNG cards or encode 60fps MP4 video loops instantly within your browser.
-              </p>
-            </div>
-          </div>
-        </section>
-      </div>
+    <ThemeToggle client:load />
+    <main class="flex-1 w-full pt-10 md:pt-16 pb-16">
+      <TemplatesGallery client:load />
     </main>
 
-    <footer class="border-t py-6 text-sm text-muted-foreground">
-      <div class="max-w-5xl mx-auto px-6 flex items-center justify-between">
-        <span>Stargazer</span>
-        <div class="flex items-center gap-6 text-sm">
-          <a href="/templates" class="hover:text-foreground transition-colors">Templates</a>
-          <a href="/generate" class="hover:text-foreground transition-colors">Studio</a>
-          <a href="https://github.com/charanmunur/stargazer" target="_blank" rel="noreferrer" class="hover:text-foreground transition-colors">GitHub</a>
+    {/* Clean Minimalist Footer */}
+    <footer class="border-t border-text-base/8 py-8 text-xs text-text-base/50" role="contentinfo">
+      <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-2 font-medium text-text-base/70">
+          <span>Stargazer</span>
+          <span className="text-text-base/30">•</span>
+          <span>Open-source Card & Video Engine</span>
+        </div>
+        <div class="flex items-center gap-6">
+          <a href="/generate" class="hover:text-text-base transition-colors">Studio</a>
+          <a
+            href="https://github.com/CharanMunur/stargazer"
+            target="_blank"
+            rel="noreferrer"
+            class="hover:text-text-base transition-colors"
+          >
+            GitHub
+          </a>
+          <a
+            href="https://github.com/CharanMunur/stargazer/issues"
+            target="_blank"
+            rel="noreferrer"
+            class="hover:text-text-base transition-colors"
+          >
+            Feedback
+          </a>
         </div>
       </div>
     </footer>

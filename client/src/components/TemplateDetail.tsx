@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Table,
   TableHeader,
@@ -10,8 +9,7 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Check } from "lucide-react";
+import { Check, List } from "lucide-react";
 import TemplatesSidebar from "./TemplatesSidebar";
 import type { TemplateInfo } from "@/lib/templatesData";
 import {
@@ -39,6 +37,8 @@ interface TemplateDetailProps {
 
 export default function TemplateDetail({ template }: TemplateDetailProps) {
   const [theme, setTheme] = useState<"dark" | "light">("light");
+  const [activeTab, setActiveTab] = useState<"preview" | "specs">("preview");
+  const [activeSection, setActiveSection] = useState<string>("overview");
 
   useEffect(() => {
     const checkTheme = () => {
@@ -55,216 +55,257 @@ export default function TemplateDetail({ template }: TemplateDetailProps) {
   }, []);
 
   return (
-    <div className="flex min-h-[calc(100vh-3.5rem)] w-full">
-      {/* Left Sidebar */}
+    <div className="flex min-h-screen w-full pt-16">
+      {/* Left Sidebar: Tree-Branch Nav */}
       <TemplatesSidebar activeId={template.id} />
 
       {/* Center Column: Documentation & Specifications */}
-      <main className="flex-1 px-8 py-10 max-w-4xl min-w-0 space-y-8">
+      <main className="flex-1 px-6 md:px-12 py-10 max-w-4xl min-w-0 space-y-8">
         {/* Header */}
         <div id="overview" className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">{template.name}</h1>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <h1 className="text-3xl font-bold tracking-tight text-text-base">{template.name}</h1>
+          <p className="text-sm text-text-base/60 leading-relaxed">
             {template.description}
           </p>
         </div>
 
-        <Separator />
+        <Separator className="bg-text-base/8" />
 
-        {/* Tabs: Preview and Specs */}
+        {/* Tabs: Inset Card with Purple Glowing Underline */}
         <div id="preview" className="space-y-4">
-          <Tabs defaultValue="preview">
-            <TabsList>
-              <TabsTrigger value="preview">Preview</TabsTrigger>
-              <TabsTrigger value="specs">Specs</TabsTrigger>
-            </TabsList>
+          <figure className="relative rounded-2xl bg-text-base/3 border border-text-base/8 overflow-hidden text-sm">
+            <div className="flex items-center w-full h-11 pl-3 border-b border-text-base/8">
+              <div className="flex items-center h-full gap-1">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("preview")}
+                  className={`relative flex items-center gap-1.5 h-full px-3 text-[13px] font-medium transition-colors cursor-pointer ${
+                    activeTab === "preview" ? "text-text-base" : "text-text-base/40 hover:text-text-base/70"
+                  }`}
+                >
+                  <span>Preview</span>
+                  {activeTab === "preview" && (
+                    <motion.span
+                      layoutId="tab-underline"
+                      className="absolute bottom-0 left-2 right-2 h-[2px] rounded-t-full bg-[#6C5CE7]"
+                      style={{ boxShadow: "0 0 8px rgba(108,92,231,0.45)" }}
+                    />
+                  )}
+                </button>
 
-            <TabsContent value="preview" className="mt-4">
-              <div className="border rounded-md overflow-hidden aspect-[16/9] w-full flex items-center justify-center bg-muted/20">
-                {template.id === "counter" && (
-                  <CounterCard
-                    key={`preview-counter-${theme}`}
-                    data={sampleData}
-                    theme={theme}
-                    animated
-                  />
-                )}
-                {template.id === "ticker" && (
-                  <TickerCard
-                    key={`preview-ticker-${theme}`}
-                    data={sampleData}
-                    theme={theme}
-                    animated
-                  />
-                )}
-                {template.id === "orbit" && (
-                  <OrbitCard
-                    key={`preview-orbit-${theme}`}
-                    data={sampleData}
-                    theme={theme}
-                    animated
-                  />
-                )}
-                {template.id === "constellation" && (
-                  <ConstellationCard
-                    key={`preview-constellation-${theme}`}
-                    data={sampleData}
-                    theme={theme}
-                    animated
-                  />
-                )}
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("specs")}
+                  className={`relative flex items-center gap-1.5 h-full px-3 text-[13px] font-medium transition-colors cursor-pointer ${
+                    activeTab === "specs" ? "text-text-base" : "text-text-base/40 hover:text-text-base/70"
+                  }`}
+                >
+                  <span>Specs</span>
+                  {activeTab === "specs" && (
+                    <motion.span
+                      layoutId="tab-underline"
+                      className="absolute bottom-0 left-2 right-2 h-[2px] rounded-t-full bg-[#6C5CE7]"
+                      style={{ boxShadow: "0 0 8px rgba(108,92,231,0.45)" }}
+                    />
+                  )}
+                </button>
               </div>
-            </TabsContent>
+            </div>
 
-            <TabsContent value="specs" className="mt-4">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-1/3">Property</TableHead>
-                    <TableHead>Specification</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium">Resolution</TableCell>
-                    <TableCell>{template.specs.resolution}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Aspect ratio</TableCell>
-                    <TableCell>{template.specs.aspectRatio}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Target framerate</TableCell>
-                    <TableCell>{template.specs.framerate}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Contributor capacity</TableCell>
-                    <TableCell>{template.specs.capacity}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Physics model</TableCell>
-                    <TableCell>{template.specs.physics}</TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Export formats</TableCell>
-                    <TableCell>{template.specs.exportFormats}</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TabsContent>
-          </Tabs>
+            <div className="p-2 sm:p-3">
+              {activeTab === "preview" ? (
+                <div className="relative border border-text-base/8 rounded-xl overflow-hidden aspect-[16/9] w-full flex items-center justify-center bg-text-base/[0.02]">
+                  {/* 20px grid background pattern */}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      backgroundImage:
+                        "linear-gradient(to right, var(--border-muted) 1px, transparent 1px), linear-gradient(to bottom, var(--border-muted) 1px, transparent 1px)",
+                      backgroundSize: "20px 20px",
+                    }}
+                  />
+
+                  {template.id === "counter" && (
+                    <CounterCard
+                      key={`preview-counter-${theme}`}
+                      data={sampleData}
+                      theme={theme}
+                      animated
+                    />
+                  )}
+                  {template.id === "ticker" && (
+                    <TickerCard
+                      key={`preview-ticker-${theme}`}
+                      data={sampleData}
+                      theme={theme}
+                      animated
+                    />
+                  )}
+                  {template.id === "orbit" && (
+                    <OrbitCard
+                      key={`preview-orbit-${theme}`}
+                      data={sampleData}
+                      theme={theme}
+                      animated
+                    />
+                  )}
+                  {template.id === "constellation" && (
+                    <ConstellationCard
+                      key={`preview-constellation-${theme}`}
+                      data={sampleData}
+                      theme={theme}
+                      animated
+                    />
+                  )}
+                </div>
+              ) : (
+                <div className="bg-bg-base border border-text-base/8 rounded-xl p-4 overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-text-base/8 hover:bg-transparent">
+                        <TableHead className="w-1/3 text-text-base/60 text-xs">Property</TableHead>
+                        <TableHead className="text-text-base/60 text-xs">Specification</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow className="border-text-base/6 hover:bg-text-base/[0.02]">
+                        <TableCell className="font-medium text-xs text-text-base">Resolution</TableCell>
+                        <TableCell className="text-xs text-text-base/70">{template.specs.resolution}</TableCell>
+                      </TableRow>
+                      <TableRow className="border-text-base/6 hover:bg-text-base/[0.02]">
+                        <TableCell className="font-medium text-xs text-text-base">Aspect ratio</TableCell>
+                        <TableCell className="text-xs text-text-base/70">{template.specs.aspectRatio}</TableCell>
+                      </TableRow>
+                      <TableRow className="border-text-base/6 hover:bg-text-base/[0.02]">
+                        <TableCell className="font-medium text-xs text-text-base">Target framerate</TableCell>
+                        <TableCell className="text-xs text-text-base/70">{template.specs.framerate}</TableCell>
+                      </TableRow>
+                      <TableRow className="border-text-base/6 hover:bg-text-base/[0.02]">
+                        <TableCell className="font-medium text-xs text-text-base">Contributor capacity</TableCell>
+                        <TableCell className="text-xs text-text-base/70">{template.specs.capacity}</TableCell>
+                      </TableRow>
+                      <TableRow className="border-text-base/6 hover:bg-text-base/[0.02]">
+                        <TableCell className="font-medium text-xs text-text-base">Physics model</TableCell>
+                        <TableCell className="text-xs text-text-base/70">{template.specs.physics}</TableCell>
+                      </TableRow>
+                      <TableRow className="border-text-base/6 hover:bg-text-base/[0.02]">
+                        <TableCell className="font-medium text-xs text-text-base">Export formats</TableCell>
+                        <TableCell className="text-xs text-text-base/70">{template.specs.exportFormats}</TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </div>
+          </figure>
         </div>
 
-        <Separator />
+        <Separator className="bg-text-base/8" />
 
         {/* Section: Technical specifications */}
         <section id="specifications" className="space-y-4">
-          <h2 className="text-xl font-semibold tracking-tight">
+          <h2 className="text-xl font-semibold tracking-tight text-text-base">
             Technical specifications
           </h2>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-1/3">Property</TableHead>
-                <TableHead>Specification</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell className="font-medium">Resolution</TableCell>
-                <TableCell>{template.specs.resolution}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Aspect ratio</TableCell>
-                <TableCell>{template.specs.aspectRatio}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Target framerate</TableCell>
-                <TableCell>{template.specs.framerate}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Contributor capacity</TableCell>
-                <TableCell>{template.specs.capacity}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Physics model</TableCell>
-                <TableCell>{template.specs.physics}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell className="font-medium">Export formats</TableCell>
-                <TableCell>{template.specs.exportFormats}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+          <div className="rounded-xl border border-text-base/8 overflow-hidden bg-text-base/[0.02]">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-text-base/8 hover:bg-transparent">
+                  <TableHead className="w-1/3 text-text-base/60 text-xs">Property</TableHead>
+                  <TableHead className="text-text-base/60 text-xs">Specification</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow className="border-text-base/6 hover:bg-text-base/[0.02]">
+                  <TableCell className="font-medium text-xs text-text-base">Resolution</TableCell>
+                  <TableCell className="text-xs text-text-base/70">{template.specs.resolution}</TableCell>
+                </TableRow>
+                <TableRow className="border-text-base/6 hover:bg-text-base/[0.02]">
+                  <TableCell className="font-medium text-xs text-text-base">Aspect ratio</TableCell>
+                  <TableCell className="text-xs text-text-base/70">{template.specs.aspectRatio}</TableCell>
+                </TableRow>
+                <TableRow className="border-text-base/6 hover:bg-text-base/[0.02]">
+                  <TableCell className="font-medium text-xs text-text-base">Target framerate</TableCell>
+                  <TableCell className="text-xs text-text-base/70">{template.specs.framerate}</TableCell>
+                </TableRow>
+                <TableRow className="border-text-base/6 hover:bg-text-base/[0.02]">
+                  <TableCell className="font-medium text-xs text-text-base">Contributor capacity</TableCell>
+                  <TableCell className="text-xs text-text-base/70">{template.specs.capacity}</TableCell>
+                </TableRow>
+                <TableRow className="border-text-base/6 hover:bg-text-base/[0.02]">
+                  <TableCell className="font-medium text-xs text-text-base">Physics model</TableCell>
+                  <TableCell className="text-xs text-text-base/70">{template.specs.physics}</TableCell>
+                </TableRow>
+                <TableRow className="border-text-base/6 hover:bg-text-base/[0.02]">
+                  <TableCell className="font-medium text-xs text-text-base">Export formats</TableCell>
+                  <TableCell className="text-xs text-text-base/70">{template.specs.exportFormats}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
         </section>
 
-        <Separator />
+        <Separator className="bg-text-base/8" />
 
         {/* Section: Recommended use cases */}
         <section id="use-cases" className="space-y-4">
-          <h2 className="text-xl font-semibold tracking-tight">
+          <h2 className="text-xl font-semibold tracking-tight text-text-base">
             Recommended use cases
           </h2>
           <ul className="space-y-3">
             {template.useCases.map((useCase, idx) => (
-              <li key={idx} className="flex items-start gap-2.5 text-sm text-muted-foreground">
-                <Check className="h-4 w-4 shrink-0 text-foreground mt-0.5" />
+              <li key={idx} className="flex items-start gap-2.5 text-sm text-text-base/70">
+                <Check className="h-4 w-4 shrink-0 text-[#6C5CE7] mt-0.5" />
                 <span>{useCase}</span>
               </li>
             ))}
           </ul>
         </section>
 
-        <Separator />
+        <Separator className="bg-text-base/8" />
 
-        {/* Section: Single primary call to action */}
+        {/* Section: Single primary call to action with Clay Button */}
         <section id="studio" className="pt-2">
-          <Button asChild>
-            <a href={`/generate?generate=${template.id}`}>
-              Configure {template.name} in Studio
-            </a>
-          </Button>
+          <a href={`/generate?generate=${template.id}`} className="clay-btn clay-primary">
+            Configure {template.name} in Studio
+          </a>
         </section>
       </main>
 
-      {/* Right Column: "On this page" TOC */}
-      <aside className="hidden xl:block w-56 shrink-0 px-6 py-10 border-l">
-        <div className="sticky top-20 space-y-3">
-          <p className="text-sm font-medium">On this page</p>
-          <ScrollArea className="h-auto">
-            <nav className="space-y-2 text-sm">
-              <a
-                href="#overview"
-                className="block text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Overview
-              </a>
-              <a
-                href="#preview"
-                className="block text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Preview
-              </a>
-              <a
-                href="#specifications"
-                className="block text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Specifications
-              </a>
-              <a
-                href="#use-cases"
-                className="block text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Use cases
-              </a>
-              <a
-                href="#studio"
-                className="block text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Studio
-              </a>
-            </nav>
-          </ScrollArea>
+      {/* Right Column: Tree-Branch "On this page" TOC */}
+      <aside className="hidden xl:block w-56 shrink-0 pt-20 px-6 border-l border-text-base/8">
+        <div className="sticky top-24">
+          <div className="stargazer-sidebar-group">
+            <div className="sidebar-section-header">
+              <div className="sidebar-icon-box">
+                <List className="w-3 h-3 text-text-base/60" />
+              </div>
+              <span>On this page</span>
+            </div>
+
+            <div className="sidebar-items-container">
+              <div className="sidebar-section-line" />
+              {[
+                { id: "overview", label: "Overview" },
+                { id: "preview", label: "Preview" },
+                { id: "specifications", label: "Specifications" },
+                { id: "use-cases", label: "Use cases" },
+                { id: "studio", label: "Studio" },
+              ].map((item) => {
+                const isActive = activeSection === item.id;
+                return (
+                  <a
+                    key={item.id}
+                    href={`#${item.id}`}
+                    onClick={() => setActiveSection(item.id)}
+                    className={`sidebar-item ${isActive ? "active" : ""}`}
+                  >
+                    <span className="truncate">{item.label}</span>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </aside>
     </div>

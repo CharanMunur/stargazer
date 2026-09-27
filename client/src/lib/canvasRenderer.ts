@@ -268,7 +268,7 @@ function renderCounter(
   const height = 900;
 
   // Background
-  ctx.fillStyle = isDark ? '#0F0E10' : '#edecea';
+  ctx.fillStyle = isDark ? '#0F0E10' : '#FFFFFF';
   ctx.fillRect(0, 0, width, height);
 
   // Easing calculations
@@ -279,7 +279,7 @@ function renderCounter(
   // Laurels flanking the title
   if (assets.leafImg && easeTitle > 0) {
     ctx.save();
-    ctx.globalAlpha = (isDark ? 0.22 : 0.16) * easeTitle;
+    ctx.globalAlpha = (isDark ? 0.32 : 0.32) * easeTitle;
     const leafW = 140;
     const leafH = 260;
     const titleText = `${data.owner || ''}/${data.repo}`;
@@ -739,16 +739,27 @@ function renderConstellation(
   );
 
   // 2. Title: owner / repo
+  const repoFullName = data.owner ? `${data.owner}/${data.repo}` : data.repo;
   ctx.font = `bold 72px 'DM Sans', sans-serif`;
   ctx.fillStyle = isDark ? '#F5EDE7' : '#000000';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(data.repo, 800, 460);
+  ctx.fillText(repoFullName, 800, 450);
 
-  // 3. Plain star count
-  ctx.font = `400 44px 'DM Sans', sans-serif`;
+  // 3. Star count with star icon
+  const starCountStr = `${data.stars.toLocaleString()} stars`;
+  ctx.font = `bold 64px 'DM Sans', sans-serif`;
+  const textW = ctx.measureText(starCountStr).width;
+  const starRadius = 24;
+  const gap = 16;
+  const startX = 800 - (textW + starRadius * 2 + gap) / 2;
+
+  drawYellowStar(ctx, startX + starRadius, 550, starRadius);
+
   ctx.fillStyle = isDark ? '#A39B95' : '#64748B';
-  ctx.fillText(`${data.stars.toLocaleString()} stars`, 800, 540);
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(starCountStr, startX + starRadius * 2 + gap, 550);
   ctx.restore();
 }
 

@@ -17,7 +17,7 @@ export const LaurelLeaf: React.FC<LaurelLeafProps> = ({ flip = false, className 
         transform: flip ? 'scaleX(-1)' : undefined,
         WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%)',
         maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%)',
-        opacity: isDark ? 0.2 : 0.15,
+        opacity: isDark ? 0.32 : 0.32,
       }}
       aria-hidden="true"
     >

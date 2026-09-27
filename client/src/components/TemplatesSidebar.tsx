@@ -1,6 +1,6 @@
 import React from "react";
 import { templatesList } from "@/lib/templatesData";
-import { cn } from "@/lib/utils";
+import { Layers } from "lucide-react";
 
 interface TemplatesSidebarProps {
   activeId?: string;
@@ -8,31 +8,31 @@ interface TemplatesSidebarProps {
 
 export default function TemplatesSidebar({ activeId }: TemplatesSidebarProps) {
   return (
-    <aside className="w-56 shrink-0 border-r hidden md:block">
-      <div className="sticky top-14 h-[calc(100vh-3.5rem)] py-8 px-4 overflow-y-auto">
-        <div className="space-y-4">
-          <div className="px-2 text-xs font-medium text-muted-foreground">
-            Architectures
+    <aside className="w-56 shrink-0 pt-20 pb-8 px-4 hidden md:block border-r border-text-base/8">
+      <div className="sticky top-24">
+        <div className="stargazer-sidebar-group">
+          <div className="sidebar-section-header">
+            <div className="sidebar-icon-box">
+              <Layers className="w-3 h-3 text-text-base/60" />
+            </div>
+            <span>Templates</span>
           </div>
-          <nav className="space-y-1">
+
+          <div className="sidebar-items-container">
+            <div className="sidebar-section-line" />
             {templatesList.map((tmpl) => {
               const isActive = activeId === tmpl.id;
               return (
                 <a
                   key={tmpl.id}
                   href={`/templates/${tmpl.id}`}
-                  className={cn(
-                    "flex w-full items-center rounded-md px-2.5 py-1.5 text-sm transition-colors",
-                    isActive
-                      ? "bg-accent font-medium text-accent-foreground"
-                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-                  )}
+                  className={`sidebar-item ${isActive ? "active" : ""}`}
                 >
-                  {tmpl.name}
+                  <span className="truncate">{tmpl.name}</span>
                 </a>
               );
             })}
-          </nav>
+          </div>
         </div>
       </div>
     </aside>

@@ -6,6 +6,7 @@ export default {
     extend: {
       fontFamily: {
         sans: [
+          "DM Sans",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",
@@ -21,6 +22,10 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        // Stargazer Design Tokens
+        "text-base": "rgb(var(--text-base-rgb) / <alpha-value>)",
+        "bg-base": "rgb(var(--bg-base-rgb) / <alpha-value>)",
+        iris: "#6C5CE7",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -70,6 +75,12 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+      },
+      boxShadow: {
+        "2xs": "0 1px 2px rgba(0, 0, 0, 0.05)",
+      },
+      spacing: {
+        "4.5": "1.125rem",
       },
     },
   },

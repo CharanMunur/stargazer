@@ -1,15 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Download, RefreshCw, RotateCcw } from 'lucide-react';
 import { CounterCard, TickerCard, OrbitCard, ConstellationCard } from './templates';
 import type { TemplateData, StargazerUser } from './templates/types';
 import { toPng } from 'html-to-image';
 import { exportTemplateToVideo } from '@/lib/videoExporter';
 import sampleStargazers from './templates/sampleStargazers.json';
+import { Separator } from '@/components/ui/separator';
 
 const initialSampleData: TemplateData = {
   owner: 'CharanMunur',
@@ -21,13 +17,41 @@ const initialSampleData: TemplateData = {
   stargazers: sampleStargazers,
 };
 
+const templatesMeta = [
+  {
+    id: 'counter',
+    name: 'Counter',
+    tag: 'Milestone',
+    description: 'Symmetrical laurel milestone card with dynamic metric counters and 16-contributor grid.',
+  },
+  {
+    id: 'ticker',
+    name: 'Ticker',
+    tag: 'Marquee Loop',
+    description: 'Continuous horizontal glide marquee with momentum physics and contributor star badges.',
+  },
+  {
+    id: 'orbit',
+    name: '3D Orbit',
+    tag: '3D WebGL',
+    description: 'Multi-ring 3D spherical orbits rotating contributor avatars around your repository core.',
+  },
+  {
+    id: 'constellation',
+    name: 'Constellation',
+    tag: 'Particle Graph',
+    description: 'Dynamic gravity nodes and glowing constellation lines connecting community stargazers.',
+  },
+] as const;
+
+type TemplateId = (typeof templatesMeta)[number]['id'];
+
 export default function CardGenerator() {
   const [token, setToken] = useState('');
   const [repo, setRepo] = useState('CharanMunur/Portfolio');
-  const [template, setTemplate] = useState<'counter' | 'ticker' | 'orbit' | 'constellation'>('counter');
+  const [template, setTemplate] = useState<TemplateId>('counter');
   const [format, setFormat] = useState<'png' | 'mp4'>('png');
-  const [theme, setTheme] = useState<'dark' | 'light'>('light');
-  const [showToken, setShowToken] = useState(false);
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
 
   const [repoData, setRepoData] = useState<TemplateData>(initialSampleData);
   const [stargazerOrder, setStargazerOrder] = useState<'latest' | 'earliest'>('latest');
@@ -35,25 +59,34 @@ export default function CardGenerator() {
   const [exporting, setExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState<{ percent: number; text: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [replayNonce, setReplayNonce] = useState(0);
 
-  // Synchronize theme with html class on initial mount
+  // Synchronize theme with html class
   useEffect(() => {
     const isDark = document.documentElement.classList.contains('dark');
     setTheme(isDark ? 'dark' : 'light');
+    const observer = new MutationObserver(() => {
+      const dark = document.documentElement.classList.contains('dark');
+      setTheme(dark ? 'dark' : 'light');
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
   }, []);
 
-  // Sync template from URL query param if present (?generate=ticker or ?template=ticker)
+  // Sync template from URL query param if present
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      const qTemplate = params.get('generate') || params.get('template');
-      if (qTemplate === 'counter' || qTemplate === 'ticker' || qTemplate === 'orbit' || qTemplate === 'constellation') {
+      const qTemplate = (params.get('generate') || params.get('template')) as TemplateId;
+      if (['counter', 'ticker', 'orbit', 'constellation'].includes(qTemplate)) {
         setTemplate(qTemplate);
       }
+      const savedToken = localStorage.getItem('stargazer-github-token');
+      if (savedToken) setToken(savedToken);
     }
   }, []);
 
-  const handleTemplateChange = (newTemplate: 'counter' | 'ticker' | 'orbit' | 'constellation') => {
+  const handleTemplateChange = (newTemplate: TemplateId) => {
     setTemplate(newTemplate);
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
@@ -62,10 +95,8 @@ export default function CardGenerator() {
     }
   };
 
-  // Hidden full-size container reference for high-res exports
   const cardContainerRef = useRef<HTMLDivElement>(null);
 
-  // Fetch real GitHub stats with latest/earliest ordering
   const fetchGitHubData = async (
     targetRepo: string,
     userToken?: string,
@@ -73,7 +104,13 @@ export default function CardGenerator() {
   ) => {
     const trimmed = targetRepo.trim();
     if (!trimmed || !trimmed.includes('/')) {
-      setError('Please provide a valid repository in owner/repo format.');
+      setError('Please provide a valid repository in owner/repo format (e.g. CharanMunur/stargazer).');
+      return;
+    }
+
+    const tokenToUse = (userToken || token).trim();
+    if (!tokenToUse) {
+      setError('A GitHub Personal Access Token (PAT) is required to view and load repository stargazers.');
       return;
     }
 
@@ -81,12 +118,14 @@ export default function CardGenerator() {
     setLoading(true);
     setError(null);
 
+    const authHeader = tokenToUse.startsWith('Bearer ') || tokenToUse.startsWith('token ')
+      ? tokenToUse
+      : `Bearer ${tokenToUse}`;
+
     const headers: Record<string, string> = {
       Accept: 'application/vnd.github.v3+json',
+      Authorization: authHeader,
     };
-    if (userToken?.trim()) {
-      headers.Authorization = `token ${userToken.trim()}`;
-    }
 
     try {
       const repoRes = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, { headers });
@@ -149,7 +188,7 @@ export default function CardGenerator() {
         stars: totalStars,
         forks: repoInfo.forks_count || 0,
         days: diffDays,
-        ownerAvatarUrl: repoInfo.owner?.avatar_url || 'https://github.com/github.png',
+        ownerAvatarUrl: repoInfo.owner?.avatar_url || '',
         stargazers: fetchedAvatars,
       });
     } catch (err: any) {
@@ -224,162 +263,253 @@ export default function CardGenerator() {
     }
   };
 
+  const currentMeta = templatesMeta.find((t) => t.id === template) || templatesMeta[0];
+  const otherTemplates = templatesMeta.filter((t) => t.id !== template);
+
   return (
-    <div className="flex flex-col lg:flex-row w-full h-full overflow-hidden bg-background text-foreground">
-      {/* Left Sidebar Controls */}
-      <aside className="w-full lg:w-80 shrink-0 h-full border-r overflow-y-auto p-6 space-y-6">
-        <form onSubmit={handleFetchSubmit} className="space-y-6">
-          <div className="space-y-1">
-            <h2 className="text-base font-semibold tracking-tight">Studio</h2>
-            <p className="text-xs text-muted-foreground">
-              Configure parameters and export community cards.
-            </p>
+    <div className="w-full max-w-6xl mx-auto px-6 py-8 space-y-8">
+      {/* 1. Header: Breadcrumbs + Title & Badges */}
+      <div className="space-y-3">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-text-base/60">
+          <a
+            href="/"
+            className="px-2.5 py-1 rounded-full bg-text-base/[0.04] hover:bg-text-base/10 text-text-base/70 hover:text-text-base transition-colors"
+          >
+            Home
+          </a>
+          <span className="text-text-base/30">/</span>
+          <span className="font-semibold text-text-base px-2 py-0.5">{currentMeta.name}</span>
+        </nav>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-text-base">
+            {currentMeta.name}
+          </h1>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="px-3 py-1 rounded-full bg-text-base/[0.04] text-text-base/70 text-xs font-medium border border-text-base/8">
+              {currentMeta.tag}
+            </span>
+            <span className="px-3 py-1 rounded-full bg-text-base/[0.04] text-text-base/70 text-xs font-medium border border-text-base/8">
+              1600 × 900
+            </span>
+            <span className="px-3 py-1 rounded-full bg-text-base/[0.04] text-text-base/70 text-xs font-medium border border-text-base/8">
+              60fps MP4
+            </span>
           </div>
+        </div>
+      </div>
 
-          <Separator />
+      {/* Main Section: Template Canvas on Left, Controls on Right - Exactly Top-Aligned */}
+      <div className="flex flex-col lg:flex-row items-start gap-8 lg:gap-10">
+        {/* Left Column: 16:9 Canvas Stage */}
+        <div className="flex-1 w-full min-w-0">
+          {/* Central Canvas Stage with REDUCED shadow */}
+          <div className="w-full aspect-[16/9] rounded-2xl border border-text-base/10 bg-text-base/[0.015] shadow-xs overflow-hidden relative flex items-center justify-center">
+            {/* Subtle grid texture background */}
+            <div
+              className="absolute inset-0 pointer-events-none opacity-40"
+              style={{
+                backgroundImage:
+                  'linear-gradient(to right, var(--border-muted) 1px, transparent 1px), linear-gradient(to bottom, var(--border-muted) 1px, transparent 1px)',
+                backgroundSize: '20px 20px',
+              }}
+            />
 
-          {/* Repository Input */}
-          <div className="space-y-2">
-            <Label htmlFor="repo-input">Repository</Label>
-            <div className="flex gap-2">
-              <Input
-                id="repo-input"
+            {/* Replay action badge */}
+            <button
+              type="button"
+              onClick={() => setReplayNonce((n) => n + 1)}
+              className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-text-base/70 hover:text-text-base text-xs font-medium border border-text-base/10 transition-colors shadow-2xs cursor-pointer"
+              title="Replay animation"
+            >
+              <RotateCcw className="w-3 h-3" />
+              <span>Replay</span>
+            </button>
+
+            {/* Live Canvas */}
+            <div ref={cardContainerRef} className="w-full aspect-[16/9] relative z-10">
+              {template === 'counter' && (
+                <CounterCard
+                  key={`card-counter-${theme}-${repoData.repo}-${replayNonce}`}
+                  data={repoData}
+                  theme={theme}
+                  animated
+                />
+              )}
+              {template === 'ticker' && (
+                <TickerCard
+                  key={`card-ticker-${theme}-${repoData.repo}-${replayNonce}`}
+                  data={repoData}
+                  theme={theme}
+                  animated
+                />
+              )}
+              {template === 'orbit' && (
+                <OrbitCard
+                  key={`card-orbit-${theme}-${repoData.repo}-${replayNonce}`}
+                  data={repoData}
+                  theme={theme}
+                  animated
+                />
+              )}
+              {template === 'constellation' && (
+                <ConstellationCard
+                  key={`card-constellation-${theme}-${repoData.repo}-${replayNonce}`}
+                  data={repoData}
+                  theme={theme}
+                  animated
+                />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Controls - Exactly Top-Aligned with the Canvas Stage */}
+        <div className="w-full lg:w-72 shrink-0 space-y-4">
+          {/* Repo & Required PAT Form */}
+          <form onSubmit={handleFetchSubmit} className="space-y-3.5">
+            {/* Repo Input */}
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-semibold uppercase tracking-wider text-text-base/50 block">
+                Repository
+              </label>
+              <input
                 type="text"
                 value={repo}
                 onChange={(e) => setRepo(e.target.value)}
                 placeholder="owner/repo"
+                required
+                className="w-full bg-text-base/[0.04] border border-text-base/10 rounded-full px-4 py-2 text-xs text-text-base outline-none focus:border-text-base/30 transition-colors placeholder:text-text-base/35"
               />
-              <Button
-                type="submit"
-                variant="secondary"
-                disabled={loading}
-                className="shrink-0"
-              >
-                {loading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Fetch'}
-              </Button>
+            </div>
+
+            {/* Required GitHub PAT Token */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-text-base/50 block">
+                  GitHub PAT <span className="text-text-base/35 lowercase font-normal">(required)</span>
+                </label>
+                <a
+                  href="https://github.com/settings/tokens/new?description=Stargazer&scopes=public_repo"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[10px] text-text-base/40 hover:text-text-base transition-colors"
+                >
+                  Generate ↗
+                </a>
+              </div>
+              <input
+                type="password"
+                value={token}
+                onChange={(e) => {
+                  setToken(e.target.value);
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('stargazer-github-token', e.target.value);
+                  }
+                }}
+                placeholder="ghp_... or github_pat_..."
+                required
+                className="w-full bg-text-base/[0.04] border border-text-base/10 rounded-full px-4 py-2 text-xs text-text-base outline-none focus:border-text-base/30 transition-colors placeholder:text-text-base/35"
+              />
+            </div>
+
+            {/* Fetch Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-2 px-3 rounded-full bg-text-base/10 hover:bg-text-base/15 text-text-base text-xs font-medium transition-colors cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5"
+            >
+              {loading ? (
+                <>
+                  <RefreshCw className="w-3 h-3 animate-spin" />
+                  <span>Loading stargazers...</span>
+                </>
+              ) : (
+                <span>Fetch Stargazers</span>
+              )}
+            </button>
+          </form>
+
+          {/* Theme Toggle (no bg) */}
+          <div className="space-y-1.5 pt-1">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-text-base/50 block">
+              Theme
+            </label>
+            <div className="flex items-center gap-1">
+              {(['dark', 'light'] as const).map((th) => (
+                <button
+                  key={th}
+                  type="button"
+                  onClick={() => setTheme(th)}
+                  className={`py-1 px-2.5 text-xs font-medium transition-colors cursor-pointer ${
+                    theme === th
+                      ? 'text-text-base font-semibold border-b-2 border-text-base'
+                      : 'text-text-base/40 hover:text-text-base'
+                  }`}
+                >
+                  {th.charAt(0).toUpperCase() + th.slice(1)}
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Access Token (Optional) */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="token-input">
-                Token <span className="text-muted-foreground font-normal text-xs">(optional)</span>
-              </Label>
-              <button
-                type="button"
-                onClick={() => setShowToken(!showToken)}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                {showToken ? 'Hide' : 'Show'}
-              </button>
+          {/* Stargazers Order Toggle (no bg) */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-text-base/50 block">
+              Stargazers
+            </label>
+            <div className="flex items-center gap-1">
+              {(['latest', 'earliest'] as const).map((ord) => (
+                <button
+                  key={ord}
+                  type="button"
+                  onClick={() => handleOrderChange(ord)}
+                  className={`py-1 px-2.5 text-xs font-medium transition-colors cursor-pointer ${
+                    stargazerOrder === ord
+                      ? 'text-text-base font-semibold border-b-2 border-text-base'
+                      : 'text-text-base/40 hover:text-text-base'
+                  }`}
+                >
+                  {ord === 'latest' ? 'Latest' : 'Earliest'}
+                </button>
+              ))}
             </div>
-            <Input
-              id="token-input"
-              type={showToken ? 'text' : 'password'}
-              value={token}
-              onChange={(e) => setToken(e.target.value)}
-              placeholder="ghp_xxxxxxxxxxxx"
-            />
           </div>
 
-          <Separator />
-
-          {/* Stargazers Source Filter */}
-          <div className="space-y-2">
-            <Label>Community filter</Label>
-            <ToggleGroup
-              type="single"
-              value={stargazerOrder}
-              onValueChange={(val) => {
-                if (val) handleOrderChange(val as 'latest' | 'earliest');
-              }}
-              variant="outline"
-              className="w-full grid grid-cols-2"
-            >
-              <ToggleGroupItem value="latest">Latest</ToggleGroupItem>
-              <ToggleGroupItem value="earliest">Earliest</ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-
-          <Separator />
-
-          {/* Template Selection */}
-          <div className="space-y-2">
-            <Label>Template</Label>
-            <ToggleGroup
-              type="single"
-              value={template}
-              onValueChange={(val) => {
-                if (val) handleTemplateChange(val as any);
-              }}
-              variant="outline"
-              className="w-full grid grid-cols-2"
-            >
-              <ToggleGroupItem value="counter">Counter</ToggleGroupItem>
-              <ToggleGroupItem value="ticker">Ticker</ToggleGroupItem>
-              <ToggleGroupItem value="orbit">3D Orbit</ToggleGroupItem>
-              <ToggleGroupItem value="constellation">Constellation</ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-
-          <Separator />
-
-          {/* Theme Selection */}
-          <div className="space-y-2">
-            <Label>Card theme</Label>
-            <ToggleGroup
-              type="single"
-              value={theme}
-              onValueChange={(val) => {
-                if (val) setTheme(val as 'dark' | 'light');
-              }}
-              variant="outline"
-              className="w-full grid grid-cols-2"
-            >
-              <ToggleGroupItem value="dark">Dark</ToggleGroupItem>
-              <ToggleGroupItem value="light">Light</ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-
-          <Separator />
-
-          {/* Output Format */}
-          <div className="space-y-2">
-            <Label>Format</Label>
-            <ToggleGroup
-              type="single"
-              value={format}
-              onValueChange={(val) => {
-                if (val) setFormat(val as 'png' | 'mp4');
-              }}
-              variant="outline"
-              className="w-full grid grid-cols-2"
-            >
-              <ToggleGroupItem value="png">PNG</ToggleGroupItem>
-              <ToggleGroupItem value="mp4">MP4</ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-
-          {error && (
-            <div className="p-3 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-xs">
-              {error}
+          {/* Format Toggle (no bg) */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-text-base/50 block">
+              Format
+            </label>
+            <div className="flex items-center gap-1">
+              {(['png', 'mp4'] as const).map((fmt) => (
+                <button
+                  key={fmt}
+                  type="button"
+                  onClick={() => setFormat(fmt)}
+                  className={`py-1 px-2.5 text-xs font-medium transition-colors cursor-pointer ${
+                    format === fmt
+                      ? 'text-text-base font-semibold border-b-2 border-text-base'
+                      : 'text-text-base/40 hover:text-text-base'
+                  }`}
+                >
+                  {fmt.toUpperCase()}
+                </button>
+              ))}
             </div>
-          )}
+          </div>
 
-          <Separator />
-
-          {/* Single Primary Call to Action */}
+          {/* Download Action Button */}
           <div className="pt-2">
-            <Button
+            <button
               type="button"
               disabled={exporting || loading}
               onClick={handleExport}
-              className="w-full"
+              className="w-full py-2.5 px-4 rounded-xl bg-text-base text-background font-semibold text-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 transition-colors shadow-2xs"
             >
               {exporting ? (
                 <>
-                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  <RefreshCw className="mr-2 h-3.5 w-3.5 animate-spin" />
                   <span>
                     {exportProgress
                       ? `${exportProgress.text} (${exportProgress.percent}%)`
@@ -388,71 +518,56 @@ export default function CardGenerator() {
                 </>
               ) : (
                 <>
-                  <Download className="mr-2 h-4 w-4" />
+                  <Download className="mr-2 h-3.5 w-3.5" />
                   <span>Download {format.toUpperCase()}</span>
                 </>
               )}
-            </Button>
+            </button>
           </div>
-        </form>
-      </aside>
 
-      {/* Right Canvas Preview */}
-      <main className="flex-1 h-full bg-background flex flex-col justify-between overflow-hidden">
-        {/* Top Preview Bar */}
-        <div className="px-6 py-3 border-b flex items-center justify-between shrink-0">
-          <span className="text-sm font-medium">Preview</span>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => setRepoData({ ...repoData })}
-          >
-            <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-            <span>Replay</span>
-          </Button>
-        </div>
-
-        {/* Center Canvas Area */}
-        <div className="flex-1 p-6 md:p-8 flex items-center justify-center bg-muted/20 overflow-hidden">
-          <div className="w-full max-w-[min(100%,calc((100vh-12rem)*16/9))] aspect-[16/9] rounded-lg border overflow-hidden bg-background shadow-sm flex items-center justify-center">
-            <div ref={cardContainerRef} className="w-full aspect-[16/9] relative">
-              {template === 'counter' && (
-                <CounterCard
-                  key={`card-counter-${theme}-${repoData.repo}`}
-                  data={repoData}
-                  theme={theme}
-                  animated
-                />
-              )}
-              {template === 'ticker' && (
-                <TickerCard
-                  key={`card-ticker-${theme}-${repoData.repo}`}
-                  data={repoData}
-                  theme={theme}
-                  animated
-                />
-              )}
-              {template === 'orbit' && (
-                <OrbitCard
-                  key={`card-orbit-${theme}-${repoData.repo}`}
-                  data={repoData}
-                  theme={theme}
-                  animated
-                />
-              )}
-              {template === 'constellation' && (
-                <ConstellationCard
-                  key={`card-constellation-${theme}-${repoData.repo}`}
-                  data={repoData}
-                  theme={theme}
-                  animated
-                />
-              )}
+          {error && (
+            <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-xs">
+              {error}
             </div>
-          </div>
+          )}
         </div>
-      </main>
+      </div>
+
+      <Separator className="bg-text-base/8 my-8" />
+
+      {/* 5. Browse other templates (Small cards, 3 in a row) */}
+      <section className="space-y-4 pt-2">
+        <h2 className="text-lg font-bold tracking-tight text-text-base">
+          Browse other templates
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {otherTemplates.map((other) => (
+            <button
+              key={other.id}
+              type="button"
+              onClick={() => handleTemplateChange(other.id)}
+              className="group rounded-2xl bg-text-base/[0.025] hover:bg-text-base/[0.06] border border-text-base/8 p-2.5 text-left flex flex-col justify-between transition-colors duration-150 cursor-pointer shadow-2xs"
+            >
+              <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-background border border-text-base/8 relative flex items-center justify-center pointer-events-none mb-2.5">
+                <div className="w-full h-full relative z-10 pointer-events-none">
+                  {other.id === 'counter' && <CounterCard data={initialSampleData} theme={theme} animated={false} />}
+                  {other.id === 'ticker' && <TickerCard data={initialSampleData} theme={theme} animated={false} />}
+                  {other.id === 'orbit' && <OrbitCard data={initialSampleData} theme={theme} animated={false} />}
+                  {other.id === 'constellation' && <ConstellationCard data={initialSampleData} theme={theme} animated={false} />}
+                </div>
+              </div>
+              <div className="flex items-center justify-between gap-1.5 px-1 pb-1">
+                <span className="font-semibold text-xs text-text-base">
+                  {other.name}
+                </span>
+                <span className="text-[10px] font-medium text-text-base/50 bg-text-base/5 px-2 py-0.5 rounded-full border border-text-base/5">
+                  {other.tag}
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
