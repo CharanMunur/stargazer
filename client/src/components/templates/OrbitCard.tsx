@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { TemplateCardProps } from './types';
+import sampleStargazers from './sampleStargazers.json';
 
 // 5-point yellow star matching Go drawYellowStar
 const YellowStar: React.FC<{ size?: number }> = ({ size = 28 }) => (
@@ -80,17 +81,15 @@ export const OrbitCard: React.FC<TemplateCardProps> = ({
     return () => cancelAnimationFrame(animId);
   }, [animated, data]);
 
-  const allStargazers = data.stargazers && data.stargazers.length > 0
-    ? data.stargazers
-    : Array.from({ length: 16 }, (_, i) => ({
-        login: `user${i + 1}`,
-        avatarUrl: '',
-      }));
+  const sourceStargazers =
+    data.stargazers && data.stargazers.length > 0
+      ? data.stargazers
+      : sampleStargazers;
 
-  const count = Math.min(16, Math.max(8, allStargazers.length));
-  const stargazers = allStargazers.slice(0, count);
+  const count = Math.min(16, Math.max(8, sourceStargazers.length));
+  const stargazers = sourceStargazers.slice(0, count);
   while (stargazers.length < count) {
-    stargazers.push({ login: `user${stargazers.length + 1}`, avatarUrl: '' });
+    stargazers.push(sourceStargazers[stargazers.length % sourceStargazers.length]);
   }
 
   const centerX = 800;
@@ -225,21 +224,21 @@ export const OrbitCard: React.FC<TemplateCardProps> = ({
                       : undefined,
                   }}
                 >
-                  {item.user.avatarUrl ? (
-                    <img
-                      src={item.user.avatarUrl}
-                      alt={item.user.login}
-                      className="w-full h-full object-cover rounded-full pointer-events-none"
-                      crossOrigin="anonymous"
-                    />
-                  ) : (
-                    <span
-                      className="font-bold text-neutral-500 uppercase"
-                      style={{ fontSize: `${curSize * 0.28}px` }}
-                    >
-                      {item.user.login.slice(0, 2)}
-                    </span>
-                  )}
+                  <img
+                    src={item.user.avatarUrl || `https://github.com/${item.user.login || 'stargazer'}.png?size=160`}
+                    alt={item.user.login || 'stargazer'}
+                    className="w-full h-full object-cover rounded-full pointer-events-none"
+                    loading="lazy"
+                    crossOrigin="anonymous"
+                    onError={(e) => {
+                      const img = e.target as HTMLImageElement;
+                      if (!img.src.includes('identicon')) {
+                        img.src = `https://github.com/identicons/${item.user.login || 'stargazer'}.png`;
+                      } else {
+                        img.onerror = null;
+                      }
+                    }}
+                  />
                 </div>
 
                 {/* Yellow 5-point star beneath avatar */}
