@@ -213,16 +213,10 @@ export const ConstellationCard: React.FC<TemplateCardProps> = ({
           </motion.div>
         ))}
 
-        {/* 2. Soft Radial Fade & Blur Backdrop behind Main Content */}
+        {/* 2. Soft Radial Fade Backdrop behind Main Content */}
         <div
           className="absolute inset-0 pointer-events-none z-15"
           style={{
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            maskImage:
-              'radial-gradient(ellipse 920px 500px at 50% 50%, black 20%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,0.4) 70%, transparent 100%)',
-            WebkitMaskImage:
-              'radial-gradient(ellipse 920px 500px at 50% 50%, black 20%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,0.4) 70%, transparent 100%)',
             background: isDark
               ? 'radial-gradient(ellipse 920px 500px at 50% 50%, rgba(15,14,16,0.98) 0%, rgba(15,14,16,0.92) 25%, rgba(15,14,16,0.75) 50%, rgba(15,14,16,0.35) 75%, rgba(15,14,16,0.08) 90%, rgba(15,14,16,0) 100%)'
               : 'radial-gradient(ellipse 920px 500px at 50% 50%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 25%, rgba(255,255,255,0.75) 50%, rgba(255,255,255,0.35) 75%, rgba(255,255,255,0.08) 90%, rgba(255,255,255,0) 100%)',
