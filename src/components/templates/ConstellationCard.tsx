@@ -105,7 +105,7 @@ function computeConstellationScatter(
   };
 
   // Full-field organic scatter across canvas (including behind main content)
-  const targetCount = 100; // Increased avatar count
+  const targetCount = 75; // Increased avatar count
   let attempts = 0;
   while (result.length < targetCount && attempts < 90000) {
     attempts++;

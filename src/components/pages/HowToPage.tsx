@@ -83,18 +83,18 @@ export default function HowToPage() {
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-muted-foreground">
           <a
             href="/"
-            className="px-3 py-1 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+            className="px-3 py-1 rounded-full bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors border border-border/50"
           >
             Home
           </a>
-          <span className="text-muted-foreground/40">/</span>
+          <span className="text-muted-foreground/40 font-normal">/</span>
           <a
             href="/generate"
-            className="px-3 py-1 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+            className="px-3 py-1 rounded-full bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors border border-border/50"
           >
             Studio
           </a>
-          <span className="text-muted-foreground/40">/</span>
+          <span className="text-muted-foreground/40 font-normal">/</span>
           <span className="font-semibold text-foreground px-1.5 py-0.5">How to</span>
         </nav>
       </FadeIn>

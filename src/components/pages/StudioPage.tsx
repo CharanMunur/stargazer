@@ -291,11 +291,11 @@ export default function StudioPage() {
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-muted-foreground">
           <a
             href="/"
-            className="px-3 py-1 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+            className="px-3 py-1 rounded-full bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors border border-border/50"
           >
             Home
           </a>
-          <span className="text-muted-foreground/40">/</span>
+          <span className="text-muted-foreground/40 font-normal">/</span>
           <span className="font-semibold text-foreground px-1.5 py-0.5">{currentMeta.name}</span>
         </nav>
 
@@ -392,7 +392,7 @@ export default function StudioPage() {
             type="button"
             disabled={exporting || loading}
             onClick={handleExport}
-            className="w-full py-3.5 px-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 transition-colors shadow-xs"
+            className="w-full py-3.5 px-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 transition-all shadow-2xs active:scale-[0.99]"
           >
             {exporting ? (
               <>
@@ -426,7 +426,7 @@ export default function StudioPage() {
                 value={repo}
                 onChange={(e) => setRepo(e.target.value)}
                 required
-                className="w-full bg-muted/50 hover:bg-muted/70 border border-input rounded-full px-4 py-2.5 text-sm text-foreground outline-none focus:border-ring focus:bg-background transition-colors"
+                className="w-full bg-muted/40 hover:bg-muted/60 border border-border hover:border-border/80 focus:border-ring rounded-full px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:bg-background transition-all shadow-2xs"
               />
             </div>
 
@@ -438,7 +438,7 @@ export default function StudioPage() {
                 </label>
                 <a
                   href="/how-to"
-                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors underline-offset-4 hover:underline"
                 >
                   How to generate?
                 </a>
@@ -448,7 +448,7 @@ export default function StudioPage() {
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
                 required
-                className="w-full bg-muted/50 hover:bg-muted/70 border border-input rounded-full px-4 py-2.5 text-sm text-foreground outline-none focus:border-ring focus:bg-background transition-colors"
+                className="w-full bg-muted/40 hover:bg-muted/60 border border-border hover:border-border/80 focus:border-ring rounded-full px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:bg-background transition-all shadow-2xs"
               />
             </div>
 
@@ -479,7 +479,7 @@ export default function StudioPage() {
               <label className="text-sm font-medium text-foreground block">
                 Theme
               </label>
-              <div className="grid grid-cols-2 p-1 rounded-full bg-muted/50 border border-border gap-1">
+              <div className="grid grid-cols-2 p-1 rounded-full bg-muted/50 border border-border/70 gap-1">
                 {(['dark', 'light'] as const).map((th) => (
                   <button
                     key={th}
@@ -491,7 +491,7 @@ export default function StudioPage() {
                     className={`flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-full transition-all cursor-pointer ${
                       theme === th
                         ? 'bg-foreground text-background font-semibold shadow-2xs'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 font-medium'
                     }`}
                   >
                     {th === 'dark' ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
@@ -506,7 +506,7 @@ export default function StudioPage() {
               <label className="text-sm font-medium text-foreground block">
                 Stargazers
               </label>
-              <div className="grid grid-cols-2 p-1 rounded-full bg-muted/50 border border-border gap-1">
+              <div className="grid grid-cols-2 p-1 rounded-full bg-muted/50 border border-border/70 gap-1">
                 {(['latest', 'earliest'] as const).map((ord) => (
                   <button
                     key={ord}
@@ -515,7 +515,7 @@ export default function StudioPage() {
                     className={`py-2 px-3 text-sm rounded-full text-center transition-all cursor-pointer ${
                       stargazerOrder === ord
                         ? 'bg-foreground text-background font-semibold shadow-2xs'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 font-medium'
                     }`}
                   >
                     {ord === 'latest' ? 'Latest' : 'Earliest'}
@@ -529,7 +529,7 @@ export default function StudioPage() {
               <label className="text-sm font-medium text-foreground block">
                 Format
               </label>
-              <div className="grid grid-cols-2 p-1 rounded-full bg-muted/50 border border-border gap-1">
+              <div className="grid grid-cols-2 p-1 rounded-full bg-muted/50 border border-border/70 gap-1">
                 {(['png', 'mp4'] as const).map((fmt) => (
                   <button
                     key={fmt}
@@ -538,7 +538,7 @@ export default function StudioPage() {
                     className={`py-2 px-3 text-sm rounded-full text-center transition-all cursor-pointer ${
                       format === fmt
                         ? 'bg-foreground text-background font-semibold shadow-2xs'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 font-medium'
                     }`}
                   >
                     {fmt.toUpperCase()}
@@ -571,9 +571,9 @@ export default function StudioPage() {
                 <button
                   type="button"
                   onClick={() => handleTemplateChange(other.id)}
-                  className="group rounded-2xl bg-card hover:bg-muted/50 border border-border hover:border-border/80 p-2 text-left flex flex-col justify-between transition-colors duration-150 cursor-pointer shadow-2xs w-full text-card-foreground"
+                  className="group rounded-3xl bg-card hover:bg-muted/40 border border-border/80 hover:border-border p-2.5 text-left flex flex-col justify-between transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs w-full text-card-foreground"
                 >
-                  <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-background border border-border relative flex items-center justify-center pointer-events-none mb-2">
+                  <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-border/70 relative flex items-center justify-center pointer-events-none mb-2">
                     <div className="w-full h-full relative z-10 pointer-events-none">
                       {other.id === 'spotlight' && <SpotlightCard data={initialSampleData} theme={theme} animated={false} />}
                       {other.id === 'revolve' && <RevolveCard data={initialSampleData} theme={theme} animated={false} />}
@@ -587,7 +587,7 @@ export default function StudioPage() {
                     <span className="font-bold text-sm text-foreground">
                       {other.name}
                     </span>
-                    <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full border border-border">
+                    <span className="text-xs font-semibold text-muted-foreground bg-muted/80 px-3 py-1 rounded-full border border-border/60">
                       {other.tag}
                     </span>
                   </div>

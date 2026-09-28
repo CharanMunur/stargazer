@@ -254,7 +254,7 @@ function generateConstellationPoints(
     return true;
   };
 
-  const targetCount = 100;
+  const targetCount = 75;
   let attempts = 0;
   while (points.length < targetCount && attempts < 90000) {
     attempts++;

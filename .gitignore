@@ -8,3 +8,6 @@ dist/
 .DS_Store
 .env
 .env.*
+.agents/
+PRODUCT.md
+product.md

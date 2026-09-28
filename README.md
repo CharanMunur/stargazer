@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="public/stargazer.svg" alt="stargazer logo" width="520" align="center" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="public/stargazer-dark.svg">
+    <img src="public/stargazer-light.svg" alt="stargazer logo" width="520" align="center" />
+  </picture>
 </p>
 
 <p align="center">
@@ -27,12 +30,16 @@ The application runs entirely client-side with zero backend server dependencies.
 
 ## Features & Design Highlights
 
-* **Pill & Rounded Geometry**: Complete consistency across interactive controls—inputs, segmented tabs, and primary action buttons utilize `rounded-full` pills.
+* **Unified Design Token System**: Complete visual hierarchy consistency across pages—breadcrumbs, input fields, template preview cards, and segmented pills share uniform geometry, borders, and hover states.
+* **Theme-Aware Branding**: Automatically switches between `stargazer-dark.svg` (Obsidian mode) and `stargazer-light.svg` (Warm stone mode) dynamically.
 * **4-Layer Animation Pipeline**:
   * **Staggered Entrance**: Framer Motion `<FadeIn>` wraps cards, sections, and headers with subtle offsets and dynamic delays.
   * **Smooth Inertia Scrolling**: Powered by Lenis with continuous RAF loop (`lerp: 0.15`), giving smooth deceleration without blocking native touch scrolling.
-  * **Tailwind Keyframes**: High-performance CSS keyframe animations for marquee streams (`marquee-left`, `marquee-right`) and status dot pulses.
+  * **Tailwind & CSS Keyframes**: High-performance keyframe animations for marquee streams (`marquee-left`, `marquee-right`) and particle motion.
   * **Scroll Restoration**: Seamless route and navigation transitions resetting window scroll to `(0, 0)`.
+* **Deterministic Dual-Renderer Parity**:
+  * **DOM Live Previews**: Interactive React components rendered in-browser during customization.
+  * **Off-Screen Canvas Engine**: HTML5 Canvas renderer (`canvasRenderer.ts`) generating 1:1 pixel-identical 1600 × 900 PNG downloads and 60fps MP4 video loops.
 * **Editorial Documentation**: Built-in `/how-to` guide structured after shadcn/ui documentation with a sticky "On This Page" table of contents and live scrollspy.
 * **Ephemeral Security**: Zero token caching in `localStorage`. Personal Access Tokens (PAT) remain strictly in ephemeral React memory for the active browser session.
 
@@ -40,33 +47,44 @@ The application runs entirely client-side with zero backend server dependencies.
 
 ## Templates
 
-### 1. Counter Template
+### 1. Spotlight (Keynote Editorial)
+Clean Apple-style keynote layout with display typography:
+* Large repo title and star count display.
+* Overlapping avatar fan stack featuring contributor profiles.
+* Clean theme adaptation for Dark and Light palettes.
+
+### 2. Revolve (Concentric Orbits)
+Multi-ring orbital choreography:
+* Concentric orbit rings revolving contributor avatars in opposing directions around live star metrics.
+* Center hub spotlighting repository avatar and milestone star counter.
+* Dynamic orbital physics synced between live DOM preview and video export.
+
+### 3. Milestone (Laurel Achievement)
 A classical layout designed for milestones, repository anniversaries, and release announcements:
 * Symmetrical laurel wreath branches flanking the repository title.
-* Dynamic counting animation for Stars, Forks, and Days metrics in DM Sans Regular.
-* Structured 2-row grid of 16 stargazers with colored ring borders.
-* Subtle bottom gradient fade to ground the card composition.
+* Metric counters for Stars, Forks, and Days metrics in DM Sans.
+* Structured 2-row grid of 16 stargazers with theme-aware laurel colors.
+* Soft gradient mask for depth grounding.
 
-### 2. Ticker Template (Marquee)
+### 4. Infinity (Marquee Loop)
 An energetic avatar marquee designed for README headers and dynamic feeds:
 * Top-left repository hierarchy header (`owner / repo`) with owner avatar.
-* Physics-driven horizontal marquee stream with continuous 60fps looping.
-* 5-pointed yellow star anchored directly beneath each community avatar.
+* Horizontal marquee stream with uniform 160px spacing and continuous 60fps looping.
+* Contributor avatars with star badges.
 * Bottom-right live metric counter readout.
 
-### 3. 3D Orbit Template
+### 5. 3D Orbit
 A spherical carousel with dynamic depth and radial lighting:
 * Curved spherical arc trajectory with depth-sorted z-index layering.
 * Dynamic scale magnification (0.7x background up to 1.35x foreground).
 * Ambient radial glow centered on the focal gravitational point.
-* Primary accent ring on active focus member and star metrics.
 
-### 4. Constellation Template
-An organic point-cloud cluster designed for contributor appreciation and showcase banners:
-* Centered stacked layout: 108px owner mascot avatar, repository title, and live star count.
-* Full-field organic scatter of 100 non-overlapping avatars across the entire canvas with natural boundary bleed.
-* Soft radial fade vignette backdrop situated directly behind the center content, creating an ethereal cosmic glow while ensuring 100% text and mascot legibility.
-* Subtle atmospheric depth blur and opacity gradation across the starfield.
+### 6. Constellation (Particle Graph)
+An organic particle cluster designed for contributor appreciation:
+* Centered stacked layout: owner mascot avatar, repository title, and live star count.
+* Full-field organic scatter of contributor avatars across the canvas.
+* Central glow vignette maintaining 100% readability.
+* Natural fade-in entrance motion.
 
 ---
 
@@ -89,11 +107,11 @@ bun install
 bun dev
 ```
 
-Open `http://localhost:4321` in your browser.
+Open `http://localhost:4321` (or `http://localhost:3000`) in your browser.
 
 * Navigate to `/` for the landing page overview and template showcase.
 * Navigate to `/how-to` for the step-by-step PAT guide and export walkthrough.
-* Navigate to `/generate` to launch the interactive studio (supports deep-linking, e.g. `/generate?generate=ticker`).
+* Navigate to `/generate` to launch the interactive studio (supports deep-linking, e.g. `/generate?template=revolve`).
 
 ---
 
@@ -101,7 +119,7 @@ Open `http://localhost:4321` in your browser.
 
 1. **Client-Side Data Fetching**: Stargazer queries GitHub's public API (`https://api.github.com/repos/{owner}/{repo}`) directly from the client. Unauthenticated requests support public repositories; optional Personal Access Tokens (PAT) can be provided to bypass rate limits.
 2. **Real-Time 60fps Rendering**: Templates are constructed as pure React components animated via Framer Motion springs, scaled deterministically to a 1600 × 900 virtual canvas.
-3. **PNG Image Export**: High-resolution DOM capture executed in milliseconds via the HTML5 Canvas API (`html-to-image`).
+3. **PNG Image Export**: High-resolution 1600 × 900 rendering executed directly in-browser via the HTML5 Canvas API (`canvasRenderer.ts`).
 4. **MP4 Video Export**: 60fps video encoding executed directly in the browser via WebCodecs `VideoEncoder` and `mp4-muxer` (with standard `MediaRecorder` fallback).
 
 ---
@@ -110,7 +128,7 @@ Open `http://localhost:4321` in your browser.
 
 ```text
 stargazer/
-├── public/                              # Static assets, logos, and DM Sans fonts
+├── public/                              # Static assets, stargazer-dark.svg, stargazer-light.svg, and fonts
 ├── src/
 │   ├── components/
 │   │   ├── helpers/                     # Cross-cutting UX & animation helpers
@@ -121,12 +139,15 @@ stargazer/
 │   │   │   ├── StudioPage.tsx           # Interactive studio & card/video generator
 │   │   │   └── HowToPage.tsx            # Step-by-step guide with live scrollspy TOC
 │   │   ├── templates/                   # React + Framer Motion canvas templates
-│   │   │   ├── ConstellationCard.tsx    # Constellation template
-│   │   │   ├── CounterCard.tsx          # Counter template
+│   │   │   ├── SpotlightCard.tsx        # Spotlight template
+│   │   │   ├── RevolveCard.tsx          # Revolve template
+│   │   │   ├── MilestoneCard.tsx        # Milestone template (re-exports CounterCard)
+│   │   │   ├── TickerCard.tsx           # Infinity template (re-exports TickerCard)
 │   │   │   ├── OrbitCard.tsx            # 3D Orbit template
-│   │   │   ├── TickerCard.tsx           # Ticker template
+│   │   │   ├── ConstellationCard.tsx    # Constellation template
 │   │   │   └── types.ts                 # Template TypeScript interfaces
 │   │   ├── ui/                          # Headless & UI primitives
+│   │   ├── Footer.astro                 # Global footer component
 │   │   ├── GitHubStars.tsx              # Real-time repository star badge
 │   │   └── ThemeToggle.tsx              # Theme switcher with observer protection
 │   ├── data/                            # Sovereign data domain
@@ -134,7 +155,7 @@ stargazer/
 │   │   ├── sampleStargazers.json        # Contributor sample dataset
 │   │   └── templates.ts                 # Template specifications & sample data
 │   ├── lib/                             # Core utilities & export engines
-│   │   ├── canvasRenderer.ts            # Canvas rendering engine
+│   │   ├── canvasRenderer.ts            # Deterministic 1600x900 canvas rendering engine
 │   │   ├── utils.ts                     # Class merging utility (clsx + tailwind-merge)
 │   │   └── videoExporter.ts             # In-browser MP4 video exporter
 │   ├── pages/                           # Route entry points
@@ -142,7 +163,7 @@ stargazer/
 │   │   ├── how-to.astro                 # How-to guide route (/how-to)
 │   │   └── index.astro                  # Landing page (/)
 │   └── styles/
-│       └── globals.css                  # Global styles & OKLCH color token engine
+│       └── globals.css                  # Global styles & design token engine
 ├── astro.config.mjs                     # Astro build configuration
 ├── components.json                      # Component CLI configuration
 ├── package.json                         # Project dependencies & scripts
