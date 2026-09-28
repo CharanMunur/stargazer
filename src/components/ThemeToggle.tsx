@@ -46,9 +46,9 @@ export default function ThemeToggle({ className }: { className?: string }) {
       }
     >
       {theme === 'dark' ? (
-        <Sun className="w-4.5 h-4.5 text-text-base/80" />
+        <Sun className="w-4.5 h-4.5 text-foreground" />
       ) : (
-        <Moon className="w-4.5 h-4.5 text-text-base/80" />
+        <Moon className="w-4.5 h-4.5 text-foreground" />
       )}
     </button>
   );

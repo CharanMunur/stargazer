@@ -51,24 +51,24 @@ export default function HomePage() {
           />
         </div>
 
-        <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-text-base leading-tight">
+        <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground leading-tight">
           Turn your github stars into shareable videos and images
         </h1>
 
-        <p className="text-sm md:text-base text-text-base/60 max-w-lg leading-relaxed">
+        <p className="text-sm md:text-base text-muted-foreground max-w-lg leading-relaxed">
           Select a template below to generate 1600 × 900 social cards and 60fps MP4 loops directly in your browser.
         </p>
 
         {/* Search Pill Bar */}
         <div className="w-full max-w-lg pt-3 pb-1">
           <div className="relative flex items-center">
-            <Search className="absolute left-4.5 w-5 h-5 text-text-base/40 pointer-events-none" />
+            <Search className="absolute left-4.5 w-5 h-5 text-muted-foreground pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search templates..."
-              className="w-full pl-12 pr-5 py-3.5 bg-text-base/[0.03] hover:bg-text-base/[0.05] border border-text-base/10 rounded-full text-base text-text-base placeholder:text-text-base/40 outline-none focus:border-text-base/30 focus:bg-background transition-all shadow-2xs"
+              className="w-full pl-12 pr-5 py-3.5 bg-muted/40 hover:bg-muted/60 border border-input rounded-full text-base text-foreground placeholder:text-muted-foreground outline-none focus:border-ring focus:bg-background transition-all shadow-2xs"
             />
           </div>
         </div>
@@ -80,15 +80,15 @@ export default function HomePage() {
           <FadeIn key={tmpl.id} delay={0.15 + idx * 0.05} yOffset={20}>
             <a
               href={`/generate?template=${tmpl.id}`}
-              className="group relative rounded-3xl bg-text-base/[0.025] hover:bg-text-base/[0.055] border border-text-base/8 p-2 sm:p-2.5 flex flex-col justify-between transition-colors duration-150 cursor-pointer shadow-xs block h-full"
+              className="group relative rounded-3xl bg-card hover:bg-muted/50 border border-border hover:border-border/80 p-2 sm:p-2.5 flex flex-col justify-between transition-colors duration-150 cursor-pointer shadow-xs block h-full text-card-foreground"
             >
               {/* Live 16:9 Canvas Preview */}
-              <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-text-base/8 relative flex items-center justify-center pointer-events-none">
+              <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-border relative flex items-center justify-center pointer-events-none">
                 <div
                   className="absolute inset-0 pointer-events-none opacity-40"
                   style={{
                     backgroundImage:
-                      "linear-gradient(to right, var(--border-muted) 1px, transparent 1px), linear-gradient(to bottom, var(--border-muted) 1px, transparent 1px)",
+                      "linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
                     backgroundSize: "16px 16px",
                   }}
                 />
@@ -131,15 +131,15 @@ export default function HomePage() {
               {/* Content: Name, Tag, and Open in Studio button */}
               <div className="pt-3.5 pb-0.5 space-y-3">
                 <div className="flex items-center justify-between px-1.5">
-                  <h2 className="text-base sm:text-lg font-bold tracking-tight text-text-base">
+                  <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
                     {tmpl.name}
                   </h2>
-                  <span className="text-xs font-semibold text-text-base/60 bg-text-base/5 px-3 py-1 rounded-full border border-text-base/8">
+                  <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
                     {tmpl.tag}
                   </span>
                 </div>
 
-                <div className="w-full py-2.5 px-4 rounded-full bg-text-base text-background font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
+                <div className="w-full py-2.5 px-4 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
                   <span>Open in Studio</span>
                   <ArrowRight className="w-4 h-4" />
                 </div>
@@ -150,7 +150,7 @@ export default function HomePage() {
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-16 text-sm text-text-base/40">
+        <div className="text-center py-16 text-sm text-muted-foreground">
           No templates match "{search}".
         </div>
       )}

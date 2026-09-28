@@ -80,22 +80,22 @@ export default function HowToPage() {
     <div className="w-full max-w-6xl mx-auto px-6 py-8">
       {/* Breadcrumb Header */}
       <FadeIn delay={0.05} yOffset={10} duration={0.4} className="mb-8">
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-text-base/60">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-muted-foreground">
           <a
             href="/"
-            className="px-3 py-1 rounded-full bg-text-base/[0.04] hover:bg-text-base/10 text-text-base/70 hover:text-text-base transition-colors"
+            className="px-3 py-1 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
           >
             Home
           </a>
-          <span className="text-text-base/30">/</span>
+          <span className="text-muted-foreground/40">/</span>
           <a
             href="/generate"
-            className="px-3 py-1 rounded-full bg-text-base/[0.04] hover:bg-text-base/10 text-text-base/70 hover:text-text-base transition-colors"
+            className="px-3 py-1 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
           >
             Studio
           </a>
-          <span className="text-text-base/30">/</span>
-          <span className="font-semibold text-text-base px-1.5 py-0.5">How to</span>
+          <span className="text-muted-foreground/40">/</span>
+          <span className="font-semibold text-foreground px-1.5 py-0.5">How to</span>
         </nav>
       </FadeIn>
 

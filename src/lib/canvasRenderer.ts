@@ -94,12 +94,12 @@ function generateConstellationPoints(
       }
     }
 
-    // Depth calculation: subtle, delicate blur (max 1.0px on inner nodes, 0px on outer)
+    // Depth calculation: organic depth blur behind main content (up to 5.0px)
     const distFromCenter = Math.hypot(x - centerX, y - centerY);
-    const normDist = Math.min(1.0, Math.max(0.0, (distFromCenter - 230.0) / 600.0));
-    const blurAmount = Math.max(0, (1.0 - normDist) * 1.0);
-    const blur = blurAmount >= 0.4 ? Number(blurAmount.toFixed(1)) : 0;
-    const baseAlpha = Number((0.68 + 0.32 * Math.pow(normDist, 0.8)).toFixed(2));
+    const normDist = Math.min(1.0, Math.max(0.0, (distFromCenter - 200.0) / 600.0));
+    const blurAmount = Math.max(0, (1.0 - normDist) * 5.0);
+    const blur = blurAmount >= 0.5 ? Number(blurAmount.toFixed(1)) : 0;
+    const baseAlpha = Number((0.65 + 0.35 * Math.pow(normDist, 0.8)).toFixed(2));
     const phase = prng() * Math.PI * 2;
 
     points.push({
@@ -719,7 +719,7 @@ function renderConstellation(
   const height = 900;
 
   // Background
-  ctx.fillStyle = isDark ? '#090809' : '#FFFFFF';
+  ctx.fillStyle = isDark ? '#0F0E10' : '#FFFFFF';
   ctx.fillRect(0, 0, width, height);
 
   const allStargazers =
@@ -764,19 +764,21 @@ function renderConstellation(
   const centerX = 800;
   ctx.save();
   ctx.translate(centerX, 460);
-  ctx.scale(1.3, 0.68);
+  ctx.scale(1.84, 1.0);
   const fadeGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 500);
   if (isDark) {
-    fadeGrad.addColorStop(0, 'rgba(15, 14, 16, 1)');
-    fadeGrad.addColorStop(0.36, 'rgba(15, 14, 16, 1)');
-    fadeGrad.addColorStop(0.52, 'rgba(15, 14, 16, 0.92)');
-    fadeGrad.addColorStop(0.76, 'rgba(15, 14, 16, 0.45)');
+    fadeGrad.addColorStop(0, 'rgba(15, 14, 16, 0.98)');
+    fadeGrad.addColorStop(0.25, 'rgba(15, 14, 16, 0.92)');
+    fadeGrad.addColorStop(0.5, 'rgba(15, 14, 16, 0.75)');
+    fadeGrad.addColorStop(0.75, 'rgba(15, 14, 16, 0.35)');
+    fadeGrad.addColorStop(0.9, 'rgba(15, 14, 16, 0.08)');
     fadeGrad.addColorStop(1, 'rgba(15, 14, 16, 0)');
   } else {
-    fadeGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    fadeGrad.addColorStop(0.36, 'rgba(255, 255, 255, 1)');
-    fadeGrad.addColorStop(0.52, 'rgba(255, 255, 255, 0.92)');
-    fadeGrad.addColorStop(0.76, 'rgba(255, 255, 255, 0.45)');
+    fadeGrad.addColorStop(0, 'rgba(255, 255, 255, 0.98)');
+    fadeGrad.addColorStop(0.25, 'rgba(255, 255, 255, 0.92)');
+    fadeGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.75)');
+    fadeGrad.addColorStop(0.75, 'rgba(255, 255, 255, 0.35)');
+    fadeGrad.addColorStop(0.9, 'rgba(255, 255, 255, 0.08)');
     fadeGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
   }
   ctx.fillStyle = fadeGrad;
@@ -817,7 +819,7 @@ function renderConstellation(
 
   drawYellowStar(ctx, startX + starRadius, 570, starRadius);
 
-  ctx.fillStyle = isDark ? '#A39B95' : '#64748B';
+  ctx.fillStyle = isDark ? 'rgba(245, 237, 231, 0.65)' : '#64748B';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   ctx.fillText(starCountStr, startX + starRadius * 2 + gap, 570);

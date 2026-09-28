@@ -79,12 +79,12 @@ function computeConstellationScatter(
       }
     }
 
-    // Depth calculation: subtle, delicate blur (max 1.0px on inner nodes, 0px on outer)
+    // Depth calculation: organic depth blur behind main content (up to 5.0px)
     const distFromCenter = Math.hypot(x - centerX, y - centerY);
-    const normDist = Math.min(1.0, Math.max(0.0, (distFromCenter - 230.0) / 600.0));
-    const blurAmount = Math.max(0, (1.0 - normDist) * 1.0);
-    const blur = blurAmount >= 0.4 ? Number(blurAmount.toFixed(1)) : 0;
-    const alpha = Number((0.68 + 0.32 * Math.pow(normDist, 0.8)).toFixed(2));
+    const normDist = Math.min(1.0, Math.max(0.0, (distFromCenter - 200.0) / 600.0));
+    const blurAmount = Math.max(0, (1.0 - normDist) * 5.0);
+    const blur = blurAmount >= 0.5 ? Number(blurAmount.toFixed(1)) : 0;
+    const alpha = Number((0.65 + 0.35 * Math.pow(normDist, 0.8)).toFixed(2));
 
     const userIdx = result.length % (stargazers.length || 1);
     const user = (stargazers && stargazers[userIdx]) || {
@@ -213,17 +213,21 @@ export const ConstellationCard: React.FC<TemplateCardProps> = ({
           </motion.div>
         ))}
 
-        {/* 2. Soft Radial Fade Backdrop behind Main Content */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-15">
-          <div
-            className="w-[1300px] h-[680px] rounded-full"
-            style={{
-              background: isDark
-                ? 'radial-gradient(ellipse at center, rgba(15,14,16,1) 0%, rgba(15,14,16,1) 36%, rgba(15,14,16,0.92) 52%, rgba(15,14,16,0.45) 76%, rgba(15,14,16,0) 100%)'
-                : 'radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 36%, rgba(255,255,255,0.92) 52%, rgba(255,255,255,0.45) 76%, rgba(255,255,255,0) 100%)',
-            }}
-          />
-        </div>
+        {/* 2. Soft Radial Fade & Blur Backdrop behind Main Content */}
+        <div
+          className="absolute inset-0 pointer-events-none z-15"
+          style={{
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            maskImage:
+              'radial-gradient(ellipse 920px 500px at 50% 50%, black 20%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,0.4) 70%, transparent 100%)',
+            WebkitMaskImage:
+              'radial-gradient(ellipse 920px 500px at 50% 50%, black 20%, rgba(0,0,0,0.85) 45%, rgba(0,0,0,0.4) 70%, transparent 100%)',
+            background: isDark
+              ? 'radial-gradient(ellipse 920px 500px at 50% 50%, rgba(15,14,16,0.98) 0%, rgba(15,14,16,0.92) 25%, rgba(15,14,16,0.75) 50%, rgba(15,14,16,0.35) 75%, rgba(15,14,16,0.08) 90%, rgba(15,14,16,0) 100%)'
+              : 'radial-gradient(ellipse 920px 500px at 50% 50%, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.92) 25%, rgba(255,255,255,0.75) 50%, rgba(255,255,255,0.35) 75%, rgba(255,255,255,0.08) 90%, rgba(255,255,255,0) 100%)',
+          }}
+        />
 
         {/* 3. Center Content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20">
@@ -282,7 +286,12 @@ export const ConstellationCard: React.FC<TemplateCardProps> = ({
                 style={{ color: subTextColor }}
               >
                 <AnimatedNumber value={data.stars} animated={animated} />
-                <span className="text-[44px] font-medium text-text-base/60">stars</span>
+                <span
+                  className="text-[44px] font-medium"
+                  style={{ color: isDark ? 'rgba(245, 237, 231, 0.65)' : 'rgba(5, 5, 5, 0.55)' }}
+                >
+                  stars
+                </span>
               </p>
             </div>
           </motion.div>

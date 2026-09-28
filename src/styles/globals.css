@@ -34,39 +34,32 @@
     --secondary-foreground: 0 0% 7%;
     --muted: 0 0% 92%;
     --muted-foreground: 0 0% 40%;
-    --accent: 247 74% 63%; /* #6C5CE7 brand iris */
-    --accent-foreground: 0 0% 100%;
+    --accent: 60 5% 90%; /* Soft neutral matching stone background, no purple */
+    --accent-foreground: 0 0% 7%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 88%;
     --input: 0 0% 88%;
-    --ring: 247 74% 63%;
+    --ring: 0 0% 20%;
     --radius: 0.5rem;
 
-    /* Stargazer Direct Tokens - Light */
+    /* Stargazer Compatibility Tokens - Light */
     --bg-base-rgb: 245 245 240;
     --text-base-rgb: 17 17 17;
-    --bg-base: #f5f5f0;
-    --text-base: #111111;
-    --clay-primary-bg-start: #111111;
-    --clay-primary-bg-end: #1e1e20;
-    --clay-primary-text: #ffffff;
-    --clay-secondary-bg-start: rgba(0, 0, 0, 0.05);
-    --clay-secondary-bg-end: rgba(0, 0, 0, 0.02);
-    --clay-secondary-border: rgba(0, 0, 0, 0.08);
-    --clay-secondary-text: #111111;
-    --dropdown-bg: #fdfdfb;
+    --bg-base: hsl(var(--background));
+    --text-base: hsl(var(--foreground));
+    --dropdown-bg: hsl(var(--popover));
     --header-bg: rgba(245, 245, 240, 0.8);
     --shadow-color: rgba(0, 0, 0, 0.08);
-    --border-muted: rgba(0, 0, 0, 0.08);
+    --border-muted: hsl(var(--border));
     --border-base: rgba(17, 17, 17, 0.06);
-    --text-hover: #111111;
-    --text-muted: rgba(17, 17, 17, 0.55);
+    --text-hover: hsl(var(--foreground));
+    --text-muted: hsl(var(--muted-foreground));
     --text-more-muted: rgba(17, 17, 17, 0.35);
     --surface-base: rgba(0, 0, 0, 0.04);
-    --surface-hover: rgba(0, 0, 0, 0.07);
-    --tooltip-bg: #111111;
-    --tooltip-text: #ffffff;
+    --surface-hover: hsl(var(--accent));
+    --tooltip-bg: hsl(var(--foreground));
+    --tooltip-text: hsl(var(--background));
   }
 
   .dark {
@@ -82,38 +75,31 @@
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 12%;
     --muted-foreground: 0 0% 60%;
-    --accent: 247 74% 63%; /* #6C5CE7 brand iris */
-    --accent-foreground: 0 0% 100%;
+    --accent: 240 3.7% 15.9%; /* Subtle dark surface hover, no purple */
+    --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 247 74% 63%;
+    --ring: 240 4.9% 83.9%;
 
-    /* Stargazer Direct Tokens - Dark */
+    /* Stargazer Compatibility Tokens - Dark */
     --bg-base-rgb: 9 9 11;
     --text-base-rgb: 255 255 255;
-    --bg-base: #09090b;
-    --text-base: #ffffff;
-    --clay-primary-bg-start: #ffffff;
-    --clay-primary-bg-end: #e8e8e8;
-    --clay-primary-text: #111111;
-    --clay-secondary-bg-start: rgba(255, 255, 255, 0.12);
-    --clay-secondary-bg-end: rgba(255, 255, 255, 0.05);
-    --clay-secondary-border: rgba(255, 255, 255, 0.15);
-    --clay-secondary-text: #ffffff;
-    --dropdown-bg: #121214;
+    --bg-base: hsl(var(--background));
+    --text-base: hsl(var(--foreground));
+    --dropdown-bg: hsl(var(--popover));
     --header-bg: rgba(9, 9, 11, 0.8);
     --shadow-color: rgba(0, 0, 0, 0.5);
-    --border-muted: rgba(255, 255, 255, 0.08);
+    --border-muted: hsl(var(--border));
     --border-base: rgba(255, 255, 255, 0.06);
-    --text-hover: #ffffff;
-    --text-muted: rgba(255, 255, 255, 0.55);
+    --text-hover: hsl(var(--foreground));
+    --text-muted: hsl(var(--muted-foreground));
     --text-more-muted: rgba(255, 255, 255, 0.35);
     --surface-base: rgba(255, 255, 255, 0.05);
-    --surface-hover: rgba(255, 255, 255, 0.08);
-    --tooltip-bg: #ffffff;
-    --tooltip-text: #09090b;
+    --surface-hover: hsl(var(--accent));
+    --tooltip-bg: hsl(var(--foreground));
+    --tooltip-text: hsl(var(--background));
   }
 }
 
@@ -127,8 +113,7 @@
   }
   body {
     font-family: 'Montserrat', 'Quicksand', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background-color: var(--bg-base);
-    color: var(--text-base);
+    @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
@@ -188,92 +173,9 @@
   opacity: 0.15;
 }
 
-.clay-accent {
-  color: #ffffff;
-  background: linear-gradient(145deg, #7c6cf0, #5a4bd1);
-  box-shadow: 0 4px 14px rgba(108, 92, 231, 0.35);
-}
-
-/* ═══ Tree-Branch Sidebar ═══ */
-.stargazer-sidebar-group {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  margin-top: 1.25rem;
-}
-
-.stargazer-sidebar-group:first-child {
-  margin-top: 0;
-}
-
-.sidebar-section-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.375rem;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-more-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.sidebar-icon-box {
-  width: 1.25rem; /* 20px */
-  height: 1.25rem;
-  border-radius: 5px;
-  background-color: var(--surface-hover);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.sidebar-items-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-}
-
-.sidebar-section-line {
-  position: absolute;
-  left: 0.625rem; /* 10px centered under icon box */
-  top: -0.375rem;
-  bottom: 0.5rem;
-  width: 1px;
-  background: linear-gradient(to bottom, var(--border-base) 0%, var(--border-base) 60%, transparent 100%);
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
-.sidebar-item {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.35rem 0.5rem 0.35rem 1.75rem; /* 28px left padding clears the 10px line */
-  font-size: 13px;
-  color: var(--text-muted);
-  border-radius: 6px;
-  transition: color 0.15s ease, background-color 0.15s ease;
-  cursor: pointer;
-  user-select: none;
-  border: 0;
-  width: 100%;
-  text-align: left;
-  background: transparent;
-}
-
-.sidebar-item:hover {
-  color: var(--text-hover);
-  background: transparent;
-}
-
 .sidebar-item.active {
-  color: #6C5CE7;
-  font-weight: 500;
+  color: hsl(var(--foreground));
+  font-weight: 600;
   background: transparent;
 }
 

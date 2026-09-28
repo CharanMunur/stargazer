@@ -278,19 +278,19 @@ export default function StudioPage() {
     <div className="w-full max-w-6xl mx-auto px-6 py-8 space-y-8">
       {/* 1. Header: Breadcrumbs + Title & Badges */}
       <FadeIn delay={0.05} yOffset={10} duration={0.4} className="space-y-3">
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-text-base/60">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-muted-foreground">
           <a
             href="/"
-            className="px-3 py-1 rounded-full bg-text-base/[0.04] hover:bg-text-base/10 text-text-base/70 hover:text-text-base transition-colors"
+            className="px-3 py-1 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
           >
             Home
           </a>
-          <span className="text-text-base/30">/</span>
-          <span className="font-semibold text-text-base px-1.5 py-0.5">{currentMeta.name}</span>
+          <span className="text-muted-foreground/40">/</span>
+          <span className="font-semibold text-foreground px-1.5 py-0.5">{currentMeta.name}</span>
         </nav>
 
         <div className="pt-1">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-text-base">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
             {currentMeta.name}
           </h1>
         </div>
@@ -301,14 +301,14 @@ export default function StudioPage() {
         <div className="flex flex-col lg:flex-row lg:items-stretch items-start gap-6 lg:gap-8">
         {/* Left Column: 16:9 Canvas Stage & Download Action Button */}
         <div className="flex-1 w-full min-w-0 flex flex-col justify-between gap-3.5">
-          {/* Central Canvas Stage with REDUCED shadow */}
-          <div className="w-full aspect-[16/9] rounded-2xl border border-text-base/10 bg-text-base/[0.015] shadow-xs overflow-hidden relative flex items-center justify-center">
+          {/* Central Canvas Stage */}
+          <div className="w-full aspect-[16/9] rounded-2xl border border-border bg-card shadow-xs overflow-hidden relative flex items-center justify-center">
             {/* Subtle grid texture background */}
             <div
               className="absolute inset-0 pointer-events-none opacity-40"
               style={{
                 backgroundImage:
-                  'linear-gradient(to right, var(--border-muted) 1px, transparent 1px), linear-gradient(to bottom, var(--border-muted) 1px, transparent 1px)',
+                  'linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)',
                 backgroundSize: '20px 20px',
               }}
             />
@@ -317,7 +317,7 @@ export default function StudioPage() {
             <button
               type="button"
               onClick={() => setReplayNonce((n) => n + 1)}
-              className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-text-base/70 hover:text-text-base text-xs font-medium border border-text-base/10 transition-colors shadow-2xs cursor-pointer"
+              className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-muted-foreground hover:text-foreground text-xs font-medium border border-border transition-colors shadow-2xs cursor-pointer"
               title="Replay animation"
             >
               <RotateCcw className="w-3 h-3" />
@@ -366,7 +366,7 @@ export default function StudioPage() {
             type="button"
             disabled={exporting || loading}
             onClick={handleExport}
-            className="w-full py-3.5 px-6 rounded-full bg-text-base text-background font-semibold text-sm sm:text-base flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 transition-colors shadow-xs"
+            className="w-full py-3.5 px-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 transition-colors shadow-xs"
           >
             {exporting ? (
               <>
@@ -392,7 +392,7 @@ export default function StudioPage() {
           <form onSubmit={handleFetchSubmit} className="space-y-3.5">
             {/* Repo Input */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-text-base/70 block">
+              <label className="text-sm font-medium text-foreground block">
                 Repository
               </label>
               <input
@@ -400,19 +400,19 @@ export default function StudioPage() {
                 value={repo}
                 onChange={(e) => setRepo(e.target.value)}
                 required
-                className="w-full bg-text-base/[0.04] hover:bg-text-base/[0.06] border border-text-base/10 rounded-full px-4 py-2.5 text-sm text-text-base outline-none focus:border-text-base/30 focus:bg-background transition-colors"
+                className="w-full bg-muted/50 hover:bg-muted/70 border border-input rounded-full px-4 py-2.5 text-sm text-foreground outline-none focus:border-ring focus:bg-background transition-colors"
               />
             </div>
 
             {/* Required GitHub PAT Token */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-medium text-text-base/70 block">
-                  GitHub PAT <span className="text-xs text-text-base/40 font-normal">(required)</span>
+                <label className="text-sm font-medium text-foreground block">
+                  GitHub PAT <span className="text-xs text-muted-foreground font-normal">(required)</span>
                 </label>
                 <a
                   href="/how-to"
-                  className="text-xs text-text-base/45 hover:text-text-base transition-colors"
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
                 >
                   How to generate?
                 </a>
@@ -422,7 +422,7 @@ export default function StudioPage() {
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
                 required
-                className="w-full bg-text-base/[0.04] hover:bg-text-base/[0.06] border border-text-base/10 rounded-full px-4 py-2.5 text-sm text-text-base outline-none focus:border-text-base/30 focus:bg-background transition-colors"
+                className="w-full bg-muted/50 hover:bg-muted/70 border border-input rounded-full px-4 py-2.5 text-sm text-foreground outline-none focus:border-ring focus:bg-background transition-colors"
               />
             </div>
 
@@ -430,7 +430,7 @@ export default function StudioPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-full bg-text-base text-background hover:bg-text-base/90 text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-2xs active:scale-[0.99]"
+              className="w-full py-2.5 px-4 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-2xs active:scale-[0.99]"
             >
               {loading ? (
                 <>
@@ -450,10 +450,10 @@ export default function StudioPage() {
           <div className="space-y-3.5">
             {/* Theme Toggle (Segmented Pill) */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-text-base/70 block">
+              <label className="text-sm font-medium text-foreground block">
                 Theme
               </label>
-              <div className="grid grid-cols-2 p-1 rounded-full bg-text-base/[0.04] border border-text-base/8 gap-1">
+              <div className="grid grid-cols-2 p-1 rounded-full bg-muted/50 border border-border gap-1">
                 {(['dark', 'light'] as const).map((th) => (
                   <button
                     key={th}
@@ -464,8 +464,8 @@ export default function StudioPage() {
                     }}
                     className={`flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-full transition-all cursor-pointer ${
                       theme === th
-                        ? 'bg-background text-text-base font-semibold shadow-2xs border border-text-base/10'
-                        : 'text-text-base/50 hover:text-text-base hover:bg-text-base/[0.02]'
+                        ? 'bg-background text-foreground font-semibold shadow-2xs border border-border'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
                     }`}
                   >
                     {th === 'dark' ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
@@ -477,10 +477,10 @@ export default function StudioPage() {
 
             {/* Stargazers Order Toggle (Segmented Pill) */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-text-base/70 block">
+              <label className="text-sm font-medium text-foreground block">
                 Stargazers
               </label>
-              <div className="grid grid-cols-2 p-1 rounded-full bg-text-base/[0.04] border border-text-base/8 gap-1">
+              <div className="grid grid-cols-2 p-1 rounded-full bg-muted/50 border border-border gap-1">
                 {(['latest', 'earliest'] as const).map((ord) => (
                   <button
                     key={ord}
@@ -488,8 +488,8 @@ export default function StudioPage() {
                     onClick={() => handleOrderChange(ord)}
                     className={`py-2 px-3 text-sm rounded-full text-center transition-all cursor-pointer ${
                       stargazerOrder === ord
-                        ? 'bg-background text-text-base font-semibold shadow-2xs border border-text-base/10'
-                        : 'text-text-base/50 hover:text-text-base hover:bg-text-base/[0.02]'
+                        ? 'bg-background text-foreground font-semibold shadow-2xs border border-border'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
                     }`}
                   >
                     {ord === 'latest' ? 'Latest' : 'Earliest'}
@@ -500,10 +500,10 @@ export default function StudioPage() {
 
             {/* Format Toggle (Segmented Pill) */}
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-text-base/70 block">
+              <label className="text-sm font-medium text-foreground block">
                 Format
               </label>
-              <div className="grid grid-cols-2 p-1 rounded-full bg-text-base/[0.04] border border-text-base/8 gap-1">
+              <div className="grid grid-cols-2 p-1 rounded-full bg-muted/50 border border-border gap-1">
                 {(['png', 'mp4'] as const).map((fmt) => (
                   <button
                     key={fmt}
@@ -511,8 +511,8 @@ export default function StudioPage() {
                     onClick={() => setFormat(fmt)}
                     className={`py-2 px-3 text-sm rounded-full text-center transition-all cursor-pointer ${
                       format === fmt
-                        ? 'bg-background text-text-base font-semibold shadow-2xs border border-text-base/10'
-                        : 'text-text-base/50 hover:text-text-base hover:bg-text-base/[0.02]'
+                        ? 'bg-background text-foreground font-semibold shadow-2xs border border-border'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
                     }`}
                   >
                     {fmt.toUpperCase()}
@@ -531,12 +531,12 @@ export default function StudioPage() {
       </div>
       </FadeIn>
 
-      <Separator className="bg-text-base/8 my-6" />
+      <Separator className="bg-border my-6" />
 
       {/* 5. Browse other templates (Small cards, 3 in a row) */}
       <FadeIn delay={0.2} yOffset={15} duration={0.45}>
         <section className="space-y-3 pt-1">
-          <h2 className="text-base sm:text-lg font-bold tracking-tight text-text-base">
+          <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
             Browse other templates
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -545,9 +545,9 @@ export default function StudioPage() {
                 <button
                   type="button"
                   onClick={() => handleTemplateChange(other.id)}
-                  className="group rounded-2xl bg-text-base/[0.025] hover:bg-text-base/[0.06] border border-text-base/8 p-2 text-left flex flex-col justify-between transition-colors duration-150 cursor-pointer shadow-2xs w-full"
+                  className="group rounded-2xl bg-card hover:bg-muted/50 border border-border hover:border-border/80 p-2 text-left flex flex-col justify-between transition-colors duration-150 cursor-pointer shadow-2xs w-full text-card-foreground"
                 >
-                  <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-background border border-text-base/8 relative flex items-center justify-center pointer-events-none mb-2">
+                  <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-background border border-border relative flex items-center justify-center pointer-events-none mb-2">
                     <div className="w-full h-full relative z-10 pointer-events-none">
                       {other.id === 'counter' && <CounterCard data={initialSampleData} theme={theme} animated={false} />}
                       {other.id === 'ticker' && <TickerCard data={initialSampleData} theme={theme} animated={false} />}
@@ -556,10 +556,10 @@ export default function StudioPage() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between gap-1.5 px-1 py-1">
-                    <span className="font-bold text-sm text-text-base">
+                    <span className="font-bold text-sm text-foreground">
                       {other.name}
                     </span>
-                    <span className="text-[11px] font-semibold text-text-base/60 bg-text-base/5 px-2.5 py-0.5 rounded-full border border-text-base/8">
+                    <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full border border-border">
                       {other.tag}
                     </span>
                   </div>

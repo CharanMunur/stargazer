@@ -26,10 +26,9 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        // Stargazer Design Tokens
-        "text-base": "rgb(var(--text-base-rgb) / <alpha-value>)",
-        "bg-base": "rgb(var(--bg-base-rgb) / <alpha-value>)",
-        iris: "#6C5CE7",
+        // Compatibility tokens
+        "text-base": "hsl(var(--foreground))",
+        "bg-base": "hsl(var(--background))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
