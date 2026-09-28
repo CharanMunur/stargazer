@@ -109,7 +109,7 @@ function generateConstellationPoints(
     const blurAmount = Math.max(0, (1.0 - normDist) * 5.0);
     const blur = blurAmount >= 0.5 ? Number(blurAmount.toFixed(1)) : 0;
     const baseAlpha = Number((0.65 + 0.35 * Math.pow(normDist, 0.8)).toFixed(2));
-    const phase = prng() * Math.PI * 2;
+    const phase = (points.length * 1.5) % (Math.PI * 2);
 
     points.push({
       x,
@@ -185,9 +185,10 @@ export async function preloadTemplateAssets(
     if (img) avatarImages.set(url, img);
   });
 
+  const repoFullName = data.owner ? `${data.owner}/${data.repo}` : data.repo;
   const constellationPoints =
     template === 'constellation'
-      ? generateConstellationPoints(data.repo || 'stargazer', sourceStargazers.length)
+      ? generateConstellationPoints(repoFullName || 'stargazer', sourceStargazers.length)
       : undefined;
 
   return { avatarImages, leafImg, ownerImg, constellationPoints };
@@ -484,13 +485,15 @@ function renderTicker(
   const itemGap = 60;
   const itemWidth = baseAvatarSize + itemGap;
 
-  // Exact Go easeOutBack glide
-  const easeT = easeOutBack(progress, 1.25);
-  const maxScroll = (count - 1) * itemWidth;
-  const scrollOffset = easeT * maxScroll;
+  // Continuous infinite marquee loop
+  const totalWidth = count * itemWidth;
+  const scrollOffset = (progress * totalWidth) % totalWidth;
 
   for (let i = 0; i < count; i++) {
-    const colX = centerX + i * itemWidth - scrollOffset;
+    let colX = centerX + i * itemWidth - scrollOffset;
+    if (colX < centerX - totalWidth / 2) colX += totalWidth;
+    if (colX > centerX + totalWidth / 2) colX -= totalWidth;
+
     if (colX < -250 || colX > width + 250) continue;
 
     const dist = Math.abs(colX - centerX);
@@ -523,9 +526,9 @@ function renderTicker(
   ctx.fillStyle = rightGrad;
   ctx.fillRect(width - fadeW, tickerY - 160, fadeW, 320);
 
-  // Bottom-right star count (INCREMENTING WITH PHYSICS)
-  const calcT = Math.min(1.0, Math.max(0.0, easeT));
-  const curStars = Math.round(1 + calcT * (data.stars - 1));
+  // Bottom-right star count
+  const easeCount = 1 - Math.pow(1 - Math.min(1, progress * 1.5), 3);
+  const curStars = Math.round(data.stars * easeCount);
   const numStr = curStars.toLocaleString();
 
   ctx.save();
@@ -630,11 +633,9 @@ function renderOrbit(
   const baseSize = 160.0;
   const spacing = 240.0;
 
-  // Elastic overshoot & bounce-back formula (s = 1.35)
-  const easeT = easeOutBack(progress, 1.35);
-
-  const maxScroll = (count - 1) * spacing;
-  const scrollOffset = easeT * maxScroll;
+  // Continuous 3D orbit loop
+  const totalWidth = count * spacing;
+  const scrollOffset = (progress * totalWidth) % totalWidth;
 
   interface OrbitItem {
     idx: number;
@@ -648,7 +649,10 @@ function renderOrbit(
 
   const items: OrbitItem[] = [];
   for (let i = 0; i < count; i++) {
-    const colX = centerX + i * spacing - scrollOffset;
+    let colX = centerX + i * spacing - scrollOffset;
+    if (colX < centerX - totalWidth / 2) colX += totalWidth;
+    if (colX > centerX + totalWidth / 2) colX -= totalWidth;
+
     if (colX < -300 || colX > width + 300) continue;
 
     const dist = Math.abs(colX - centerX);
@@ -742,10 +746,15 @@ function renderConstellation(
   const stargazers = allStargazers.slice(0, 96);
   const points = assets.constellationPoints || [];
 
-  // Draw scatter avatars with gentle twinkle / breathing and depth blur
-  for (const pt of points) {
+  // Draw scatter avatars popping in one by one organically with depth blur
+  for (let idx = 0; idx < points.length; idx++) {
+    const pt = points[idx];
+    const startP = (idx / (points.length || 1)) * 0.65;
+    const fadeProgress = Math.max(0, Math.min(1, (progress - startP) / 0.20));
+    if (fadeProgress <= 0) continue;
+
     const twinkle = 0.85 + 0.15 * Math.sin(progress * Math.PI * 4 + pt.phase);
-    const alpha = Math.min(1, pt.baseAlpha * twinkle);
+    const alpha = Math.min(1, pt.baseAlpha * twinkle * fadeProgress);
 
     ctx.save();
     ctx.globalAlpha = alpha;
@@ -775,7 +784,9 @@ function renderConstellation(
 
   // Soft Radial Fade Backdrop behind Main Content
   const centerX = 800;
+  const backdropAlpha = Math.max(0, Math.min(1, progress * 4));
   ctx.save();
+  ctx.globalAlpha = backdropAlpha;
   ctx.translate(centerX, 460);
   ctx.scale(1.84, 1.0);
   const fadeGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 500);
@@ -801,42 +812,62 @@ function renderConstellation(
   ctx.restore();
 
   // Center Content: Stacked Mascot (y=350) + Title (y=470) + Star Count (y=570)
-  ctx.save();
   // 1. Center mascot avatar (108px)
-  drawCircularAvatar(
-    ctx,
-    assets.ownerImg || undefined,
-    data.owner,
-    centerX,
-    350,
-    54,
-    isDark ? '#342A27' : '#E2E8F0',
-    3
-  );
+  const mascotAlpha = Math.max(0, Math.min(1, (progress - 0.10) / 0.25));
+  if (mascotAlpha > 0) {
+    ctx.save();
+    ctx.globalAlpha = mascotAlpha;
+    drawCircularAvatar(
+      ctx,
+      assets.ownerImg || undefined,
+      data.owner,
+      centerX,
+      350,
+      54,
+      isDark ? '#342A27' : '#E2E8F0',
+      3
+    );
+    ctx.restore();
+  }
 
   // 2. Title: owner / repo
-  const repoFullName = data.owner ? `${data.owner}/${data.repo}` : data.repo;
-  ctx.font = `bold 72px 'DM Sans', sans-serif`;
-  ctx.fillStyle = isDark ? '#F5EDE7' : '#000000';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(repoFullName, centerX, 470);
+  const titleAlpha = Math.max(0, Math.min(1, (progress - 0.20) / 0.25));
+  if (titleAlpha > 0) {
+    ctx.save();
+    ctx.globalAlpha = titleAlpha;
+    const repoFullName = data.owner ? `${data.owner}/${data.repo}` : data.repo;
+    ctx.font = `bold 72px 'DM Sans', sans-serif`;
+    ctx.fillStyle = isDark ? '#F5EDE7' : '#000000';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(repoFullName, centerX, 470);
+    ctx.restore();
+  }
 
-  // 3. Star count with star icon
-  const starCountStr = `${data.stars.toLocaleString()} stars`;
-  ctx.font = `bold 64px 'DM Sans', sans-serif`;
-  const textW = ctx.measureText(starCountStr).width;
-  const starRadius = 24;
-  const gap = 16;
-  const startX = centerX - (textW + starRadius * 2 + gap) / 2;
+  // 3. Animated Star count with star icon
+  const countAlpha = Math.max(0, Math.min(1, (progress - 0.30) / 0.25));
+  if (countAlpha > 0) {
+    ctx.save();
+    ctx.globalAlpha = countAlpha;
+    const countProgress = Math.max(0, Math.min(1, (progress - 0.15) / 0.65));
+    const easeCount = 1 - Math.pow(1 - countProgress, 3);
+    const curStars = Math.round(1 + easeCount * (data.stars - 1));
+    const starCountStr = `${curStars.toLocaleString()} stars`;
 
-  drawYellowStar(ctx, startX + starRadius, 570, starRadius);
+    ctx.font = `bold 64px 'DM Sans', sans-serif`;
+    const textW = ctx.measureText(starCountStr).width;
+    const starRadius = 24;
+    const gap = 16;
+    const startX = centerX - (textW + starRadius * 2 + gap) / 2;
 
-  ctx.fillStyle = isDark ? 'rgba(245, 237, 231, 0.65)' : '#64748B';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(starCountStr, startX + starRadius * 2 + gap, 570);
-  ctx.restore();
+    drawYellowStar(ctx, startX + starRadius, 570, starRadius);
+
+    ctx.fillStyle = isDark ? 'rgba(245, 237, 231, 0.65)' : '#64748B';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(starCountStr, startX + starRadius * 2 + gap, 570);
+    ctx.restore();
+  }
 }
 
 function drawRoundedRect(
@@ -950,34 +981,51 @@ function renderSpotlight(
     const u = visible[i];
     const img = u.avatarUrl ? assets.avatarImages.get(u.avatarUrl) : undefined;
     const ax = stackStartX + i * (avatarR * 2 - overlap);
+    const startP = 0.30 + (i / visible.length) * 0.35;
+    const itemProgress = Math.max(0, Math.min(1, (progress - startP) / 0.15));
+    if (itemProgress <= 0) continue;
+
+    const itemScale = 0.6 + 0.4 * (1 - Math.pow(1 - itemProgress, 3));
+    ctx.save();
+    ctx.globalAlpha = itemProgress;
+    ctx.translate(ax, stackY);
+    ctx.scale(itemScale, itemScale);
     drawCircularAvatar(
       ctx,
       img,
       u.login,
-      ax,
-      stackY,
+      0,
+      0,
       avatarR,
       isDark ? '#1C1B1F' : '#FFFFFF',
       4
     );
+    ctx.restore();
   }
 
   if (remaining > 0) {
-    const pillX = stackStartX + visible.length * (avatarR * 2 - overlap) + 15;
-    const pillW = 160;
-    const pillH = 46;
-    drawRoundedRect(ctx, pillX, stackY - pillH / 2, pillW, pillH, 23);
-    ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
-    ctx.fill();
-    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.1)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
+    const pillStartP = 0.65;
+    const pillProgress = Math.max(0, Math.min(1, (progress - pillStartP) / 0.15));
+    if (pillProgress > 0) {
+      ctx.save();
+      ctx.globalAlpha = pillProgress;
+      const pillX = stackStartX + visible.length * (avatarR * 2 - overlap) + 15;
+      const pillW = 160;
+      const pillH = 46;
+      drawRoundedRect(ctx, pillX, stackY - pillH / 2, pillW, pillH, 23);
+      ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+      ctx.fill();
+      ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.1)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
 
-    ctx.font = `600 15px 'DM Sans', sans-serif`;
-    ctx.fillStyle = isDark ? '#A1958D' : '#64748B';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`+${remaining.toLocaleString()} others`, pillX + pillW / 2, stackY);
+      ctx.font = `600 15px 'DM Sans', sans-serif`;
+      ctx.fillStyle = isDark ? '#A1958D' : '#64748B';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`+${remaining.toLocaleString()} others`, pillX + pillW / 2, stackY);
+      ctx.restore();
+    }
   }
   ctx.restore();
 }
