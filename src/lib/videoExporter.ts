@@ -240,3 +240,39 @@ export async function exportTemplateToVideo(
     requestAnimationFrame(tick);
   });
 }
+
+export interface ImageExportOptions {
+  template: TemplateType;
+  data: TemplateData;
+  theme: 'dark' | 'light';
+  width?: number;
+  height?: number;
+}
+
+export async function exportTemplateToImage(
+  options: ImageExportOptions
+): Promise<string> {
+  const {
+    template,
+    data,
+    theme,
+    width = 1600,
+    height = 900,
+  } = options;
+
+  const assets: PreloadedAssets = await preloadTemplateAssets(template, data, theme);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    throw new Error('Could not create 2D canvas context for image export.');
+  }
+
+  // Render the final completed frame (progress = 1.0)
+  renderTemplateFrame(ctx, template, data, theme, 1.0, assets);
+
+  return canvas.toDataURL('image/png');
+}
+

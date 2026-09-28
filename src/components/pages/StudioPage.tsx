@@ -9,8 +9,7 @@ import {
   RevolveCard,
 } from '../templates';
 import type { TemplateData, StargazerUser } from '../templates/types';
-import { toPng } from 'html-to-image';
-import { exportTemplateToVideo } from '@/lib/videoExporter';
+import { exportTemplateToVideo, exportTemplateToImage } from '@/lib/videoExporter';
 import { Separator } from '@/components/ui/separator';
 import { FadeIn } from '../helpers/FadeIn';
 import { templatesData, initialSampleData, type TemplateMeta } from '@/data/templates';
@@ -235,10 +234,13 @@ export default function StudioPage() {
 
     try {
       if (format === 'png') {
-        const dataUrl = await toPng(cardContainerRef.current, {
+        setExportProgress({ percent: 30, text: 'Rendering 1600x900 image...' });
+        const dataUrl = await exportTemplateToImage({
+          template,
+          data: repoData,
+          theme,
           width: 1600,
           height: 900,
-          pixelRatio: 1,
         });
 
         const link = document.createElement('a');
