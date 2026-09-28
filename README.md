@@ -68,6 +68,12 @@ An organic point-cloud cluster designed for contributor appreciation and showcas
 * Soft radial fade vignette backdrop situated directly behind the center content, creating an ethereal cosmic glow while ensuring 100% text and mascot legibility.
 * Subtle atmospheric depth blur and opacity gradation across the starfield.
 
+### 5. Hyperdrive (Light-Speed Jump)
+Anamorphic light-speed acceleration beams with burst-speed contributor avatars and shockwave rings:
+* 48 anamorphic laser warp beams stretching across the canvas from a bright vanishing center.
+* High-velocity accelerating avatar bursts projecting toward screen boundaries with motion blur.
+* Expanding hyperdrive warp rings and sleek aerospace telemetry HUD.
+
 ---
 
 ## Quick Start

@@ -7,6 +7,7 @@ import {
   ConstellationCard,
   SpotlightCard,
   RevolveCard,
+  HyperdriveCard,
 } from '../templates';
 import type { TemplateData, StargazerUser } from '../templates/types';
 import { exportTemplateToVideo, exportTemplateToImage } from '@/lib/videoExporter';
@@ -379,6 +380,14 @@ export default function StudioPage() {
               {template === 'revolve' && (
                 <RevolveCard
                   key={`card-revolve-${theme}-${repoData.repo}-${replayNonce}`}
+                  data={repoData}
+                  theme={theme}
+                  animated
+                />
+              )}
+              {template === 'hyperdrive' && (
+                <HyperdriveCard
+                  key={`card-hyperdrive-${theme}-${repoData.repo}-${replayNonce}`}
                   data={repoData}
                   theme={theme}
                   animated

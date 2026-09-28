@@ -8,6 +8,7 @@ export type TemplateType =
   | 'infinity'
   | 'orbit'
   | 'constellation'
+  | 'hyperdrive'
   // legacy aliases kept for backward compat
   | 'counter'
   | 'ticker';
@@ -301,6 +302,8 @@ export async function preloadTemplateAssets(
     avatarUrls = sourceStargazers.slice(0, 100).map((s) => s.avatarUrl).filter(Boolean);
   } else if (template === 'spotlight') {
     avatarUrls = sourceStargazers.slice(0, 8).map((s) => s.avatarUrl).filter(Boolean);
+  } else if (template === 'hyperdrive') {
+    avatarUrls = sourceStargazers.slice(0, 28).map((s) => s.avatarUrl).filter(Boolean);
   }
 
   const [leafImg, ownerImg, ...loadedAvatars] = await Promise.all([
@@ -1522,6 +1525,269 @@ function renderRevolve(
   ctx.restore();
 }
 
+// -------------------------------------------------------------
+// TEMPLATE: HYPERDRIVE (LIGHT-SPEED JUMP)
+// -------------------------------------------------------------
+function renderHyperdrive(
+  ctx: CanvasRenderingContext2D,
+  data: TemplateData,
+  theme: 'dark' | 'light',
+  progress: number,
+  assets: PreloadedAssets
+) {
+  const isDark = theme === 'dark';
+  const width = 1600;
+  const height = 900;
+  const cx = 800;
+  const cy = 450;
+
+  // 1. Background Fill
+  ctx.fillStyle = isDark ? '#05070D' : '#F6F9FD';
+  ctx.fillRect(0, 0, width, height);
+
+  // 2. Anamorphic Hyperspace Radial Glow
+  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 750);
+  if (isDark) {
+    grad.addColorStop(0, 'rgba(14, 165, 233, 0.25)');
+    grad.addColorStop(0.3, 'rgba(99, 102, 241, 0.12)');
+    grad.addColorStop(0.55, 'rgba(245, 158, 11, 0.04)');
+    grad.addColorStop(0.75, 'transparent');
+  } else {
+    grad.addColorStop(0, 'rgba(14, 165, 233, 0.18)');
+    grad.addColorStop(0.3, 'rgba(99, 102, 241, 0.08)');
+    grad.addColorStop(0.7, 'transparent');
+  }
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+
+  // 3. 64 Anamorphic Laser Warp Beams
+  ctx.save();
+  const beamCount = 64;
+  for (let i = 0; i < beamCount; i++) {
+    const angle = (i / beamCount) * Math.PI * 2 + ((i * 17) % 7) * 0.05;
+    const cosA = Math.cos(angle);
+    const sinA = Math.sin(angle);
+    const absCos = Math.abs(cosA);
+    const absSin = Math.abs(sinA);
+    const edgeDist = Math.min(
+      absCos > 0.0001 ? 800 / absCos : 9999,
+      absSin > 0.0001 ? 450 / absSin : 9999
+    );
+
+    const speed = 0.35 + (i % 5) * 0.06;
+    const initialProgress = (i * (1 / beamCount)) % 1;
+    const p = (initialProgress + progress * speed * 2.8) % 1;
+
+    const baseLength = 160 + (i % 4) * 80;
+    const length = baseLength * (0.3 + Math.pow(p, 1.4) * 1.5);
+    const startDist = 70 + Math.pow(p, 2.0) * (edgeDist - 40);
+    const endDist = startDist + length;
+
+    const x1 = cx + cosA * startDist;
+    const y1 = cy + sinA * startDist;
+    const x2 = cx + cosA * endDist;
+    const y2 = cy + sinA * endDist;
+
+    let alpha = 1;
+    if (p < 0.15) {
+      alpha = p / 0.15;
+    } else if (p > 0.8) {
+      alpha = (1 - p) / 0.2;
+    }
+    alpha *= 0.25 + (i % 3) * 0.18;
+
+    const isGold = i % 8 === 0;
+    const isWhite = i % 5 === 0 && !isGold;
+
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.strokeStyle = isGold
+      ? '#FACC15'
+      : isWhite
+      ? (isDark ? '#E0F2FE' : '#0369A1')
+      : (isDark ? '#38BDF8' : '#0284C7');
+    ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+    ctx.lineWidth = isGold ? 2.5 : isWhite ? 2.0 : 1.5;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  }
+  ctx.restore();
+
+  // 4. Relativistic Shockwave Rings (4 Expanding wavefronts)
+  ctx.save();
+  const ringCount = 4;
+  for (let k = 0; k < ringCount; k++) {
+    const ringP = (k / ringCount + progress * 0.22 * 2.8) % 1;
+    const r = 70 + Math.pow(ringP, 1.6) * 1050;
+
+    let ringAlpha = 0;
+    if (ringP < 0.25) {
+      ringAlpha = (ringP / 0.25) * 0.26;
+    } else {
+      ringAlpha = ((1 - ringP) / 0.75) * 0.26;
+    }
+
+    if (ringAlpha > 0.01) {
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, r * 1.08, r * 0.94, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = isDark ? '#38BDF8' : '#0284C7';
+      ctx.globalAlpha = ringAlpha;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+
+  // 5. Stardust specks (High-velocity particles)
+  ctx.save();
+  for (let s = 0; s < 36; s++) {
+    const sAngle = (s / 36) * Math.PI * 2 + ((s * 23) % 9) * 0.08;
+    const sSpeed = 0.5 + (s % 4) * 0.1;
+    const sP = ((s * 0.0277) + progress * sSpeed * 2.8) % 1;
+    const sDist = 60 + Math.pow(sP, 2.2) * 900;
+
+    const px = cx + Math.cos(sAngle) * sDist;
+    const py = cy + Math.sin(sAngle) * sDist;
+
+    let sAlpha = 1;
+    if (sP < 0.2) sAlpha = sP / 0.2;
+    else if (sP > 0.85) sAlpha = (1 - sP) / 0.15;
+
+    ctx.beginPath();
+    ctx.arc(px, py, 1.2 + (s % 2) * 1.0, 0, Math.PI * 2);
+    ctx.fillStyle = s % 3 === 0 ? '#FACC15' : isDark ? '#BAE6FD' : '#0284C7';
+    ctx.globalAlpha = Math.max(0, Math.min(1, sAlpha * 0.6));
+    ctx.fill();
+  }
+  ctx.restore();
+
+  // 6. Contributor Avatars
+  const sourceStargazers =
+    data.stargazers && data.stargazers.length > 0 ? data.stargazers : sampleStargazers;
+
+  const count = 28;
+  for (let i = 0; i < count; i++) {
+    const angle = (i / count) * Math.PI * 2 + (i % 5) * 0.12;
+    const cosA = Math.cos(angle);
+    const sinA = Math.sin(angle);
+    const absCos = Math.abs(cosA);
+    const absSin = Math.abs(sinA);
+
+    const hudDist = Math.min(
+      absCos > 0.0001 ? 310 / absCos : 9999,
+      absSin > 0.0001 ? 170 / absSin : 9999
+    );
+    const startDist = hudDist * 0.35;
+
+    const edgeDist = Math.min(
+      absCos > 0.0001 ? 800 / absCos : 9999,
+      absSin > 0.0001 ? 450 / absSin : 9999
+    );
+    const exitDist = edgeDist + 140;
+
+    const speed = 0.22 + (i % 4) * 0.035;
+    const initialProgress = (i * (1 / count)) % 1;
+    const p = (initialProgress + progress * speed * 2.8) % 1;
+
+    const dist = startDist + (exitDist - startDist) * Math.pow(p, 2.2);
+    const posX = cx + cosA * dist;
+    const posY = cy + sinA * dist;
+
+    const scaleVal = 0.38 + Math.pow(p, 1.8) * 1.35;
+    let alpha = 1;
+    if (p < 0.1) {
+      alpha = p / 0.1;
+    }
+
+    const r = Math.round(37 * scaleVal);
+    const user = sourceStargazers[i % sourceStargazers.length];
+    const img = user ? assets.avatarImages.get(user.avatarUrl) : undefined;
+
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+    drawCircularAvatar(
+      ctx,
+      img,
+      user?.login || 'U',
+      posX,
+      posY,
+      r,
+      isDark ? 'rgba(56, 189, 248, 0.55)' : 'rgba(2, 132, 199, 0.4)',
+      2
+    );
+    ctx.restore();
+  }
+
+  // 7. Center Aerospace Cockpit Core HUD
+  const ease = easeOut(Math.min(1, progress * 2));
+  const hudW = 620;
+  const hudH = 340;
+  const hudX = cx - hudW / 2;
+  const hudY = cy - hudH / 2;
+
+  ctx.save();
+  ctx.globalAlpha = ease;
+
+  // Background Card
+  drawRoundedRect(ctx, hudX, hudY, hudW, hudH, 32);
+  ctx.fillStyle = isDark ? 'rgba(8, 14, 25, 0.88)' : 'rgba(255, 255, 255, 0.92)';
+  ctx.fill();
+  ctx.strokeStyle = isDark ? 'rgba(56, 189, 248, 0.3)' : 'rgba(2, 132, 199, 0.2)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Owner Mascot Avatar
+  if (assets.ownerImg) {
+    const avSize = 76;
+    const avX = cx - avSize / 2;
+    const avY = hudY + 28;
+    drawRoundedRect(ctx, avX, avY, avSize, avSize, 18);
+    ctx.save();
+    ctx.clip();
+    ctx.drawImage(assets.ownerImg, avX, avY, avSize, avSize);
+    ctx.restore();
+    drawRoundedRect(ctx, avX, avY, avSize, avSize, 18);
+    ctx.strokeStyle = isDark ? 'rgba(56, 189, 248, 0.4)' : 'rgba(2, 132, 199, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // Repo Hierarchy Name
+  const repoFullName = data.owner ? `${data.owner}/${data.repo}` : data.repo;
+  ctx.font = `bold 32px 'DM Sans', sans-serif`;
+  ctx.fillStyle = isDark ? '#FFFFFF' : '#0F172A';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(repoFullName, cx, hudY + 135);
+
+  // Big Star Count
+  const curStars = Math.round(data.stars * Math.min(1, progress * 3));
+  const countStr = curStars.toLocaleString();
+  ctx.font = `900 88px 'DM Sans', sans-serif`;
+  const countWidth = ctx.measureText(countStr).width;
+  const starR = 34;
+  const totalStarGroup = starR * 2 + 18 + countWidth;
+  const groupStart = cx - totalStarGroup / 2;
+
+  drawYellowStar(ctx, groupStart + starR, hudY + 215, starR);
+
+  ctx.font = `900 88px 'DM Sans', sans-serif`;
+  ctx.fillStyle = isDark ? '#FFFFFF' : '#0F172A';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(countStr, groupStart + starR * 2 + 18, hudY + 215);
+
+  // Subtitle
+  ctx.font = `bold 12px 'DM Sans', sans-serif`;
+  ctx.fillStyle = isDark ? '#38BDF8' : '#0284C7';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('COMMUNITY STARGAZERS', cx, hudY + 295);
+
+  ctx.restore();
+}
+
 // Main rendering dispatcher
 export function renderTemplateFrame(
   ctx: CanvasRenderingContext2D,
@@ -1543,5 +1809,8 @@ export function renderTemplateFrame(
     renderConstellation(ctx, data, theme, progress, assets);
   } else if (template === 'spotlight') {
     renderSpotlight(ctx, data, theme, progress, assets);
+  } else if (template === 'hyperdrive') {
+    renderHyperdrive(ctx, data, theme, progress, assets);
   }
 }
+

@@ -2,7 +2,14 @@ import type { TemplateData } from '../components/templates/types';
 import sampleStargazers from './sampleStargazers.json';
 
 export interface TemplateMeta {
-  id: 'spotlight' | 'revolve' | 'milestone' | 'infinity' | 'orbit' | 'constellation';
+  id:
+    | 'spotlight'
+    | 'revolve'
+    | 'milestone'
+    | 'infinity'
+    | 'orbit'
+    | 'constellation'
+    | 'hyperdrive';
   name: string;
   tag: string;
   description: string;
@@ -14,6 +21,12 @@ export const templatesData: readonly TemplateMeta[] = [
     name: 'Spotlight',
     tag: 'Keynote Editorial',
     description: 'Clean Apple-style keynote layout with display typography and an overlapping avatar stack.',
+  },
+  {
+    id: 'hyperdrive',
+    name: 'Hyperdrive',
+    tag: 'Light-Speed Jump',
+    description: 'Anamorphic light-speed acceleration beams with burst-speed contributor avatars and shockwave rings.',
   },
   {
     id: 'revolve',
