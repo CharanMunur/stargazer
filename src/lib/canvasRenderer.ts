@@ -1,7 +1,16 @@
 import type { TemplateData } from '../components/templates/types';
 import sampleStargazers from '../data/sampleStargazers.json';
 
-export type TemplateType = 'counter' | 'ticker' | 'orbit' | 'constellation';
+export type TemplateType =
+  | 'spotlight'
+  | 'revolve'
+  | 'milestone'
+  | 'infinity'
+  | 'orbit'
+  | 'constellation'
+  // legacy aliases kept for backward compat
+  | 'counter'
+  | 'ticker';
 
 export interface ScatterPoint {
   x: number;
@@ -150,19 +159,23 @@ export async function preloadTemplateAssets(
       : sampleStargazers;
 
   let avatarUrls: string[] = [];
-  if (template === 'counter') {
+  if (template === 'counter' || template === 'milestone') {
     avatarUrls = sourceStargazers.slice(0, 16).map((s) => s.avatarUrl).filter(Boolean);
-  } else if (template === 'ticker') {
+  } else if (template === 'ticker' || template === 'infinity') {
     avatarUrls = sourceStargazers.slice(0, 16).map((s) => s.avatarUrl).filter(Boolean);
+  } else if (template === 'revolve') {
+    avatarUrls = sourceStargazers.slice(0, 55).map((s) => s.avatarUrl).filter(Boolean);
   } else if (template === 'orbit') {
     avatarUrls = sourceStargazers.slice(0, 16).map((s) => s.avatarUrl).filter(Boolean);
   } else if (template === 'constellation') {
     // Up to 96 avatars for scatter pool
     avatarUrls = sourceStargazers.slice(0, 96).map((s) => s.avatarUrl).filter(Boolean);
+  } else if (template === 'spotlight') {
+    avatarUrls = sourceStargazers.slice(0, 8).map((s) => s.avatarUrl).filter(Boolean);
   }
 
   const [leafImg, ownerImg, ...loadedAvatars] = await Promise.all([
-    template === 'counter' ? loadImage('/leaf.svg') : Promise.resolve(null),
+    (template === 'counter' || template === 'milestone') ? loadImage('/leaf.svg') : Promise.resolve(null),
     data.ownerAvatarUrl ? loadImage(data.ownerAvatarUrl) : Promise.resolve(null),
     ...avatarUrls.map((u) => loadImage(u, 2000)),
   ]);
@@ -826,6 +839,396 @@ function renderConstellation(
   ctx.restore();
 }
 
+function drawRoundedRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) {
+  if (ctx.roundRect) {
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, r);
+  } else {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+}
+
+function renderSpotlight(
+  ctx: CanvasRenderingContext2D,
+  data: TemplateData,
+  theme: 'dark' | 'light',
+  progress: number,
+  assets: PreloadedAssets
+) {
+  const width = 1600;
+  const height = 900;
+  const isDark = theme === 'dark';
+  const ease = easeOut(progress);
+
+  // Background
+  ctx.fillStyle = isDark ? '#0F0E10' : '#FFFFFF';
+  ctx.fillRect(0, 0, width, height);
+
+  // Radial ambient spotlight
+  ctx.save();
+  const grad = ctx.createRadialGradient(800, 420, 0, 800, 420, 600);
+  if (isDark) {
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.04)');
+    grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  } else {
+    grad.addColorStop(0, 'rgba(0, 0, 0, 0.025)');
+    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  }
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
+
+
+
+  // Center Title
+  const repoFullName = data.owner ? `${data.owner}/${data.repo}` : data.repo;
+  ctx.save();
+  ctx.globalAlpha = ease;
+  ctx.font = `bold 76px 'DM Sans', sans-serif`;
+  ctx.fillStyle = isDark ? '#F5EDE7' : '#050505';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(repoFullName, 800, 320);
+
+  // Big Stargazer Count
+  const curStars = Math.round(data.stars * ease);
+  const countStr = curStars.toLocaleString();
+  ctx.font = `bold 120px 'DM Sans', sans-serif`;
+  const countW = ctx.measureText(countStr).width;
+  ctx.font = `500 44px 'DM Sans', sans-serif`;
+  const labelW = ctx.measureText('stargazers').width;
+  const totalGroupW = 75 + countW + 20 + labelW;
+  const startX = 800 - totalGroupW / 2;
+
+  // Star
+  drawYellowStar(ctx, startX + 35, 470, 36);
+
+  // Number
+  ctx.font = `bold 120px 'DM Sans', sans-serif`;
+  ctx.fillStyle = isDark ? '#F5EDE7' : '#050505';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(countStr, startX + 85, 465);
+
+  // "stargazers"
+  ctx.font = `500 44px 'DM Sans', sans-serif`;
+  ctx.fillStyle = isDark ? '#A1958D' : '#64748B';
+  ctx.fillText('stargazers', startX + 85 + countW + 20, 485);
+  ctx.restore();
+
+  // Bottom Avatar Stack (8 avatars)
+  const allStargazers = data.stargazers && data.stargazers.length > 0 ? data.stargazers : sampleStargazers;
+  const visible = allStargazers.slice(0, 8);
+  const remaining = Math.max(0, data.stars - visible.length);
+
+  ctx.save();
+  ctx.globalAlpha = ease;
+  const avatarR = 34; // 68px diameter
+  const overlap = 22;
+  const stackW = (visible.length - 1) * (avatarR * 2 - overlap) + avatarR * 2;
+  const stackStartX = remaining > 0 ? 800 - (stackW + 160) / 2 + avatarR : 800 - stackW / 2 + avatarR;
+  const stackY = 740;
+
+  for (let i = 0; i < visible.length; i++) {
+    const u = visible[i];
+    const img = u.avatarUrl ? assets.avatarImages.get(u.avatarUrl) : undefined;
+    const ax = stackStartX + i * (avatarR * 2 - overlap);
+    drawCircularAvatar(
+      ctx,
+      img,
+      u.login,
+      ax,
+      stackY,
+      avatarR,
+      isDark ? '#1C1B1F' : '#FFFFFF',
+      4
+    );
+  }
+
+  if (remaining > 0) {
+    const pillX = stackStartX + visible.length * (avatarR * 2 - overlap) + 15;
+    const pillW = 160;
+    const pillH = 46;
+    drawRoundedRect(ctx, pillX, stackY - pillH / 2, pillW, pillH, 23);
+    ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+    ctx.fill();
+    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.1)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.font = `600 15px 'DM Sans', sans-serif`;
+    ctx.fillStyle = isDark ? '#A1958D' : '#64748B';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`+${remaining.toLocaleString()} others`, pillX + pillW / 2, stackY);
+  }
+  ctx.restore();
+}
+
+
+// ─── Revolve Template ──────────────────────────────────────────────────────────
+function renderRevolve(
+  ctx: CanvasRenderingContext2D,
+  data: TemplateData,
+  theme: 'dark' | 'light',
+  progress: number,
+  assets: PreloadedAssets
+) {
+  const W = 1600, H = 900;
+  const isDark = theme === 'dark';
+  const CX = 800, CY = 450;
+
+  // Background
+  ctx.fillStyle = isDark ? '#0D0C12' : '#F5F4F1';
+  ctx.fillRect(0, 0, W, H);
+
+  // Radial glow
+  const grd = ctx.createRadialGradient(CX, CY, 0, CX, CY, 480);
+  if (isDark) {
+    grd.addColorStop(0,   'rgba(168,85,247,0.28)');
+    grd.addColorStop(0.28,'rgba(139,92,246,0.12)');
+    grd.addColorStop(1,   'rgba(13,12,18,0)');
+  } else {
+    grd.addColorStop(0,   'rgba(192,132,252,0.30)');
+    grd.addColorStop(0.32,'rgba(221,214,254,0.14)');
+    grd.addColorStop(1,   'rgba(245,244,241,0)');
+  }
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, W, H);
+
+  // Ring definitions: [count, radius, chipSize, durationSec, clockwise, angleOffsetDeg→rad]
+  const rings: [number, number, number, number, boolean, number][] = [
+    [5,  310, 70, 26, true,  45   * Math.PI / 180],
+    [8,  440, 74, 40, false, 0],
+    [11, 570, 78, 56, true,  30   * Math.PI / 180],
+    [14, 700, 82, 72, false, 60   * Math.PI / 180],
+    [17, 830, 86, 90, true,  22.5 * Math.PI / 180],
+  ];
+
+  const totalCycles = 3.5; // matches videoExporter default durationSeconds
+
+  const allStargazers = data.stargazers && data.stargazers.length > 0 ? data.stargazers : sampleStargazers;
+  let cursor = 0;
+
+  // Draw ring tracks and avatars per ring (staggered fade-in: ring 0 first, then ring 1, 2, 3, 4)
+  for (let ri = 0; ri < rings.length; ri++) {
+    const [count, radius, chipSize, dur, clockwise, offset] = rings[ri];
+    const ringAlpha = Math.max(0, Math.min(1, (progress - ri * 0.12) / 0.18));
+    if (ringAlpha <= 0) continue;
+
+    ctx.save();
+    ctx.globalAlpha = ringAlpha;
+
+    // Track circle
+    ctx.beginPath();
+    ctx.arc(CX, CY, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = isDark
+      ? `rgba(255,255,255,${0.12 - ri * 0.015})`
+      : `rgba(0,0,0,${0.09 - ri * 0.012})`;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Avatars
+    const avatars = allStargazers.slice(
+      rings.slice(0, ri).reduce((s, r) => s + r[0], 0),
+      rings.slice(0, ri + 1).reduce((s, r) => s + r[0], 0)
+    );
+    const speed = (totalCycles / dur) * Math.PI * 2;
+    const dirSign = clockwise ? 1 : -1;
+
+    for (let i = 0; i < avatars.length; i++) {
+      const u = avatars[i];
+      const angle = offset + (i / count) * Math.PI * 2 + dirSign * progress * speed;
+      const ax = CX + Math.cos(angle) * radius;
+      const ay = CY + Math.sin(angle) * radius;
+      const half = chipSize / 2;
+      const r = chipSize * 0.28;
+
+      ctx.save();
+
+      // Chip background
+      ctx.beginPath();
+      ctx.moveTo(ax - half + r, ay - half);
+      ctx.lineTo(ax + half - r, ay - half);
+      ctx.quadraticCurveTo(ax + half, ay - half, ax + half, ay - half + r);
+      ctx.lineTo(ax + half, ay + half - r);
+      ctx.quadraticCurveTo(ax + half, ay + half, ax + half - r, ay + half);
+      ctx.lineTo(ax - half + r, ay + half);
+      ctx.quadraticCurveTo(ax - half, ay + half, ax - half, ay + half - r);
+      ctx.lineTo(ax - half, ay - half + r);
+      ctx.quadraticCurveTo(ax - half, ay - half, ax - half + r, ay - half);
+      ctx.closePath();
+      ctx.fillStyle = isDark ? 'rgba(22,20,30,0.95)' : 'rgba(255,255,255,0.97)';
+      ctx.fill();
+      ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.13)' : 'rgba(0,0,0,0.08)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Avatar image or initial
+      const img = u.avatarUrl ? assets.avatarImages.get(u.avatarUrl) : undefined;
+      const pad = 4;
+      const inner = chipSize - pad * 2;
+      const ix = ax - half + pad;
+      const iy = ay - half + pad;
+      const ir = inner * 0.22;
+
+      if (img) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(ix + ir, iy);
+        ctx.lineTo(ix + inner - ir, iy);
+        ctx.quadraticCurveTo(ix + inner, iy, ix + inner, iy + ir);
+        ctx.lineTo(ix + inner, iy + inner - ir);
+        ctx.quadraticCurveTo(ix + inner, iy + inner, ix + inner - ir, iy + inner);
+        ctx.lineTo(ix + ir, iy + inner);
+        ctx.quadraticCurveTo(ix, iy + inner, ix, iy + inner - ir);
+        ctx.lineTo(ix, iy + ir);
+        ctx.quadraticCurveTo(ix, iy, ix + ir, iy);
+        ctx.closePath();
+        ctx.clip();
+        ctx.drawImage(img, ix, iy, inner, inner);
+        ctx.restore();
+      } else {
+        const initial = (u.login || '?').charAt(0).toUpperCase();
+        ctx.font = `700 ${inner * 0.42}px 'DM Sans', sans-serif`;
+        ctx.fillStyle = isDark ? '#E2E8F0' : '#475569';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(initial, ax, ay);
+      }
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+
+  // ── Center Hub ──────────────────────────────────────────────────────
+  const ease = Math.min(1, progress * 5);
+
+  // Center halo
+  const halo = ctx.createRadialGradient(CX, CY, 0, CX, CY, 110);
+  halo.addColorStop(0, isDark ? 'rgba(168,85,247,0.35)' : 'rgba(192,132,252,0.32)');
+  halo.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.save();
+  ctx.globalAlpha = ease;
+  ctx.fillStyle = halo;
+  ctx.fillRect(CX - 110, CY - 110, 220, 220);
+  ctx.restore();
+
+  // Owner avatar: 160×160 centered
+  const avatarSz = 160;
+  const avatarHalf = avatarSz / 2;
+  const avatarR = 36;
+  // Layout: avatar center at CY - 230, repo name at CY - 60, star row at CY + 80
+  // Total content height ≈ 160 + 24 + 56 + 18 + 110 = 368px → top at CY-184, bottom at CY+184
+  const avatarY = CY - 205;
+
+  ctx.save();
+  ctx.globalAlpha = ease;
+  ctx.beginPath();
+  ctx.moveTo(CX - avatarHalf + avatarR, avatarY - avatarHalf);
+  ctx.lineTo(CX + avatarHalf - avatarR, avatarY - avatarHalf);
+  ctx.quadraticCurveTo(CX + avatarHalf, avatarY - avatarHalf, CX + avatarHalf, avatarY - avatarHalf + avatarR);
+  ctx.lineTo(CX + avatarHalf, avatarY + avatarHalf - avatarR);
+  ctx.quadraticCurveTo(CX + avatarHalf, avatarY + avatarHalf, CX + avatarHalf - avatarR, avatarY + avatarHalf);
+  ctx.lineTo(CX - avatarHalf + avatarR, avatarY + avatarHalf);
+  ctx.quadraticCurveTo(CX - avatarHalf, avatarY + avatarHalf, CX - avatarHalf, avatarY + avatarHalf - avatarR);
+  ctx.lineTo(CX - avatarHalf, avatarY - avatarHalf + avatarR);
+  ctx.quadraticCurveTo(CX - avatarHalf, avatarY - avatarHalf, CX - avatarHalf + avatarR, avatarY - avatarHalf);
+  ctx.closePath();
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.09)' : '#FFFFFF';
+  ctx.fill();
+  ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.09)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  if (assets.ownerImg) {
+    ctx.save();
+    const ix = CX - avatarHalf;
+    const iy = avatarY - avatarHalf;
+    const inner = avatarSz;
+    const ir = avatarR;
+    ctx.beginPath();
+    ctx.moveTo(ix + ir, iy);
+    ctx.lineTo(ix + inner - ir, iy);
+    ctx.quadraticCurveTo(ix + inner, iy, ix + inner, iy + ir);
+    ctx.lineTo(ix + inner, iy + inner - ir);
+    ctx.quadraticCurveTo(ix + inner, iy + inner, ix + inner - ir, iy + inner);
+    ctx.lineTo(ix + ir, iy + inner);
+    ctx.quadraticCurveTo(ix, iy + inner, ix, iy + inner - ir);
+    ctx.lineTo(ix, iy + ir);
+    ctx.quadraticCurveTo(ix, iy, ix + ir, iy);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(assets.ownerImg, ix, iy, inner, inner);
+    ctx.restore();
+  }
+  ctx.restore();
+
+  // Repo full name — 46px bold
+  const repoFullName = data.owner ? `${data.owner}/${data.repo}` : data.repo;
+  ctx.save();
+  ctx.globalAlpha = ease;
+  ctx.font = `800 46px 'DM Sans', sans-serif`;
+  ctx.fillStyle = isDark ? '#F5EDE7' : '#0F0E10';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(repoFullName, CX, CY - 50);
+  ctx.restore();
+
+  // Star count row — 100px
+  const curStars = Math.round(data.stars * Math.min(1, progress * 4));
+  const countStr = curStars.toLocaleString();
+  ctx.save();
+  ctx.globalAlpha = ease;
+
+  ctx.font = `900 100px 'DM Sans', sans-serif`;
+  const countW = ctx.measureText(countStr).width;
+  const starSz = 76;
+  const labelFont = 28;
+  const gap = 16;
+
+  ctx.font = `500 ${labelFont}px 'DM Sans', sans-serif`;
+  const labelW = ctx.measureText('stars').width;
+
+  const totalW = starSz + gap + countW + gap + labelW;
+  const startX = CX - totalW / 2;
+  const rowY = CY + 85;
+
+  // Star icon
+  drawYellowStar(ctx, startX + starSz / 2, rowY, starSz / 2);
+
+  // Count
+  ctx.font = `900 100px 'DM Sans', sans-serif`;
+  ctx.fillStyle = isDark ? '#F5EDE7' : '#0F0E10';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(countStr, startX + starSz + gap, rowY - 2);
+
+  // "stars" label
+  ctx.font = `500 ${labelFont}px 'DM Sans', sans-serif`;
+  ctx.fillStyle = isDark ? '#A1958D' : '#64748B';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('stars', startX + starSz + gap + countW + gap, rowY + 50);
+  ctx.restore();
+}
+
 // Main rendering dispatcher
 export function renderTemplateFrame(
   ctx: CanvasRenderingContext2D,
@@ -835,13 +1238,17 @@ export function renderTemplateFrame(
   progress: number,
   assets: PreloadedAssets
 ) {
-  if (template === 'counter') {
+  if (template === 'counter' || template === 'milestone') {
     renderCounter(ctx, data, theme, progress, assets);
-  } else if (template === 'ticker') {
+  } else if (template === 'ticker' || template === 'infinity') {
     renderTicker(ctx, data, theme, progress, assets);
+  } else if (template === 'revolve') {
+    renderRevolve(ctx, data, theme, progress, assets);
   } else if (template === 'orbit') {
     renderOrbit(ctx, data, theme, progress, assets);
   } else if (template === 'constellation') {
     renderConstellation(ctx, data, theme, progress, assets);
+  } else if (template === 'spotlight') {
+    renderSpotlight(ctx, data, theme, progress, assets);
   }
 }

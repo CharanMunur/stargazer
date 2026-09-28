@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Search, ArrowRight } from "lucide-react";
 import { FadeIn } from "../helpers/FadeIn";
 import {
-  CounterCard,
-  TickerCard,
+  MilestoneCard,
+  InfinityCard,
   OrbitCard,
   ConstellationCard,
+  SpotlightCard,
+  RevolveCard,
 } from "../templates";
 import { templatesData, initialSampleData } from "@/data/templates";
 
@@ -93,17 +95,33 @@ export default function HomePage() {
                   }}
                 />
                 <div className="w-full h-full relative z-10">
-                  {tmpl.id === "counter" && (
-                    <CounterCard
-                      key={`preview-counter-${theme}`}
+                  {tmpl.id === "spotlight" && (
+                    <SpotlightCard
+                      key={`preview-spotlight-${theme}`}
                       data={initialSampleData}
                       theme={theme}
                       animated
                     />
                   )}
-                  {tmpl.id === "ticker" && (
-                    <TickerCard
-                      key={`preview-ticker-${theme}`}
+                  {tmpl.id === "revolve" && (
+                    <RevolveCard
+                      key={`preview-revolve-${theme}`}
+                      data={initialSampleData}
+                      theme={theme}
+                      animated
+                    />
+                  )}
+                  {tmpl.id === "milestone" && (
+                    <MilestoneCard
+                      key={`preview-milestone-${theme}`}
+                      data={initialSampleData}
+                      theme={theme}
+                      animated
+                    />
+                  )}
+                  {tmpl.id === "infinity" && (
+                    <InfinityCard
+                      key={`preview-infinity-${theme}`}
                       data={initialSampleData}
                       theme={theme}
                       animated

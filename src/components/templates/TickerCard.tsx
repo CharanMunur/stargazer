@@ -46,7 +46,7 @@ const YellowStar: React.FC<{ className?: string }> = ({ className = 'w-7 h-7' })
   </svg>
 );
 
-export const TickerCard: React.FC<TemplateCardProps> = ({
+export const InfinityCard: React.FC<TemplateCardProps> = ({
   data,
   theme = 'light',
   animated = true,
@@ -236,3 +236,5 @@ export const TickerCard: React.FC<TemplateCardProps> = ({
     </div>
   );
 };
+
+export const TickerCard = InfinityCard;

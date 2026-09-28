@@ -2,7 +2,7 @@ import type { TemplateData } from '../components/templates/types';
 import sampleStargazers from './sampleStargazers.json';
 
 export interface TemplateMeta {
-  id: 'counter' | 'ticker' | 'orbit' | 'constellation';
+  id: 'spotlight' | 'revolve' | 'milestone' | 'infinity' | 'orbit' | 'constellation';
   name: string;
   tag: string;
   description: string;
@@ -10,14 +10,26 @@ export interface TemplateMeta {
 
 export const templatesData: readonly TemplateMeta[] = [
   {
-    id: 'counter',
-    name: 'Counter',
-    tag: 'Milestone',
+    id: 'spotlight',
+    name: 'Spotlight',
+    tag: 'Keynote Editorial',
+    description: 'Clean Apple-style keynote layout with display typography and an overlapping avatar stack.',
+  },
+  {
+    id: 'revolve',
+    name: 'Revolve',
+    tag: 'Concentric Orbits',
+    description: 'Multi-ring concentric orbits revolving contributor avatars in opposing directions around live star metrics.',
+  },
+  {
+    id: 'milestone',
+    name: 'Milestone',
+    tag: 'Laurel Achievement',
     description: 'Symmetrical laurel milestone card with dynamic metric counters and 16-contributor grid.',
   },
   {
-    id: 'ticker',
-    name: 'Ticker',
+    id: 'infinity',
+    name: 'Infinity',
     tag: 'Marquee Loop',
     description: 'Continuous horizontal glide marquee with momentum physics and contributor star badges.',
   },

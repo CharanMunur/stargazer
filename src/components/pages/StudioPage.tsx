@@ -1,6 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Download, RefreshCw, RotateCcw, Sun, Moon } from 'lucide-react';
-import { CounterCard, TickerCard, OrbitCard, ConstellationCard } from '../templates';
+import {
+  MilestoneCard,
+  InfinityCard,
+  OrbitCard,
+  ConstellationCard,
+  SpotlightCard,
+  RevolveCard,
+} from '../templates';
 import type { TemplateData, StargazerUser } from '../templates/types';
 import { toPng } from 'html-to-image';
 import { exportTemplateToVideo } from '@/lib/videoExporter';
@@ -14,7 +21,7 @@ type TemplateId = TemplateMeta['id'];
 export default function StudioPage() {
   const [token, setToken] = useState('');
   const [repo, setRepo] = useState('CharanMunur/Portfolio');
-  const [template, setTemplate] = useState<TemplateId>('counter');
+  const [template, setTemplate] = useState<TemplateId>('spotlight');
   const [format, setFormat] = useState<'png' | 'mp4'>('png');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const userCustomizedTheme = useRef(false);
@@ -51,8 +58,8 @@ export default function StudioPage() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      const qTemplate = (params.get('generate') || params.get('template')) as TemplateId;
-      if (['counter', 'ticker', 'orbit', 'constellation'].includes(qTemplate)) {
+      const qTemplate = (params.get('template') || params.get('generate')) as TemplateId;
+      if (templatesData.some((t) => t.id === qTemplate)) {
         setTemplate(qTemplate);
       }
     }
@@ -62,7 +69,8 @@ export default function StudioPage() {
     setTemplate(newTemplate);
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
-      url.searchParams.set('generate', newTemplate);
+      url.searchParams.set('template', newTemplate);
+      url.searchParams.delete('generate');
       window.history.replaceState({}, '', url.toString());
     }
   };
@@ -326,17 +334,17 @@ export default function StudioPage() {
 
             {/* Live Canvas */}
             <div ref={cardContainerRef} className="w-full aspect-[16/9] relative z-10">
-              {template === 'counter' && (
-                <CounterCard
-                  key={`card-counter-${theme}-${repoData.repo}-${replayNonce}`}
+              {template === 'milestone' && (
+                <MilestoneCard
+                  key={`card-milestone-${theme}-${repoData.repo}-${replayNonce}`}
                   data={repoData}
                   theme={theme}
                   animated
                 />
               )}
-              {template === 'ticker' && (
-                <TickerCard
-                  key={`card-ticker-${theme}-${repoData.repo}-${replayNonce}`}
+              {template === 'infinity' && (
+                <InfinityCard
+                  key={`card-infinity-${theme}-${repoData.repo}-${replayNonce}`}
                   data={repoData}
                   theme={theme}
                   animated
@@ -353,6 +361,22 @@ export default function StudioPage() {
               {template === 'constellation' && (
                 <ConstellationCard
                   key={`card-constellation-${theme}-${repoData.repo}-${replayNonce}`}
+                  data={repoData}
+                  theme={theme}
+                  animated
+                />
+              )}
+              {template === 'spotlight' && (
+                <SpotlightCard
+                  key={`card-spotlight-${theme}-${repoData.repo}-${replayNonce}`}
+                  data={repoData}
+                  theme={theme}
+                  animated
+                />
+              )}
+              {template === 'revolve' && (
+                <RevolveCard
+                  key={`card-revolve-${theme}-${repoData.repo}-${replayNonce}`}
                   data={repoData}
                   theme={theme}
                   animated
@@ -464,7 +488,7 @@ export default function StudioPage() {
                     }}
                     className={`flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-full transition-all cursor-pointer ${
                       theme === th
-                        ? 'bg-background text-foreground font-semibold shadow-2xs border border-border'
+                        ? 'bg-foreground text-background font-semibold shadow-2xs'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
                     }`}
                   >
@@ -488,7 +512,7 @@ export default function StudioPage() {
                     onClick={() => handleOrderChange(ord)}
                     className={`py-2 px-3 text-sm rounded-full text-center transition-all cursor-pointer ${
                       stargazerOrder === ord
-                        ? 'bg-background text-foreground font-semibold shadow-2xs border border-border'
+                        ? 'bg-foreground text-background font-semibold shadow-2xs'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
                     }`}
                   >
@@ -511,7 +535,7 @@ export default function StudioPage() {
                     onClick={() => setFormat(fmt)}
                     className={`py-2 px-3 text-sm rounded-full text-center transition-all cursor-pointer ${
                       format === fmt
-                        ? 'bg-background text-foreground font-semibold shadow-2xs border border-border'
+                        ? 'bg-foreground text-background font-semibold shadow-2xs'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
                     }`}
                   >
@@ -539,7 +563,7 @@ export default function StudioPage() {
           <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
             Browse other templates
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {otherTemplates.map((other, idx) => (
               <FadeIn key={other.id} delay={0.25 + idx * 0.05} yOffset={15}>
                 <button
@@ -549,8 +573,10 @@ export default function StudioPage() {
                 >
                   <div className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-background border border-border relative flex items-center justify-center pointer-events-none mb-2">
                     <div className="w-full h-full relative z-10 pointer-events-none">
-                      {other.id === 'counter' && <CounterCard data={initialSampleData} theme={theme} animated={false} />}
-                      {other.id === 'ticker' && <TickerCard data={initialSampleData} theme={theme} animated={false} />}
+                      {other.id === 'spotlight' && <SpotlightCard data={initialSampleData} theme={theme} animated={false} />}
+                      {other.id === 'revolve' && <RevolveCard data={initialSampleData} theme={theme} animated={false} />}
+                      {other.id === 'milestone' && <MilestoneCard data={initialSampleData} theme={theme} animated={false} />}
+                      {other.id === 'infinity' && <InfinityCard data={initialSampleData} theme={theme} animated={false} />}
                       {other.id === 'orbit' && <OrbitCard data={initialSampleData} theme={theme} animated={false} />}
                       {other.id === 'constellation' && <ConstellationCard data={initialSampleData} theme={theme} animated={false} />}
                     </div>

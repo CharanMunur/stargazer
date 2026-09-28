@@ -44,7 +44,7 @@ function AnimatedNumber({ value, animated = true }: { value: number; animated?: 
   return <>{displayValue.toLocaleString()}</>;
 }
 
-export const CounterCard: React.FC<TemplateCardProps> = ({
+export const MilestoneCard: React.FC<TemplateCardProps> = ({
   data,
   theme = 'light',
   animated = true,
@@ -276,3 +276,5 @@ export const CounterCard: React.FC<TemplateCardProps> = ({
     </div>
   );
 };
+
+export const CounterCard = MilestoneCard;
