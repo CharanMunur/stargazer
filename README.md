@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="client/public/stargazer.svg" alt="stargazer logo" width="520" align="center" />
+  <img src="public/stargazer.svg" alt="stargazer logo" width="520" align="center" />
 </p>
 
 <p align="center">
@@ -80,7 +80,7 @@ An organic point-cloud cluster designed for contributor appreciation and showcas
 ```bash
 # Clone the repository
 git clone https://github.com/CharanMunur/stargazer.git
-cd stargazer/client
+cd stargazer
 
 # Install dependencies
 bun install
@@ -110,35 +110,44 @@ Open `http://localhost:4321` in your browser.
 
 ```text
 stargazer/
-├── AGENTS.md                            # Design rules & architecture guidelines
-├── client/                              # Astro + React + Tailwind frontend
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── CardGenerator.tsx        # Interactive Studio interface
-│   │   │   ├── FadeIn.tsx               # Entrance & scroll animation wrapper
-│   │   │   ├── GitHubStars.tsx          # Real-time repository star badge
-│   │   │   ├── HowToGuide.tsx           # shadcn-style documentation with scrollspy
-│   │   │   ├── SmoothScroll.tsx         # Lenis smooth inertia scrolling
-│   │   │   ├── TemplatesGallery.tsx     # Homepage template gallery
-│   │   │   ├── ThemeToggle.tsx          # Theme switcher with observer protection
-│   │   │   ├── templates/               # React + Framer Motion templates
-│   │   │   │   ├── ConstellationCard.tsx# Constellation template
-│   │   │   │   ├── CounterCard.tsx      # Counter template
-│   │   │   │   ├── OrbitCard.tsx        # 3D Orbit template
-│   │   │   │   ├── TickerCard.tsx       # Ticker template
-│   │   │   │   └── types.ts             # Template TypeScript interfaces
-│   │   │   └── ui/                      # Official shadcn/ui components
-│   │   ├── data/
-│   │   │   └── howToData.ts             # Structured documentation content
-│   │   ├── lib/
-│   │   │   ├── canvasRenderer.ts        # Canvas rendering engine
-│   │   │   ├── templatesData.ts         # Centralized template metadata & specs
-│   │   │   └── videoExporter.ts         # In-browser MP4 video exporter
-│   │   └── pages/
-│   │       ├── generate.astro           # Studio route (/generate)
-│   │       ├── how-to.astro             # How to guide route (/how-to)
-│   │       └── index.astro              # Landing page (/)
-│   └── public/                          # Static assets and DM Sans font files
+├── public/                              # Static assets, logos, and DM Sans fonts
+├── src/
+│   ├── components/
+│   │   ├── helpers/                     # Cross-cutting UX & animation helpers
+│   │   │   ├── FadeIn.tsx               # Viewport-aware entrance animation wrapper
+│   │   │   └── SmoothScroll.tsx         # Lenis smooth inertia scrolling
+│   │   ├── pages/                       # Dedicated page coordinator components
+│   │   │   ├── HomePage.tsx             # Landing page & template showcase
+│   │   │   ├── StudioPage.tsx           # Interactive studio & card/video generator
+│   │   │   └── HowToPage.tsx            # Step-by-step guide with live scrollspy TOC
+│   │   ├── templates/                   # React + Framer Motion canvas templates
+│   │   │   ├── ConstellationCard.tsx    # Constellation template
+│   │   │   ├── CounterCard.tsx          # Counter template
+│   │   │   ├── OrbitCard.tsx            # 3D Orbit template
+│   │   │   ├── TickerCard.tsx           # Ticker template
+│   │   │   └── types.ts                 # Template TypeScript interfaces
+│   │   ├── ui/                          # Headless & UI primitives
+│   │   ├── GitHubStars.tsx              # Real-time repository star badge
+│   │   └── ThemeToggle.tsx              # Theme switcher with observer protection
+│   ├── data/                            # Sovereign data domain
+│   │   ├── howToData.ts                 # Structured documentation content
+│   │   ├── sampleStargazers.json        # Contributor sample dataset
+│   │   └── templates.ts                 # Template specifications & sample data
+│   ├── lib/                             # Core utilities & export engines
+│   │   ├── canvasRenderer.ts            # Canvas rendering engine
+│   │   ├── utils.ts                     # Class merging utility (clsx + tailwind-merge)
+│   │   └── videoExporter.ts             # In-browser MP4 video exporter
+│   ├── pages/                           # Route entry points
+│   │   ├── generate.astro               # Studio route (/generate)
+│   │   ├── how-to.astro                 # How-to guide route (/how-to)
+│   │   └── index.astro                  # Landing page (/)
+│   └── styles/
+│       └── globals.css                  # Global styles & OKLCH color token engine
+├── astro.config.mjs                     # Astro build configuration
+├── components.json                      # Component CLI configuration
+├── package.json                         # Project dependencies & scripts
+├── tailwind.config.mjs                  # Tailwind configuration
+├── tsconfig.json                        # TypeScript configuration & path aliases
 └── README.md
 ```
 
