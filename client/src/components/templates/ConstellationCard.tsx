@@ -50,11 +50,11 @@ interface ScatterAvatar {
   y: number;
   size: number;
   alpha: number;
+  blur: number;
   login: string;
   avatarUrl: string;
 }
 
-// Exactly mirrors Go constellation.go generateConstellationScatter
 function computeConstellationScatter(
   stargazers: { login: string; avatarUrl: string }[],
   repoFullName: string,
@@ -62,59 +62,29 @@ function computeConstellationScatter(
   height = 900
 ): ScatterAvatar[] {
   const rng = createRng(repoFullName || 'stargazer');
-  const centerX = width / 2.0; // 800.0
-  const centerY = height / 2.0; // 450.0
+  const centerX = 800.0;
+  const centerY = 460.0;
 
-  // Exact Go radii
-  const rx = 560.0;
-  const ry = 240.0;
-  const maxDEll = Math.sqrt(Math.pow(centerX / rx, 2) + Math.pow(centerY / ry, 2)); // ~2.23
-
-  // Limit to 44 avatars for ideal balance and constellation line connectivity
-  const targetCount = 44;
   const result: ScatterAvatar[] = [];
-  const maxAttempts = 90000;
-  let attempts = 0;
+  const padding = 12.0; // Reduced padding between avatars for denser constellation
 
-  while (result.length < targetCount && attempts < maxAttempts) {
-    attempts++;
-    const margin = 50.0;
-    const x = margin + rng() * (width - 2 * margin);
-    const y = margin + rng() * (height - 2 * margin);
+  const tryAdd = (x: number, y: number, size: number): boolean => {
+    const r = size / 2.0;
 
-    const dx = (x - centerX) / rx;
-    const dy = (y - centerY) / ry;
-    const dEll = Math.sqrt(dx * dx + dy * dy);
-
-    // 1. Must be outside the central whitespace ellipse
-    if (dEll < 1.0) continue;
-
-    // 2. Corner and outer density bias
-    const uDist = (dEll - 1.0) / (maxDEll - 1.0);
-    const prob = 0.25 + 0.75 * Math.pow(uDist, 0.6);
-    if (rng() > prob) continue;
-
-    // 3. Avatar size variation (78px to 120px)
-    const size = 78.0 + rng() * 42.0;
-
-    // 4. Overlap rejection check (prevent touching avatars)
-    const padding = 20.0;
-    let overlapping = false;
+    // Strict collision check against existing avatars (guarantees NO overlapping)
     for (const existing of result) {
-      const edx = x - existing.x;
-      const edy = y - existing.y;
-      const edist = Math.sqrt(edx * edx + edy * edy);
-      const minGap = size / 2.0 + existing.size / 2.0 + padding;
-      if (edist < minGap) {
-        overlapping = true;
-        break;
+      const edist = Math.hypot(x - existing.x, y - existing.y);
+      if (edist < r + existing.size / 2.0 + padding) {
+        return false;
       }
     }
-    if (overlapping) continue;
 
-    // 5. Opacity falloff: 0.35 at boundary -> 1.0 at outer canvas corners
-    const uOpacity = Math.min(1.0, Math.max(0.0, uDist));
-    const alpha = 0.35 + 0.65 * Math.pow(uOpacity, 1.1);
+    // Depth calculation: subtle, delicate blur (max 1.0px on inner nodes, 0px on outer)
+    const distFromCenter = Math.hypot(x - centerX, y - centerY);
+    const normDist = Math.min(1.0, Math.max(0.0, (distFromCenter - 230.0) / 600.0));
+    const blurAmount = Math.max(0, (1.0 - normDist) * 1.0);
+    const blur = blurAmount >= 0.4 ? Number(blurAmount.toFixed(1)) : 0;
+    const alpha = Number((0.68 + 0.32 * Math.pow(normDist, 0.8)).toFixed(2));
 
     const userIdx = result.length % (stargazers.length || 1);
     const user = (stargazers && stargazers[userIdx]) || {
@@ -127,9 +97,22 @@ function computeConstellationScatter(
       y,
       size,
       alpha,
+      blur,
       login: user.login,
       avatarUrl: user.avatarUrl,
     });
+    return true;
+  };
+
+  // Full-field organic scatter across canvas (including behind main content)
+  const targetCount = 100; // Increased avatar count
+  let attempts = 0;
+  while (result.length < targetCount && attempts < 90000) {
+    attempts++;
+    const x = -35.0 + rng() * (width + 70.0);
+    const y = -35.0 + rng() * (height + 70.0);
+    const size = 84.0 + rng() * 54.0; // Increased avatar sizes (84px - 138px)
+    tryAdd(x, y, size);
   }
 
   return result;
@@ -195,8 +178,8 @@ export const ConstellationCard: React.FC<TemplateCardProps> = ({
             initial={animated ? { opacity: 0, scale: 0.3 } : { opacity: scat.alpha, scale: 1 }}
             animate={{ opacity: scat.alpha, scale: 1 }}
             transition={{
-              duration: 0.45,
-              delay: animated ? (i / scatters.length) * 0.6 : 0,
+              duration: 0.4,
+              delay: animated ? (i / scatters.length) * 0.7 : 0,
               type: 'spring',
               stiffness: 240,
               damping: 18,
@@ -208,6 +191,7 @@ export const ConstellationCard: React.FC<TemplateCardProps> = ({
               width: `${scat.size}px`,
               height: `${scat.size}px`,
               transform: 'translate(-50%, -50%)',
+              filter: scat.blur > 0 ? `blur(${scat.blur}px)` : undefined,
               border: `2px solid ${isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.06)'}`,
             }}
           >
@@ -229,8 +213,19 @@ export const ConstellationCard: React.FC<TemplateCardProps> = ({
           </motion.div>
         ))}
 
-        {/* 2. Center Content */}
-        {/* 2. Center Content - Perfectly Centered */}
+        {/* 2. Soft Radial Fade Backdrop behind Main Content */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-15">
+          <div
+            className="w-[1300px] h-[680px] rounded-full"
+            style={{
+              background: isDark
+                ? 'radial-gradient(ellipse at center, rgba(15,14,16,1) 0%, rgba(15,14,16,1) 36%, rgba(15,14,16,0.92) 52%, rgba(15,14,16,0.45) 76%, rgba(15,14,16,0) 100%)'
+                : 'radial-gradient(ellipse at center, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 36%, rgba(255,255,255,0.92) 52%, rgba(255,255,255,0.45) 76%, rgba(255,255,255,0) 100%)',
+            }}
+          />
+        </div>
+
+        {/* 3. Center Content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-20">
           {/* 2a. Owner Mascot Icon */}
           <motion.div

@@ -63,10 +63,10 @@ A spherical carousel with dynamic depth and radial lighting:
 
 ### 4. Constellation Template
 An organic point-cloud cluster designed for contributor appreciation and showcase banners:
-* Centered stacked layout: 100px mascot avatar, repository title, and plain text star count.
-* Strict horizontal whitespace ellipse (560px × 240px keep-clear zone) preserving center legibility.
-* Deterministic PRNG scatter of 48+ non-overlapping avatars across outer margins and corners.
-* Radial Euclidean distance opacity falloff: faint avatars (~0.35 opacity) near the oval boundary, brightening to full opacity (1.0) at the canvas perimeter.
+* Centered stacked layout: 108px owner mascot avatar, repository title, and live star count.
+* Full-field organic scatter of 100 non-overlapping avatars across the entire canvas with natural boundary bleed.
+* Soft radial fade vignette backdrop situated directly behind the center content, creating an ethereal cosmic glow while ensuring 100% text and mascot legibility.
+* Subtle atmospheric depth blur and opacity gradation across the starfield.
 
 ---
 

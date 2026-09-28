@@ -6,7 +6,8 @@ export default {
     extend: {
       fontFamily: {
         sans: [
-          "DM Sans",
+          "Montserrat",
+          "Quicksand",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",
@@ -15,6 +16,9 @@ export default {
           "Arial",
           "sans-serif",
         ],
+        montserrat: ["Montserrat", "sans-serif"],
+        quicksand: ["Quicksand", "sans-serif"],
+        dmsans: ["DM Sans", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

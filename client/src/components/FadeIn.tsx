@@ -7,6 +7,7 @@ export interface FadeInProps {
   duration?: number;
   yOffset?: number;
   className?: string;
+  id?: string;
 }
 
 export function FadeIn({
@@ -15,6 +16,7 @@ export function FadeIn({
   duration = 0.5,
   yOffset = 20,
   className = '',
+  id,
 }: FadeInProps) {
   const customVariants: Variants = {
     hidden: { opacity: 0, y: yOffset },
@@ -27,6 +29,7 @@ export function FadeIn({
 
   return (
     <motion.div
+      id={id}
       variants={customVariants}
       initial="hidden"
       whileInView="visible"

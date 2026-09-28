@@ -18,6 +18,7 @@ These rules govern the UI/UX design language, component architecture, animations
 
 ## 2. Typography & Hierarchy
 
+- **Font Stack Distinction**: Website UI pages and components use `Montserrat` and `Quicksand`, while all card templates and canvas exports strictly use `DM Sans` with local `@font-face` definitions.
 - **No All-Caps Headings**: Sidebar control headings must never use `uppercase tracking-wider`. Always capitalize only the first letter (`text-sm font-medium text-text-base/70`).
 - **Font Sizing**: Ensure comfortable, legible typography:
   - Breadcrumbs: `text-sm text-text-base/60` with pill links (`Home / Studio / {Page}`)

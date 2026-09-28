@@ -128,18 +128,20 @@ export default function HowToGuide() {
 
           {/* Section 1: Creating a GitHub Personal Access Token */}
           <section id="creating-pat" className="scroll-mt-24 pt-6 space-y-6">
-            <div className="border-b border-border/40 pb-3">
-              <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                Creating a GitHub PAT
-              </h2>
-            </div>
+            <FadeIn delay={0.05} yOffset={15} duration={0.4}>
+              <div className="border-b border-border/40 pb-3">
+                <h2 className="text-2xl font-bold tracking-tight text-foreground">
+                  Creating a GitHub PAT
+                </h2>
+              </div>
 
-            <p className="text-base text-foreground/80 leading-7 font-normal">
-              GitHub limits unauthenticated API requests to <strong>60 requests per hour</strong>. Creating a Personal Access Token increases your rate limit to <strong>5,000 requests per hour</strong>, allowing Stargazer to stream complete stargazer profiles and avatars in real time.
-            </p>
+              <p className="text-base text-foreground/80 leading-7 font-normal pt-4">
+                GitHub limits unauthenticated API requests to <strong>60 requests per hour</strong>. Creating a Personal Access Token increases your rate limit to <strong>5,000 requests per hour</strong>, allowing Stargazer to stream complete stargazer profiles and avatars in real time.
+              </p>
+            </FadeIn>
 
             <div className="space-y-8 pt-2">
-              <div id="open-token-settings" className="scroll-mt-24 space-y-2">
+              <FadeIn id="open-token-settings" delay={0.05} yOffset={15} duration={0.45} className="scroll-mt-24 space-y-2">
                 <div className="flex items-center justify-between gap-4">
                   <h3 className="text-lg font-semibold tracking-tight text-foreground">
                     Open Token Settings
@@ -157,108 +159,110 @@ export default function HowToGuide() {
                 <p className="text-base text-foreground/80 leading-7 font-normal">
                   Sign in to your GitHub account, click your profile picture in the top-right corner, and go to <strong>Settings → Developer settings → Personal access tokens → Tokens (classic)</strong>. You can also click the shortcut button on the right to open the pre-filled form.
                 </p>
-              </div>
+              </FadeIn>
 
-              <div id="select-classic-token" className="scroll-mt-24 space-y-2">
+              <FadeIn id="select-classic-token" delay={0.05} yOffset={15} duration={0.45} className="scroll-mt-24 space-y-2">
                 <h3 className="text-lg font-semibold tracking-tight text-foreground">
                   Select Classic Token
                 </h3>
                 <p className="text-base text-foreground/80 leading-7 font-normal">
                   Click <strong>Generate new token</strong> and choose <strong>Generate new token (classic)</strong>. Classic tokens provide clean, simple read access without requiring fine-grained repository selections or organization approvals.
                 </p>
-              </div>
+              </FadeIn>
 
-              <div id="set-note-and-expiration" className="scroll-mt-24 space-y-2">
+              <FadeIn id="set-note-and-expiration" delay={0.05} yOffset={15} duration={0.45} className="scroll-mt-24 space-y-2">
                 <h3 className="text-lg font-semibold tracking-tight text-foreground">
                   Set Note & Expiration
                 </h3>
                 <p className="text-base text-foreground/80 leading-7 font-normal">
                   In the <strong>Note</strong> field, enter an identifiable description such as <code className="px-1.5 py-0.5 rounded-md bg-muted text-sm font-mono text-foreground font-normal">Stargazer</code>. Set an expiration date (e.g. 30 days, 90 days, or No expiration) based on your security preference.
                 </p>
-              </div>
+              </FadeIn>
 
-              <div id="select-public-repo-scope" className="scroll-mt-24 space-y-2">
+              <FadeIn id="select-public-repo-scope" delay={0.05} yOffset={15} duration={0.45} className="scroll-mt-24 space-y-2">
                 <h3 className="text-lg font-semibold tracking-tight text-foreground">
                   Select public_repo Scope
                 </h3>
                 <p className="text-base text-foreground/80 leading-7 font-normal">
                   Under <strong>Select scopes</strong>, check the <code className="px-1.5 py-0.5 rounded-md bg-muted text-sm font-mono text-foreground font-normal">public_repo</code> checkbox. Stargazer only requires public read access to repository stargazers and avatars. No private repository access or write permissions are required.
                 </p>
-              </div>
+              </FadeIn>
 
-              <div id="generate-and-copy-token" className="scroll-mt-24 space-y-2">
+              <FadeIn id="generate-and-copy-token" delay={0.05} yOffset={15} duration={0.45} className="scroll-mt-24 space-y-2">
                 <h3 className="text-lg font-semibold tracking-tight text-foreground">
                   Generate & Copy Token
                 </h3>
                 <p className="text-base text-foreground/80 leading-7 font-normal">
                   Scroll to the bottom of the page and click the green <strong>Generate token</strong> button. Copy the generated token string (starts with <code className="px-1.5 py-0.5 rounded-md bg-muted text-sm font-mono text-foreground font-normal">ghp_</code>) immediately. GitHub will never display it again after you leave the page.
                 </p>
-              </div>
+              </FadeIn>
             </div>
           </section>
 
           {/* Section 2: Customizing & Exporting */}
           <section id="customizing-card" className="scroll-mt-24 pt-10 space-y-6">
-            <div className="border-b border-border/40 pb-3">
-              <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                Customizing & Exporting
-              </h2>
-            </div>
+            <FadeIn delay={0.05} yOffset={15} duration={0.4}>
+              <div className="border-b border-border/40 pb-3">
+                <h2 className="text-2xl font-bold tracking-tight text-foreground">
+                  Customizing & Exporting
+                </h2>
+              </div>
 
-            <p className="text-base text-foreground/80 leading-7 font-normal">
-              Once you have copied your personal access token, head over to the <strong>Studio</strong> to configure your visual milestone card and render high-resolution assets.
-            </p>
+              <p className="text-base text-foreground/80 leading-7 font-normal pt-4">
+                Once you have copied your personal access token, head over to the <strong>Studio</strong> to configure your visual milestone card and render high-resolution assets.
+              </p>
+            </FadeIn>
 
             <div className="space-y-8 pt-2">
-              <div id="enter-repo-and-pat" className="scroll-mt-24 space-y-2">
+              <FadeIn id="enter-repo-and-pat" delay={0.05} yOffset={15} duration={0.45} className="scroll-mt-24 space-y-2">
                 <h3 className="text-lg font-semibold tracking-tight text-foreground">
                   Enter Repository & Token
                 </h3>
                 <p className="text-base text-foreground/80 leading-7 font-normal">
                   In the Studio sidebar, enter your target repository in <code className="px-1.5 py-0.5 rounded-md bg-muted text-sm font-mono text-foreground font-normal">owner/repo</code> format (e.g. <code className="px-1.5 py-0.5 rounded-md bg-muted text-sm font-mono text-foreground font-normal">CharanMunur/stargazer</code> or <code className="px-1.5 py-0.5 rounded-md bg-muted text-sm font-mono text-foreground font-normal">facebook/react</code>) and paste your token into the GitHub PAT field.
                 </p>
-              </div>
+              </FadeIn>
 
-              <div id="fetch-stargazers" className="scroll-mt-24 space-y-2">
+              <FadeIn id="fetch-stargazers" delay={0.05} yOffset={15} duration={0.45} className="scroll-mt-24 space-y-2">
                 <h3 className="text-lg font-semibold tracking-tight text-foreground">
                   Fetch Live Stargazers
                 </h3>
                 <p className="text-base text-foreground/80 leading-7 font-normal">
                   Click the <strong>Fetch Stargazers</strong> button. The generator queries GitHub's REST API and populates the 16:9 canvas with real stargazers, avatars, and star counts.
                 </p>
-              </div>
+              </FadeIn>
 
-              <div id="choose-stargazer-order" className="scroll-mt-24 space-y-2">
+              <FadeIn id="choose-stargazer-order" delay={0.05} yOffset={15} duration={0.45} className="scroll-mt-24 space-y-2">
                 <h3 className="text-lg font-semibold tracking-tight text-foreground">
                   Choose Stargazer Order
                 </h3>
                 <p className="text-base text-foreground/80 leading-7 font-normal">
                   Toggle between <strong>Latest</strong> (to spotlight your most recent supporters) or <strong>Earliest</strong> (to celebrate the original contributors who supported your project from day one).
                 </p>
-              </div>
+              </FadeIn>
 
-              <div id="select-theme-and-template" className="scroll-mt-24 space-y-2">
+              <FadeIn id="select-theme-and-template" delay={0.05} yOffset={15} duration={0.45} className="scroll-mt-24 space-y-2">
                 <h3 className="text-lg font-semibold tracking-tight text-foreground">
                   Select Theme & Template
                 </h3>
                 <p className="text-base text-foreground/80 leading-7 font-normal">
                   Switch between <strong>Dark</strong> and <strong>Light</strong> color palettes. You can also browse and switch between templates: <strong>Counter</strong> (laurel milestone), <strong>Ticker</strong> (marquee loop), <strong>3D Orbit</strong> (spherical multi-ring orbit), or <strong>Constellation</strong> (particle gravity graph).
                 </p>
-              </div>
+              </FadeIn>
 
-              <div id="export-png-or-mp4" className="scroll-mt-24 space-y-2">
+              <FadeIn id="export-png-or-mp4" delay={0.05} yOffset={15} duration={0.45} className="scroll-mt-24 space-y-2">
                 <h3 className="text-lg font-semibold tracking-tight text-foreground">
                   Export PNG or 60fps MP4
                 </h3>
                 <p className="text-base text-foreground/80 leading-7 font-normal">
                   Select <strong>PNG</strong> for crisp static milestone cards (1600 × 900) or <strong>MP4</strong> for buttery smooth 60fps looped videos with celebratory audio. Click <strong>Download</strong> beneath the canvas to render and save directly to your computer.
                 </p>
-              </div>
+              </FadeIn>
             </div>
           </section>
 
           {/* Section 3: Core Principles */}
-          <section id="core-principles" className="scroll-mt-24 pt-10 space-y-4">
+          <FadeIn id="core-principles" delay={0.05} yOffset={15} duration={0.4} className="scroll-mt-24 pt-10 space-y-4">
             <div className="border-b border-border/40 pb-3">
               <h2 className="text-2xl font-bold tracking-tight text-foreground">
                 Core Principles
@@ -283,61 +287,63 @@ export default function HowToGuide() {
                 <strong>Zero Rate-Limit Lockout:</strong> By utilizing your personal access token, you unlock GitHub's 5,000 requests/hr quota instead of the unauthenticated 60 requests/hr pool.
               </li>
             </ul>
-          </section>
+          </FadeIn>
         </article>
 
         {/* Right Column: Clean shadcn-Style "On This Page" Sidebar */}
         <aside className="hidden lg:block w-64 shrink-0 sticky top-24 self-start space-y-6">
-          <div className="space-y-3">
-            <p className="text-sm font-medium text-foreground">
-              On This Page
-            </p>
+          <FadeIn delay={0.15} yOffset={10} duration={0.4}>
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-foreground">
+                On This Page
+              </p>
 
-            <nav className="space-y-3 text-sm" aria-label="On this page">
-              {tocSections.map((section) => {
-                const isSectionActive = activeId === section.id;
+              <nav className="space-y-3 text-sm" aria-label="On this page">
+                {tocSections.map((section) => {
+                  const isSectionActive = activeId === section.id;
 
-                return (
-                  <div key={section.id} className="space-y-1.5">
-                    <a
-                      href={`#${section.id}`}
-                      onClick={(e) => scrollTo(e, section.id)}
-                      className={`block transition-colors cursor-pointer ${
-                        isSectionActive
-                          ? 'text-foreground font-medium'
-                          : 'text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      {section.title}
-                    </a>
+                  return (
+                    <div key={section.id} className="space-y-1.5">
+                      <a
+                        href={`#${section.id}`}
+                        onClick={(e) => scrollTo(e, section.id)}
+                        className={`block transition-colors cursor-pointer ${
+                          isSectionActive
+                            ? 'text-foreground font-medium'
+                            : 'text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        {section.title}
+                      </a>
 
-                    {section.items.length > 0 && (
-                      <ul className="pl-3.5 border-l border-border/40 space-y-1">
-                        {section.items.map((item) => {
-                          const isItemActive = activeId === item.id;
-                          return (
-                            <li key={item.id}>
-                              <a
-                                href={`#${item.id}`}
-                                onClick={(e) => scrollTo(e, item.id)}
-                                className={`block text-xs py-0.5 transition-colors cursor-pointer ${
-                                  isItemActive
-                                    ? 'text-foreground font-medium'
-                                    : 'text-muted-foreground hover:text-foreground'
-                                }`}
-                              >
-                                {item.title}
-                              </a>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </div>
-                );
-              })}
-            </nav>
-          </div>
+                      {section.items.length > 0 && (
+                        <ul className="pl-3.5 border-l border-border/40 space-y-1">
+                          {section.items.map((item) => {
+                            const isItemActive = activeId === item.id;
+                            return (
+                              <li key={item.id}>
+                                <a
+                                  href={`#${item.id}`}
+                                  onClick={(e) => scrollTo(e, item.id)}
+                                  className={`block text-xs py-0.5 transition-colors cursor-pointer ${
+                                    isItemActive
+                                      ? 'text-foreground font-medium'
+                                      : 'text-muted-foreground hover:text-foreground'
+                                  }`}
+                                >
+                                  {item.title}
+                                </a>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </div>
+                  );
+                })}
+              </nav>
+            </div>
+          </FadeIn>
         </aside>
       </div>
     </div>

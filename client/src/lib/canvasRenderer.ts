@@ -8,6 +8,7 @@ export interface ScatterPoint {
   y: number;
   size: number;
   baseAlpha: number;
+  blur: number;
   phase: number;
   stargazerIndex: number;
 }
@@ -77,32 +78,28 @@ function generateConstellationPoints(
     return seed / 4294967296;
   };
 
-  const rx = 560;
-  const ry = 240;
-  const centerX = 800;
-  const centerY = 450;
-  const totalScatter = 48;
+  const centerX = 800.0;
+  const centerY = 460.0;
+
   const points: ScatterPoint[] = [];
+  const padding = 12.0; // Reduced padding between avatars for denser constellation
 
-  let attempts = 0;
-  while (points.length < totalScatter && attempts < 10000) {
-    attempts++;
-    const x = 70 + prng() * (1600 - 140);
-    const y = 70 + prng() * (900 - 140);
+  const tryAdd = (x: number, y: number, size: number): boolean => {
+    const r = size / 2.0;
 
-    const dx = x - centerX;
-    const dy = y - centerY;
-    const ellDist = Math.sqrt(Math.pow(dx / rx, 2) + Math.pow(dy / ry, 2));
-    if (ellDist < 1.0) continue;
+    // Strict collision check against existing points (guarantees NO overlapping)
+    for (const p of points) {
+      if (Math.hypot(x - p.x, y - p.y) < r + p.size / 2.0 + padding) {
+        return false;
+      }
+    }
 
-    const size = 56 + prng() * 46;
-    const tooClose = points.some((p) => {
-      return Math.hypot(p.x - x, p.y - y) < (p.size + size) / 2 + 14;
-    });
-    if (tooClose) continue;
-
-    const normDist = Math.min(1, Math.max(0, (ellDist - 1.0) / 1.2));
-    const baseAlpha = 0.35 + 0.65 * normDist;
+    // Depth calculation: subtle, delicate blur (max 1.0px on inner nodes, 0px on outer)
+    const distFromCenter = Math.hypot(x - centerX, y - centerY);
+    const normDist = Math.min(1.0, Math.max(0.0, (distFromCenter - 230.0) / 600.0));
+    const blurAmount = Math.max(0, (1.0 - normDist) * 1.0);
+    const blur = blurAmount >= 0.4 ? Number(blurAmount.toFixed(1)) : 0;
+    const baseAlpha = Number((0.68 + 0.32 * Math.pow(normDist, 0.8)).toFixed(2));
     const phase = prng() * Math.PI * 2;
 
     points.push({
@@ -110,9 +107,22 @@ function generateConstellationPoints(
       y,
       size,
       baseAlpha,
+      blur,
       phase,
       stargazerIndex: points.length % Math.max(1, stargazerCount),
     });
+    return true;
+  };
+
+  // Full-field organic scatter across canvas (including behind main content)
+  const targetCount = 100; // Increased avatar count
+  let attempts = 0;
+  while (points.length < targetCount && attempts < 90000) {
+    attempts++;
+    const x = -35.0 + prng() * (1600.0 + 70.0);
+    const y = -35.0 + prng() * (900.0 + 70.0);
+    const size = 84.0 + prng() * 54.0; // Increased avatar sizes (84px - 138px)
+    tryAdd(x, y, size);
   }
 
   return points;
@@ -147,8 +157,8 @@ export async function preloadTemplateAssets(
   } else if (template === 'orbit') {
     avatarUrls = sourceStargazers.slice(0, 16).map((s) => s.avatarUrl).filter(Boolean);
   } else if (template === 'constellation') {
-    // Top 48 avatars for scatter pool
-    avatarUrls = sourceStargazers.slice(0, 48).map((s) => s.avatarUrl).filter(Boolean);
+    // Up to 96 avatars for scatter pool
+    avatarUrls = sourceStargazers.slice(0, 96).map((s) => s.avatarUrl).filter(Boolean);
   }
 
   const [leafImg, ownerImg, ...loadedAvatars] = await Promise.all([
@@ -716,16 +726,21 @@ function renderConstellation(
     data.stargazers && data.stargazers.length > 0
       ? data.stargazers
       : sampleStargazers;
-  const stargazers = allStargazers.slice(0, 48);
+  const stargazers = allStargazers.slice(0, 96);
   const points = assets.constellationPoints || [];
 
-  // Draw scatter avatars with gentle twinkle / breathing
+  // Draw scatter avatars with gentle twinkle / breathing and depth blur
   for (const pt of points) {
     const twinkle = 0.85 + 0.15 * Math.sin(progress * Math.PI * 4 + pt.phase);
     const alpha = Math.min(1, pt.baseAlpha * twinkle);
 
     ctx.save();
     ctx.globalAlpha = alpha;
+    if (pt.blur > 0.3) {
+      ctx.filter = `blur(${pt.blur}px)`;
+    } else {
+      ctx.filter = 'none';
+    }
 
     const u = stargazers[pt.stargazerIndex % stargazers.length] || { login: 'star', avatarUrl: '' };
     const img = u.avatarUrl ? assets.avatarImages.get(u.avatarUrl) : undefined;
@@ -741,19 +756,45 @@ function renderConstellation(
       isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)',
       2
     );
+    ctx.filter = 'none';
     ctx.restore();
   }
 
-  // Center Content: Stacked Mascot (y=340) + Title (y=460) + Plain Star Count (y=540)
+  // Soft Radial Fade Backdrop behind Main Content
+  const centerX = 800;
   ctx.save();
-  // 1. Center mascot avatar (100px)
+  ctx.translate(centerX, 460);
+  ctx.scale(1.3, 0.68);
+  const fadeGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 500);
+  if (isDark) {
+    fadeGrad.addColorStop(0, 'rgba(15, 14, 16, 1)');
+    fadeGrad.addColorStop(0.36, 'rgba(15, 14, 16, 1)');
+    fadeGrad.addColorStop(0.52, 'rgba(15, 14, 16, 0.92)');
+    fadeGrad.addColorStop(0.76, 'rgba(15, 14, 16, 0.45)');
+    fadeGrad.addColorStop(1, 'rgba(15, 14, 16, 0)');
+  } else {
+    fadeGrad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+    fadeGrad.addColorStop(0.36, 'rgba(255, 255, 255, 1)');
+    fadeGrad.addColorStop(0.52, 'rgba(255, 255, 255, 0.92)');
+    fadeGrad.addColorStop(0.76, 'rgba(255, 255, 255, 0.45)');
+    fadeGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  }
+  ctx.fillStyle = fadeGrad;
+  ctx.beginPath();
+  ctx.arc(0, 0, 500, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  // Center Content: Stacked Mascot (y=350) + Title (y=470) + Star Count (y=570)
+  ctx.save();
+  // 1. Center mascot avatar (108px)
   drawCircularAvatar(
     ctx,
     assets.ownerImg || undefined,
     data.owner,
-    800,
-    340,
-    50,
+    centerX,
+    350,
+    54,
     isDark ? '#342A27' : '#E2E8F0',
     3
   );
@@ -764,7 +805,7 @@ function renderConstellation(
   ctx.fillStyle = isDark ? '#F5EDE7' : '#000000';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(repoFullName, 800, 450);
+  ctx.fillText(repoFullName, centerX, 470);
 
   // 3. Star count with star icon
   const starCountStr = `${data.stars.toLocaleString()} stars`;
@@ -772,14 +813,14 @@ function renderConstellation(
   const textW = ctx.measureText(starCountStr).width;
   const starRadius = 24;
   const gap = 16;
-  const startX = 800 - (textW + starRadius * 2 + gap) / 2;
+  const startX = centerX - (textW + starRadius * 2 + gap) / 2;
 
-  drawYellowStar(ctx, startX + starRadius, 550, starRadius);
+  drawYellowStar(ctx, startX + starRadius, 570, starRadius);
 
   ctx.fillStyle = isDark ? '#A39B95' : '#64748B';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.fillText(starCountStr, startX + starRadius * 2 + gap, 550);
+  ctx.fillText(starCountStr, startX + starRadius * 2 + gap, 570);
   ctx.restore();
 }
 
