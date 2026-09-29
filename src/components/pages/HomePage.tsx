@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Search, ArrowUpRight } from "lucide-react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import { Search, ArrowUpRight, SlidersHorizontal, ChevronDown, Check } from "lucide-react";
 import { FadeIn } from "../helpers/FadeIn";
 import {
   MilestoneCard,
@@ -17,6 +17,9 @@ import { templatesData, initialSampleData } from "@/data/templates";
 export default function HomePage() {
   const [search, setSearch] = useState("");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [filterMode, setFilterMode] = useState<"all" | "new">("all");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const filterMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let lastDark = document.documentElement.classList.contains("dark");
@@ -37,6 +40,18 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
 
+  // Close filter dropdown on outside click
+  useEffect(() => {
+    if (!filterOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (filterMenuRef.current && !filterMenuRef.current.contains(e.target as Node)) {
+        setFilterOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [filterOpen]);
+
   // Filter templates by search keyword
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -45,6 +60,113 @@ export default function HomePage() {
       t.name.toLowerCase().includes(q)
     );
   }, [search]);
+
+  const newTemplates = useMemo(() => {
+    return filtered.filter((t) => t.isNew);
+  }, [filtered]);
+
+  const otherTemplates = useMemo(() => {
+    return filtered.filter((t) => !t.isNew);
+  }, [filtered]);
+
+  // Reusable template card renderer
+  const renderTemplateCard = (tmpl: (typeof templatesData)[number], idx: number) => (
+    <FadeIn key={tmpl.id} delay={0.06 + (idx % 6) * 0.03} yOffset={16}>
+      <a
+        href={`/generate?template=${tmpl.id}`}
+        className="group relative rounded-3xl bg-card hover:bg-muted/40 border border-border/80 hover:border-border p-2.5 sm:p-3 flex flex-col justify-between transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs block h-full text-card-foreground"
+      >
+        {/* Live 16:9 Canvas Preview */}
+        <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-border/70 relative flex items-center justify-center pointer-events-none">
+          <div
+            className="absolute inset-0 pointer-events-none opacity-40"
+            style={{
+              backgroundImage:
+                "linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
+              backgroundSize: "16px 16px",
+            }}
+          />
+          <div className="w-full h-full relative z-10">
+            {tmpl.id === "spotlight" && (
+              <SpotlightCard
+                key={`preview-spotlight-${theme}`}
+                data={initialSampleData}
+                theme={theme}
+                animated
+              />
+            )}
+            {tmpl.id === "revolve" && (
+              <RevolveCard
+                key={`preview-revolve-${theme}`}
+                data={initialSampleData}
+                theme={theme}
+                animated
+              />
+            )}
+            {tmpl.id === "milestone" && (
+              <MilestoneCard
+                key={`preview-milestone-${theme}`}
+                data={initialSampleData}
+                theme={theme}
+                animated
+              />
+            )}
+            {tmpl.id === "infinity" && (
+              <InfinityCard
+                key={`preview-infinity-${theme}`}
+                data={initialSampleData}
+                theme={theme}
+                animated
+              />
+            )}
+            {tmpl.id === "orbit" && (
+              <OrbitCard
+                key={`preview-orbit-${theme}`}
+                data={initialSampleData}
+                theme={theme}
+                animated
+              />
+            )}
+            {tmpl.id === "constellation" && (
+              <ConstellationCard
+                key={`preview-constellation-${theme}`}
+                data={initialSampleData}
+                theme={theme}
+                animated
+              />
+            )}
+            {tmpl.id === "hyperdrive" && (
+              <HyperdriveCard
+                key={`preview-hyperdrive-${theme}`}
+                data={initialSampleData}
+                theme={theme}
+                animated
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Content: Name (left) and Open in Studio button in place of tag (right) */}
+        <div className="pt-3 pb-1 flex items-center justify-between px-1">
+          <div className="flex items-center gap-2">
+            <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
+              {tmpl.name}
+            </h2>
+            {tmpl.isNew && (
+              <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 tracking-wider">
+                NEW
+              </span>
+            )}
+          </div>
+
+          <div className="py-1.5 px-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs">
+            <span>Open in Studio</span>
+            <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.2]" />
+          </div>
+        </div>
+      </a>
+    </FadeIn>
+  );
 
   return (
     <section className="w-full max-w-6xl mx-auto px-6 py-4 space-y-10">
@@ -90,120 +212,132 @@ export default function HomePage() {
         </div>
       </FadeIn>
 
-      {/* Template Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5">
-        {filtered.map((tmpl, idx) => (
-          <FadeIn key={tmpl.id} delay={0.1 + idx * 0.04} yOffset={16}>
-            <a
-              href={`/generate?template=${tmpl.id}`}
-              className="group relative rounded-3xl bg-card hover:bg-muted/40 border border-border/80 hover:border-border p-2.5 sm:p-3 flex flex-col justify-between transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs block h-full text-card-foreground"
-            >
-              {/* Live 16:9 Canvas Preview */}
-              <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-border/70 relative flex items-center justify-center pointer-events-none">
-                <div
-                  className="absolute inset-0 pointer-events-none opacity-40"
-                  style={{
-                    backgroundImage:
-                      "linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
-                    backgroundSize: "16px 16px",
-                  }}
-                />
-                <div className="w-full h-full relative z-10">
-                  {tmpl.id === "spotlight" && (
-                    <SpotlightCard
-                      key={`preview-spotlight-${theme}`}
-                      data={initialSampleData}
-                      theme={theme}
-                      animated
-                    />
-                  )}
-                  {tmpl.id === "revolve" && (
-                    <RevolveCard
-                      key={`preview-revolve-${theme}`}
-                      data={initialSampleData}
-                      theme={theme}
-                      animated
-                    />
-                  )}
-                  {tmpl.id === "milestone" && (
-                    <MilestoneCard
-                      key={`preview-milestone-${theme}`}
-                      data={initialSampleData}
-                      theme={theme}
-                      animated
-                    />
-                  )}
-                  {tmpl.id === "infinity" && (
-                    <InfinityCard
-                      key={`preview-infinity-${theme}`}
-                      data={initialSampleData}
-                      theme={theme}
-                      animated
-                    />
-                  )}
-                  {tmpl.id === "orbit" && (
-                    <OrbitCard
-                      key={`preview-orbit-${theme}`}
-                      data={initialSampleData}
-                      theme={theme}
-                      animated
-                    />
-                  )}
-                  {tmpl.id === "constellation" && (
-                    <ConstellationCard
-                      key={`preview-constellation-${theme}`}
-                      data={initialSampleData}
-                      theme={theme}
-                      animated
-                    />
-                  )}
-                  {tmpl.id === "hyperdrive" && (
-                    <HyperdriveCard
-                      key={`preview-hyperdrive-${theme}`}
-                      data={initialSampleData}
-                      theme={theme}
-                      animated
-                    />
-                  )}
-                </div>
-              </div>
+      {/* Top Filter Bar above template area */}
+      <div className="flex items-center justify-between px-1 -mb-5">
+        <div className="text-xs font-medium text-muted-foreground">
+          {filtered.length} {filtered.length === 1 ? "template" : "templates"}
+        </div>
 
-              {/* Content: Name (left) and Open in Studio button in place of tag (right) */}
-              <div className="pt-3 pb-1 flex items-center justify-between px-1">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
-                    {tmpl.name}
-                  </h2>
-                  {tmpl.isNew && (
-                    <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 tracking-wider">
-                      NEW
-                    </span>
-                  )}
-                </div>
+        {/* Filter dropdown on top right */}
+        <div className="relative" ref={filterMenuRef}>
+          <button
+            type="button"
+            onClick={() => setFilterOpen((prev) => !prev)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium transition-all shadow-2xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              filterMode === "new"
+                ? "bg-primary/10 border-primary/30 text-primary font-semibold"
+                : "bg-card hover:bg-muted/60 border-border/80 text-foreground"
+            }`}
+            title="Filter templates view"
+            aria-label="Filter templates"
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5 shrink-0" />
+            <span>{filterMode === "all" ? "All Templates" : "New Releases"}</span>
+            <ChevronDown
+              className={`w-3 h-3 shrink-0 transition-transform duration-200 ${
+                filterOpen ? "rotate-180" : ""
+              }`}
+            />
+          </button>
 
-                <div className="py-1.5 px-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs">
-                  <span>Open in Studio</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.2]" />
-                </div>
-              </div>
-            </a>
-          </FadeIn>
-        ))}
+          {filterOpen && (
+            <div className="absolute right-0 top-full mt-2 w-52 rounded-2xl bg-card border border-border shadow-lg p-1.5 z-30 animate-in fade-in-50 zoom-in-95">
+              <button
+                type="button"
+                onClick={() => {
+                  setFilterMode("all");
+                  setFilterOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  filterMode === "all"
+                    ? "bg-primary/10 text-primary font-semibold"
+                    : "text-foreground hover:bg-muted/60"
+                }`}
+              >
+                <span>All Templates</span>
+                {filterMode === "all" && <Check className="w-3.5 h-3.5 text-primary shrink-0" />}
+              </button>
 
-        {/* When templates count is odd, fill the empty cell in the 2-column grid */}
-        {filtered.length % 2 !== 0 && (
-          <FadeIn delay={0.1 + filtered.length * 0.04} yOffset={16}>
-            <ComingSoonCard />
-          </FadeIn>
-        )}
-
-        {/* When templates count is even and > 0, display the wide coming soon card across both columns */}
-        {filtered.length > 0 && filtered.length % 2 === 0 && (
-          <FadeIn delay={0.1 + filtered.length * 0.04} yOffset={16} className="col-span-1 md:col-span-2">
-            <ComingSoonCardWide />
-          </FadeIn>
-        )}
+              <button
+                type="button"
+                onClick={() => {
+                  setFilterMode("new");
+                  setFilterOpen(false);
+                }}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  filterMode === "new"
+                    ? "bg-primary/10 text-primary font-semibold"
+                    : "text-foreground hover:bg-muted/60"
+                }`}
+              >
+                <span>New Releases</span>
+                {filterMode === "new" && <Check className="w-3.5 h-3.5 text-primary shrink-0" />}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Templates Display Area */}
+      {filtered.length > 0 && (
+        filterMode === "all" ? (
+          /* All Templates (Default Order) */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5">
+            {filtered.map((tmpl, idx) => renderTemplateCard(tmpl, idx))}
+
+            {/* When templates count is odd, fill the empty cell in the 2-column grid */}
+            {filtered.length % 2 !== 0 && (
+              <FadeIn delay={0.1 + filtered.length * 0.04} yOffset={16}>
+                <ComingSoonCard />
+              </FadeIn>
+            )}
+
+            {/* When templates count is even and > 0, display the wide coming soon card across both columns */}
+            {filtered.length % 2 === 0 && (
+              <FadeIn delay={0.1 + filtered.length * 0.04} yOffset={16} className="col-span-1 md:col-span-2">
+                <ComingSoonCardWide />
+              </FadeIn>
+            )}
+          </div>
+        ) : (
+          /* New Releases Mode: New templates first, and other templates under that */
+          <div className="space-y-10">
+            {/* 1. New Templates First */}
+            {newTemplates.length > 0 && (
+              <div className="space-y-3.5">
+                <div className="flex items-center gap-2 px-1">
+                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    New Releases
+                  </span>
+                  <span className="text-xs text-muted-foreground font-medium">
+                    ({newTemplates.length})
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5">
+                  {newTemplates.map((tmpl, idx) => renderTemplateCard(tmpl, idx))}
+                </div>
+              </div>
+            )}
+
+            {/* 2. Other Templates Except New Underneath */}
+            {otherTemplates.length > 0 && (
+              <div className="space-y-3.5">
+                <div className="flex items-center gap-2 px-1 pt-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    Other Templates
+                  </span>
+                  <span className="text-xs text-muted-foreground font-medium">
+                    ({otherTemplates.length})
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5">
+                  {otherTemplates.map((tmpl, idx) => renderTemplateCard(tmpl, idx))}
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      )}
 
       {filtered.length === 0 && (
         <div className="text-center py-20 text-sm text-muted-foreground space-y-3">
@@ -212,7 +346,7 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => setSearch("")}
-            className="text-xs font-semibold text-primary hover:underline"
+            className="text-xs font-semibold text-primary hover:underline cursor-pointer"
           >
             Clear search
           </button>

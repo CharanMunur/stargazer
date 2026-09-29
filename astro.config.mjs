@@ -9,6 +9,11 @@ export default defineConfig({
       applyBaseStyles: false,
     }),
   ],
+  vite: {
+    optimizeDeps: {
+      include: ['mp4-muxer', '@radix-ui/react-separator'],
+    },
+  },
   server: {
     port: 3000,
     host: true,

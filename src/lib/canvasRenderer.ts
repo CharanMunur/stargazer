@@ -782,16 +782,16 @@ function renderOrbit(
   ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, width, height);
 
-  // Ambient radial glow matching OrbitCard.tsx (center 800, 430, radius 550)
-  const glow = ctx.createRadialGradient(800, 430, 0, 800, 430, 550);
+  // Ambient radial glow matching OrbitCard.tsx (center 800, 432)
+  const glow = ctx.createRadialGradient(800, 432, 0, 800, 432, 580);
   if (isDark) {
-    glow.addColorStop(0, 'rgba(232, 116, 67, 0.22)');
-    glow.addColorStop(0.5, 'rgba(242, 200, 121, 0.08)');
-    glow.addColorStop(0.75, 'rgba(15, 14, 16, 0)');
+    glow.addColorStop(0, 'rgba(232, 116, 67, 0.18)');
+    glow.addColorStop(0.3, 'rgba(242, 200, 121, 0.07)');
+    glow.addColorStop(0.65, 'rgba(15, 14, 16, 0)');
   } else {
-    glow.addColorStop(0, 'rgba(232, 116, 67, 0.15)');
-    glow.addColorStop(0.5, 'rgba(242, 200, 121, 0.05)');
-    glow.addColorStop(0.75, 'rgba(255, 255, 255, 0)');
+    glow.addColorStop(0, 'rgba(232, 116, 67, 0.14)');
+    glow.addColorStop(0.3, 'rgba(242, 200, 121, 0.05)');
+    glow.addColorStop(0.65, 'rgba(255, 255, 255, 0)');
   }
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, width, height);

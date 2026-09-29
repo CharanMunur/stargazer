@@ -18,6 +18,12 @@ export interface TemplateMeta {
 
 export const templatesData: readonly TemplateMeta[] = [
   {
+    id: 'revolve',
+    name: 'Revolve',
+    isNew: true,
+    hasImage: false,
+  },
+  {
     id: 'spotlight',
     name: 'Spotlight',
     isNew: true,
@@ -26,12 +32,6 @@ export const templatesData: readonly TemplateMeta[] = [
   {
     id: 'hyperdrive',
     name: 'Hyperdrive',
-    isNew: true,
-    hasImage: false,
-  },
-  {
-    id: 'revolve',
-    name: 'Revolve',
     isNew: true,
     hasImage: false,
   },

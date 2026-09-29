@@ -58,7 +58,7 @@ export function GitHubStars({
       href={`https://github.com/${repo}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="h-10 inline-flex items-center gap-2.5 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/50 px-3.5 text-xs font-light tracking-tight text-foreground transition-all hover:border-border cursor-pointer backdrop-blur-md shadow-2xs"
+      className="h-10 inline-flex items-center gap-2.5 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/50 px-3.5 text-xs font-light tracking-tight text-foreground transition-all hover:border-border cursor-pointer backdrop-blur-md shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <span className="shrink-0 flex items-center justify-center w-4.5 h-4.5">
         <img

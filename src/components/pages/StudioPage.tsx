@@ -338,10 +338,10 @@ export default function StudioPage() {
             <button
               type="button"
               onClick={() => setReplayNonce((n) => n + 1)}
-              className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-muted-foreground hover:text-foreground text-xs font-medium border border-border transition-colors shadow-2xs cursor-pointer"
+              className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-muted-foreground hover:text-foreground text-xs font-medium border border-border transition-colors shadow-2xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               title="Replay animation"
             >
-              <RotateCcw className="w-3 h-3" />
+              <RotateCcw className="w-3 h-3 shrink-0" />
               <span>Replay</span>
             </button>
 
@@ -411,11 +411,11 @@ export default function StudioPage() {
             type="button"
             disabled={exporting || loading}
             onClick={handleExport}
-            className="w-full py-3.5 px-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 transition-all shadow-2xs active:scale-[0.99]"
+            className="w-full py-3.5 px-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 transition-all shadow-2xs active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             {exporting ? (
               <>
-                <RefreshCw className="mr-2 h-4.5 w-4.5 animate-spin" />
+                <RefreshCw className="mr-2 h-4.5 w-4.5 animate-spin shrink-0" />
                 <span>
                   {exportProgress
                     ? `${exportProgress.text} (${exportProgress.percent}%)`
@@ -424,7 +424,7 @@ export default function StudioPage() {
               </>
             ) : (
               <>
-                <Download className="mr-2 h-4.5 w-4.5" />
+                <Download className="mr-2 h-4.5 w-4.5 shrink-0" />
                 <span>Download {format.toUpperCase()}</span>
               </>
             )}
@@ -475,16 +475,16 @@ export default function StudioPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-2xs active:scale-[0.99]"
+              className="w-full py-2.5 px-4 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-2xs active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {loading ? (
                 <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin shrink-0" />
                   <span>Loading stargazers...</span>
                 </>
               ) : (
                 <>
-                  <RefreshCw className="w-3.5 h-3.5" />
+                  <RefreshCw className="w-3.5 h-3.5 shrink-0" />
                   <span>Fetch Stargazers</span>
                 </>
               )}
@@ -507,13 +507,13 @@ export default function StudioPage() {
                       userCustomizedTheme.current = true;
                       setTheme(th);
                     }}
-                    className={`flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-full transition-all cursor-pointer ${
+                    className={`flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-full transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                       theme === th
                         ? 'bg-foreground text-background font-semibold shadow-2xs'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 font-medium'
                     }`}
                   >
-                    {th === 'dark' ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
+                    {th === 'dark' ? <Moon className="w-3.5 h-3.5 shrink-0" /> : <Sun className="w-3.5 h-3.5 shrink-0" />}
                     <span>{th.charAt(0).toUpperCase() + th.slice(1)}</span>
                   </button>
                 ))}
@@ -531,7 +531,7 @@ export default function StudioPage() {
                     key={ord}
                     type="button"
                     onClick={() => handleOrderChange(ord)}
-                    className={`py-2 px-3 text-sm rounded-full text-center transition-all cursor-pointer ${
+                    className={`py-2 px-3 text-sm rounded-full text-center transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                       stargazerOrder === ord
                         ? 'bg-foreground text-background font-semibold shadow-2xs'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 font-medium'
@@ -558,7 +558,7 @@ export default function StudioPage() {
                       type="button"
                       disabled={!!isDisabled}
                       onClick={() => !isDisabled && setFormat(fmt)}
-                      className={`py-2 px-3 text-sm rounded-full text-center transition-all ${
+                      className={`py-2 px-3 text-sm rounded-full text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                         isDisabled
                           ? 'opacity-40 cursor-not-allowed text-muted-foreground font-medium'
                           : format === fmt
@@ -595,33 +595,11 @@ export default function StudioPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {otherTemplates.map((other, idx) => (
               <FadeIn key={other.id} delay={0.25 + idx * 0.05} yOffset={15}>
-                <button
-                  type="button"
+                <BrowseTemplateCard
+                  template={other}
+                  theme={theme}
                   onClick={() => handleTemplateChange(other.id)}
-                  className="group rounded-3xl bg-card hover:bg-muted/40 border border-border/80 hover:border-border p-2.5 text-left flex flex-col justify-between transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs w-full text-card-foreground"
-                >
-                  <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-border/70 relative flex items-center justify-center pointer-events-none mb-2">
-                    <div className="w-full h-full relative z-10 pointer-events-none">
-                      {other.id === 'spotlight' && <SpotlightCard data={initialSampleData} theme={theme} animated={false} />}
-                      {other.id === 'revolve' && <RevolveCard data={initialSampleData} theme={theme} animated={false} />}
-                      {other.id === 'milestone' && <MilestoneCard data={initialSampleData} theme={theme} animated={false} />}
-                      {other.id === 'infinity' && <InfinityCard data={initialSampleData} theme={theme} animated={false} />}
-                      {other.id === 'orbit' && <OrbitCard data={initialSampleData} theme={theme} animated={false} />}
-                      {other.id === 'constellation' && <ConstellationCard data={initialSampleData} theme={theme} animated={false} />}
-                      {other.id === 'hyperdrive' && <HyperdriveCard data={initialSampleData} theme={theme} animated={false} />}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between gap-1.5 px-1 py-1">
-                    <span className="font-bold text-sm text-foreground">
-                      {other.name}
-                    </span>
-                    {other.isNew && (
-                      <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 tracking-wider">
-                        NEW
-                      </span>
-                    )}
-                  </div>
-                </button>
+                />
               </FadeIn>
             ))}
           </div>
@@ -630,3 +608,48 @@ export default function StudioPage() {
     </div>
   );
 }
+
+function BrowseTemplateCard({
+  template,
+  theme,
+  onClick,
+}: {
+  template: (typeof templatesData)[number];
+  theme: 'dark' | 'light';
+  onClick: () => void;
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="group rounded-3xl bg-card hover:bg-muted/40 border border-border/80 hover:border-border p-2.5 text-left flex flex-col justify-between transition-colors duration-200 cursor-pointer shadow-2xs hover:shadow-xs w-full text-card-foreground"
+    >
+      <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-border/70 relative flex items-center justify-center pointer-events-none mb-2 isolate">
+        <div className="w-full h-full relative z-10 pointer-events-none">
+          {template.id === 'spotlight' && <SpotlightCard data={initialSampleData} theme={theme} animated={isHovered} />}
+          {template.id === 'revolve' && <RevolveCard data={initialSampleData} theme={theme} animated={isHovered} />}
+          {template.id === 'milestone' && <MilestoneCard data={initialSampleData} theme={theme} animated={isHovered} />}
+          {template.id === 'infinity' && <InfinityCard data={initialSampleData} theme={theme} animated={isHovered} />}
+          {template.id === 'orbit' && <OrbitCard data={initialSampleData} theme={theme} animated={isHovered} />}
+          {template.id === 'constellation' && <ConstellationCard data={initialSampleData} theme={theme} animated={isHovered} />}
+          {template.id === 'hyperdrive' && <HyperdriveCard data={initialSampleData} theme={theme} animated={isHovered} />}
+        </div>
+      </div>
+      <div className="flex items-center justify-between gap-1.5 px-1 py-1">
+        <span className="font-bold text-sm text-foreground">
+          {template.name}
+        </span>
+        {template.isNew && (
+          <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 tracking-wider">
+            NEW
+          </span>
+        )}
+      </div>
+    </button>
+  );
+}
+

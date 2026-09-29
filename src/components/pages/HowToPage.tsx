@@ -150,10 +150,10 @@ export default function HowToPage() {
                     href="https://github.com/settings/tokens/new?description=Stargazer&scopes=public_repo"
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-medium text-foreground bg-muted hover:bg-muted/80 px-2.5 py-1 rounded-md transition-colors"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground bg-muted hover:bg-muted/80 px-3 py-1.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer shadow-2xs"
                   >
                     <span>Generate Token</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
+                    <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
                   </a>
                 </div>
                 <p className="text-base text-foreground/80 leading-7 font-normal">
@@ -246,7 +246,7 @@ export default function HowToPage() {
                   Select Theme & Template
                 </h3>
                 <p className="text-base text-foreground/80 leading-7 font-normal">
-                  Switch between <strong>Dark</strong> and <strong>Light</strong> color palettes. You can also browse and switch between templates: <strong>Counter</strong> (laurel milestone), <strong>Ticker</strong> (marquee loop), <strong>3D Orbit</strong> (spherical multi-ring orbit), or <strong>Constellation</strong> (particle gravity graph).
+                  Switch between <strong>Dark</strong> and <strong>Light</strong> color palettes. You can also browse and switch between templates: <strong>Revolve</strong> (orbital rings), <strong>Spotlight</strong> (focused highlight), <strong>Hyperdrive</strong> (warp streaks), <strong>Milestone</strong> (laurel counters), <strong>Infinity</strong> (marquee loop), <strong>Orbit</strong> (3D carousel), or <strong>Constellation</strong> (particle gravity graph).
                 </p>
               </FadeIn>
 

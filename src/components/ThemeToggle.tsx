@@ -42,7 +42,7 @@ export default function ThemeToggle({ className }: { className?: string }) {
       title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
       className={
         className ||
-        "flex items-center justify-center w-10 h-10 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/50 text-foreground transition-all hover:border-border cursor-pointer backdrop-blur-md shadow-2xs"
+        "flex items-center justify-center w-10 h-10 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/50 text-foreground transition-all hover:border-border cursor-pointer backdrop-blur-md shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       }
     >
       {theme === 'dark' ? (

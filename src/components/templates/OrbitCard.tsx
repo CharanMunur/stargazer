@@ -46,7 +46,10 @@ export const OrbitCard: React.FC<TemplateCardProps> = ({
     const updateScale = () => {
       if (containerRef.current) {
         const width = containerRef.current.clientWidth;
-        setScale(width / 1600);
+        if (width > 0) {
+          const newScale = width / 1600;
+          setScale((prev) => (Math.abs(prev - newScale) > 0.001 ? newScale : prev));
+        }
       }
     };
     updateScale();
@@ -125,7 +128,8 @@ export const OrbitCard: React.FC<TemplateCardProps> = ({
 
   // Incrementing star count synced with physics
   const calcT = Math.min(1.0, Math.max(0.0, easeT));
-  const curStars = Math.round(1 + calcT * (data.stars - 1));
+  const totalStars = data.stars ?? 0;
+  const curStars = totalStars > 0 ? Math.round(1 + calcT * (totalStars - 1)) : 0;
 
   return (
     <div
@@ -142,18 +146,13 @@ export const OrbitCard: React.FC<TemplateCardProps> = ({
           backgroundColor: bgColor,
         }}
       >
-        {/* Radial Ambient Orange Glow (matching Go orbit.go lines 159-178) */}
+        {/* Ambient Radial Glow (matching RevolveCard / other templates) */}
         <div
-          className="absolute pointer-events-none rounded-full"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            left: '800px',
-            top: '430px',
-            width: '1100px',
-            height: '1100px',
-            transform: 'translate(-50%, -50%)',
             background: isDark
-              ? 'radial-gradient(circle, rgba(232, 116, 67, 0.22) 0%, rgba(242, 200, 121, 0.08) 50%, rgba(15, 14, 16, 0) 75%)'
-              : 'radial-gradient(circle, rgba(232, 116, 67, 0.15) 0%, rgba(242, 200, 121, 0.05) 50%, rgba(255, 255, 255, 0) 75%)',
+              ? 'radial-gradient(circle at 50% 48%, rgba(232, 116, 67, 0.18) 0%, rgba(242, 200, 121, 0.07) 30%, transparent 65%)'
+              : 'radial-gradient(circle at 50% 48%, rgba(232, 116, 67, 0.14) 0%, rgba(242, 200, 121, 0.05) 30%, transparent 65%)',
           }}
         />
 
@@ -201,12 +200,13 @@ export const OrbitCard: React.FC<TemplateCardProps> = ({
             return (
               <div
                 key={`${item.user.login}-${i}`}
-                className="absolute flex flex-col items-center justify-center pointer-events-none"
+                className="absolute flex flex-col items-center justify-center pointer-events-none transform-gpu"
                 style={{
                   left: `${item.x}px`,
                   top: `${item.y}px`,
                   width: `${curSize}px`,
-                  transform: 'translate(-50%, -50%)',
+                  transform: 'translate3d(-50%, -50%, 0)',
+                  backfaceVisibility: 'hidden',
                   zIndex: item.zIndex,
                 }}
               >
@@ -228,7 +228,6 @@ export const OrbitCard: React.FC<TemplateCardProps> = ({
                     src={item.user.avatarUrl || `https://github.com/${item.user.login || 'stargazer'}.png?size=160`}
                     alt={item.user.login || 'stargazer'}
                     className="w-full h-full object-cover rounded-full pointer-events-none"
-                    loading="lazy"
                     crossOrigin="anonymous"
                     onError={(e) => {
                       const img = e.target as HTMLImageElement;
