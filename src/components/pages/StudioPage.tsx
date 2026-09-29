@@ -302,7 +302,7 @@ export default function StudioPage() {
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-muted-foreground">
           <a
             href="/"
-            className="px-3 py-1 rounded-full bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors border border-border/50"
+            className="h-8 px-3.5 inline-flex items-center rounded-full bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors border border-border/50 text-xs sm:text-sm"
           >
             Home
           </a>
@@ -338,10 +338,10 @@ export default function StudioPage() {
             <button
               type="button"
               onClick={() => setReplayNonce((n) => n + 1)}
-              className="absolute top-4 right-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-muted-foreground hover:text-foreground text-xs font-medium border border-border transition-colors shadow-2xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="absolute top-4 right-4 z-20 h-8.5 px-3.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-muted-foreground hover:text-foreground text-xs font-medium border border-border/80 transition-colors shadow-2xs cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
               title="Replay animation"
             >
-              <RotateCcw className="w-3 h-3 shrink-0" />
+              <RotateCcw className="w-3.5 h-3.5 shrink-0" />
               <span>Replay</span>
             </button>
 
@@ -411,7 +411,7 @@ export default function StudioPage() {
             type="button"
             disabled={exporting || loading}
             onClick={handleExport}
-            className="w-full py-3.5 px-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 transition-all shadow-2xs active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="w-full h-12 py-3 px-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 transition-all shadow-2xs active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
           >
             {exporting ? (
               <>
@@ -445,7 +445,7 @@ export default function StudioPage() {
                 value={repo}
                 onChange={(e) => setRepo(e.target.value)}
                 required
-                className="w-full bg-muted/40 hover:bg-muted/60 border border-border hover:border-border/80 focus:border-ring rounded-full px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:bg-background transition-all shadow-2xs"
+                className="w-full h-11 bg-muted/40 hover:bg-muted/60 border border-border hover:border-border/80 focus:border-ring rounded-full px-4.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:bg-background transition-all shadow-2xs"
               />
             </div>
 
@@ -467,7 +467,7 @@ export default function StudioPage() {
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
                 required
-                className="w-full bg-muted/40 hover:bg-muted/60 border border-border hover:border-border/80 focus:border-ring rounded-full px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:bg-background transition-all shadow-2xs"
+                className="w-full h-11 bg-muted/40 hover:bg-muted/60 border border-border hover:border-border/80 focus:border-ring rounded-full px-4.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:bg-background transition-all shadow-2xs"
               />
             </div>
 
@@ -475,16 +475,16 @@ export default function StudioPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-2xs active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="w-full h-11 px-5 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-semibold transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 shadow-2xs active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
             >
               {loading ? (
                 <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin shrink-0" />
+                  <RefreshCw className="w-4 h-4 animate-spin shrink-0" />
                   <span>Loading stargazers...</span>
                 </>
               ) : (
                 <>
-                  <RefreshCw className="w-3.5 h-3.5 shrink-0" />
+                  <RefreshCw className="w-4 h-4 shrink-0" />
                   <span>Fetch Stargazers</span>
                 </>
               )}
@@ -498,7 +498,7 @@ export default function StudioPage() {
               <label className="text-sm font-medium text-foreground block">
                 Theme
               </label>
-              <div className="grid grid-cols-2 p-1 rounded-full bg-muted/50 border border-border/70 gap-1">
+              <div className="grid grid-cols-2 p-1.5 rounded-full bg-muted/40 border border-border/80 gap-1.5">
                 {(['dark', 'light'] as const).map((th) => (
                   <button
                     key={th}
@@ -507,13 +507,13 @@ export default function StudioPage() {
                       userCustomizedTheme.current = true;
                       setTheme(th);
                     }}
-                    className={`flex items-center justify-center gap-2 py-2 px-3 text-sm rounded-full transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    className={`flex items-center justify-center gap-2 h-10 py-2 px-4 text-sm rounded-full transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                       theme === th
                         ? 'bg-foreground text-background font-semibold shadow-2xs'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 font-medium'
                     }`}
                   >
-                    {th === 'dark' ? <Moon className="w-3.5 h-3.5 shrink-0" /> : <Sun className="w-3.5 h-3.5 shrink-0" />}
+                    {th === 'dark' ? <Moon className="w-4 h-4 shrink-0" /> : <Sun className="w-4 h-4 shrink-0" />}
                     <span>{th.charAt(0).toUpperCase() + th.slice(1)}</span>
                   </button>
                 ))}
@@ -525,13 +525,13 @@ export default function StudioPage() {
               <label className="text-sm font-medium text-foreground block">
                 Stargazers
               </label>
-              <div className="grid grid-cols-2 p-1 rounded-full bg-muted/50 border border-border/70 gap-1">
+              <div className="grid grid-cols-2 p-1.5 rounded-full bg-muted/40 border border-border/80 gap-1.5">
                 {(['latest', 'earliest'] as const).map((ord) => (
                   <button
                     key={ord}
                     type="button"
                     onClick={() => handleOrderChange(ord)}
-                    className={`py-2 px-3 text-sm rounded-full text-center transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    className={`h-10 py-2 px-4 text-sm rounded-full text-center flex items-center justify-center transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                       stargazerOrder === ord
                         ? 'bg-foreground text-background font-semibold shadow-2xs'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 font-medium'
@@ -548,7 +548,7 @@ export default function StudioPage() {
               <label className="text-sm font-medium text-foreground block">
                 Format
               </label>
-              <div className="grid grid-cols-2 p-1 rounded-full bg-muted/50 border border-border/70 gap-1">
+              <div className="grid grid-cols-2 p-1.5 rounded-full bg-muted/40 border border-border/80 gap-1.5">
                 {(['png', 'mp4'] as const).map((fmt) => {
                   const currentMeta = templatesData.find((t) => t.id === template);
                   const isDisabled = fmt === 'png' && currentMeta && !currentMeta.hasImage;
@@ -558,7 +558,7 @@ export default function StudioPage() {
                       type="button"
                       disabled={!!isDisabled}
                       onClick={() => !isDisabled && setFormat(fmt)}
-                      className={`py-2 px-3 text-sm rounded-full text-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                      className={`h-10 py-2 px-4 text-sm rounded-full text-center flex items-center justify-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                         isDisabled
                           ? 'opacity-40 cursor-not-allowed text-muted-foreground font-medium'
                           : format === fmt

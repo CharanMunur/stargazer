@@ -147,7 +147,7 @@ export default function HomePage() {
         </div>
 
         {/* Content: Name (left) and Open in Studio button in place of tag (right) */}
-        <div className="pt-3 pb-1 flex items-center justify-between px-1">
+        <div className="pt-4 sm:pt-4.5 pb-1.5 flex items-center justify-between px-1">
           <div className="flex items-center gap-2">
             <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
               {tmpl.name}
@@ -159,9 +159,9 @@ export default function HomePage() {
             )}
           </div>
 
-          <div className="py-1.5 px-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs">
+          <div className="h-9 sm:h-10 px-4 rounded-full bg-primary text-primary-foreground font-semibold text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs group-hover:bg-primary/90 transition-colors shrink-0">
             <span>Open in Studio</span>
-            <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.2]" />
+            <ArrowUpRight className="w-4 h-4 stroke-[2.2] shrink-0" />
           </div>
         </div>
       </a>
@@ -213,8 +213,8 @@ export default function HomePage() {
       </FadeIn>
 
       {/* Top Filter Bar above template area */}
-      <div className="flex items-center justify-between px-1 -mb-5">
-        <div className="text-xs font-medium text-muted-foreground">
+      <div className="flex items-center justify-between px-1 -mb-4">
+        <div className="text-sm font-semibold text-muted-foreground">
           {filtered.length} {filtered.length === 1 ? "template" : "templates"}
         </div>
 
@@ -223,39 +223,35 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() => setFilterOpen((prev) => !prev)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-medium transition-all shadow-2xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-              filterMode === "new"
-                ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                : "bg-card hover:bg-muted/60 border-border/80 text-foreground"
-            }`}
+            className="h-10 inline-flex items-center gap-2 px-4 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/50 text-foreground transition-all hover:border-border cursor-pointer backdrop-blur-md shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
             title="Filter templates view"
             aria-label="Filter templates"
           >
-            <SlidersHorizontal className="w-3.5 h-3.5 shrink-0" />
+            <SlidersHorizontal className="w-4 h-4 shrink-0 text-muted-foreground" />
             <span>{filterMode === "all" ? "All Templates" : "New Releases"}</span>
             <ChevronDown
-              className={`w-3 h-3 shrink-0 transition-transform duration-200 ${
+              className={`w-3.5 h-3.5 shrink-0 text-muted-foreground transition-transform duration-200 ${
                 filterOpen ? "rotate-180" : ""
               }`}
             />
           </button>
 
           {filterOpen && (
-            <div className="absolute right-0 top-full mt-2 w-52 rounded-2xl bg-card border border-border shadow-lg p-1.5 z-30 animate-in fade-in-50 zoom-in-95">
+            <div className="absolute right-0 top-full mt-2 w-52 rounded-2xl bg-background/80 backdrop-blur-md border border-border/70 shadow-lg p-1.5 z-30 animate-in fade-in-50 zoom-in-95">
               <button
                 type="button"
                 onClick={() => {
                   setFilterMode("all");
                   setFilterOpen(false);
                 }}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                   filterMode === "all"
-                    ? "bg-primary/10 text-primary font-semibold"
-                    : "text-foreground hover:bg-muted/60"
+                    ? "bg-muted text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 <span>All Templates</span>
-                {filterMode === "all" && <Check className="w-3.5 h-3.5 text-primary shrink-0" />}
+                {filterMode === "all" && <Check className="w-4 h-4 text-foreground shrink-0" />}
               </button>
 
               <button
@@ -264,14 +260,14 @@ export default function HomePage() {
                   setFilterMode("new");
                   setFilterOpen(false);
                 }}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-medium text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                   filterMode === "new"
-                    ? "bg-primary/10 text-primary font-semibold"
-                    : "text-foreground hover:bg-muted/60"
+                    ? "bg-muted text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                 }`}
               >
                 <span>New Releases</span>
-                {filterMode === "new" && <Check className="w-3.5 h-3.5 text-primary shrink-0" />}
+                {filterMode === "new" && <Check className="w-4 h-4 text-foreground shrink-0" />}
               </button>
             </div>
           )}
@@ -304,13 +300,15 @@ export default function HomePage() {
           <div className="space-y-10">
             {/* 1. New Templates First */}
             {newTemplates.length > 0 && (
-              <div className="space-y-3.5">
-                <div className="flex items-center gap-2 px-1">
-                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 px-1 pb-1">
+                  <h2 className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
                     New Releases
-                  </span>
-                  <span className="text-xs text-muted-foreground font-medium">
-                    ({newTemplates.length})
+                  </h2>
+                  <span className="text-base sm:text-lg font-medium select-none">
+                    <span className="text-foreground">(</span>
+                    <span className="text-muted-foreground font-semibold">{newTemplates.length}</span>
+                    <span className="text-foreground">)</span>
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5">
@@ -321,13 +319,15 @@ export default function HomePage() {
 
             {/* 2. Other Templates Except New Underneath */}
             {otherTemplates.length > 0 && (
-              <div className="space-y-3.5">
-                <div className="flex items-center gap-2 px-1 pt-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 px-1 pb-1 pt-4">
+                  <h2 className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
                     Other Templates
-                  </span>
-                  <span className="text-xs text-muted-foreground font-medium">
-                    ({otherTemplates.length})
+                  </h2>
+                  <span className="text-base sm:text-lg font-medium select-none">
+                    <span className="text-foreground">(</span>
+                    <span className="text-muted-foreground font-semibold">{otherTemplates.length}</span>
+                    <span className="text-foreground">)</span>
                   </span>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5">

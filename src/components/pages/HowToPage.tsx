@@ -83,19 +83,19 @@ export default function HowToPage() {
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-muted-foreground">
           <a
             href="/"
-            className="px-3 py-1 rounded-full bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors border border-border/50"
+            className="h-8 px-3.5 inline-flex items-center rounded-full bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors border border-border/50 text-xs sm:text-sm"
           >
             Home
           </a>
           <span className="text-muted-foreground/40 font-normal">/</span>
           <a
             href="/generate"
-            className="px-3 py-1 rounded-full bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors border border-border/50"
+            className="h-8 px-3.5 inline-flex items-center rounded-full bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors border border-border/50 text-xs sm:text-sm"
           >
             Studio
           </a>
           <span className="text-muted-foreground/40 font-normal">/</span>
-          <span className="font-semibold text-foreground px-1.5 py-0.5">How to</span>
+          <span className="font-semibold text-foreground px-1.5 py-0.5">{`How to`}</span>
         </nav>
       </FadeIn>
 
@@ -150,10 +150,10 @@ export default function HowToPage() {
                     href="https://github.com/settings/tokens/new?description=Stargazer&scopes=public_repo"
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground bg-muted hover:bg-muted/80 px-3 py-1.5 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer shadow-2xs"
+                    className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-foreground bg-muted hover:bg-muted/80 h-9 px-4 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer shadow-2xs shrink-0"
                   >
                     <span>Generate Token</span>
-                    <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+                    <ArrowUpRight className="w-4 h-4 shrink-0" />
                   </a>
                 </div>
                 <p className="text-base text-foreground/80 leading-7 font-normal">

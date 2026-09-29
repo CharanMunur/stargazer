@@ -58,25 +58,25 @@ export function GitHubStars({
       href={`https://github.com/${repo}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="h-10 inline-flex items-center gap-2.5 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/50 px-3.5 text-xs font-light tracking-tight text-foreground transition-all hover:border-border cursor-pointer backdrop-blur-md shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="h-11 inline-flex items-center gap-3 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/50 px-4.5 text-sm font-medium tracking-tight text-foreground transition-all hover:border-border cursor-pointer backdrop-blur-md shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
     >
-      <span className="shrink-0 flex items-center justify-center w-4.5 h-4.5">
+      <span className="shrink-0 flex items-center justify-center w-5 h-5">
         <img
           src="/social/github.svg"
           alt="GitHub"
-          className="w-4.5 h-4.5 object-contain dark:hidden shrink-0"
+          className="w-5 h-5 object-contain dark:hidden shrink-0"
         />
         <img
           src="/social/github-dark.svg"
           alt="GitHub"
-          className="hidden w-4.5 h-4.5 object-contain dark:block shrink-0"
+          className="hidden w-5 h-5 object-contain dark:block shrink-0"
         />
       </span>
 
-      <div className="h-4 w-px shrink-0 bg-border" aria-hidden="true" />
+      <div className="h-5 w-px shrink-0 bg-border/80" aria-hidden="true" />
 
       <div className="flex items-center gap-1.5">
-        <span className="text-sm text-foreground/90 font-medium leading-none inline-flex items-center translate-y-px">
+        <span className="text-sm text-foreground/90 font-semibold leading-none inline-flex items-center">
           {formattedStars}
         </span>
 
