@@ -303,7 +303,7 @@ export async function preloadTemplateAssets(
   } else if (template === 'spotlight') {
     avatarUrls = sourceStargazers.slice(0, 8).map((s) => s.avatarUrl).filter(Boolean);
   } else if (template === 'hyperdrive') {
-    avatarUrls = sourceStargazers.slice(0, 28).map((s) => s.avatarUrl).filter(Boolean);
+    avatarUrls = sourceStargazers.slice(0, 36).map((s) => s.avatarUrl).filter(Boolean);
   }
 
   const [leafImg, ownerImg, ...loadedAvatars] = await Promise.all([
@@ -1541,26 +1541,26 @@ function renderHyperdrive(
   const cx = 800;
   const cy = 450;
 
-  // 1. Background Fill
-  ctx.fillStyle = isDark ? '#05070D' : '#F6F9FD';
+  // 1. Background Fill: Obsidian in Dark, Warm Stone in Light
+  const bgColor = isDark ? '#09090b' : '#f5f5f0';
+  ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, width, height);
 
-  // 2. Anamorphic Hyperspace Radial Glow
+  // 2. Monochromatic Ambient Hyperspace Radial Glow
   const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 750);
   if (isDark) {
-    grad.addColorStop(0, 'rgba(14, 165, 233, 0.25)');
-    grad.addColorStop(0.3, 'rgba(99, 102, 241, 0.12)');
-    grad.addColorStop(0.55, 'rgba(245, 158, 11, 0.04)');
-    grad.addColorStop(0.75, 'transparent');
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
+    grad.addColorStop(0.3, 'rgba(250, 204, 21, 0.02)');
+    grad.addColorStop(0.7, 'transparent');
   } else {
-    grad.addColorStop(0, 'rgba(14, 165, 233, 0.18)');
-    grad.addColorStop(0.3, 'rgba(99, 102, 241, 0.08)');
+    grad.addColorStop(0, 'rgba(0, 0, 0, 0.03)');
+    grad.addColorStop(0.3, 'rgba(250, 204, 21, 0.02)');
     grad.addColorStop(0.7, 'transparent');
   }
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, width, height);
 
-  // 3. 64 Anamorphic Laser Warp Beams
+  // 3. 64 Warp Streak Lines
   ctx.save();
   const beamCount = 64;
   for (let i = 0; i < beamCount; i++) {
@@ -1574,11 +1574,11 @@ function renderHyperdrive(
       absSin > 0.0001 ? 450 / absSin : 9999
     );
 
-    const speed = 0.35 + (i % 5) * 0.06;
+    const speed = 0.3 + (i % 5) * 0.05;
     const initialProgress = (i * (1 / beamCount)) % 1;
     const p = (initialProgress + progress * speed * 2.8) % 1;
 
-    const baseLength = 160 + (i % 4) * 80;
+    const baseLength = 140 + (i % 4) * 70;
     const length = baseLength * (0.3 + Math.pow(p, 1.4) * 1.5);
     const startDist = 70 + Math.pow(p, 2.0) * (edgeDist - 40);
     const endDist = startDist + length;
@@ -1594,58 +1594,57 @@ function renderHyperdrive(
     } else if (p > 0.8) {
       alpha = (1 - p) / 0.2;
     }
-    alpha *= 0.25 + (i % 3) * 0.18;
+    alpha *= 0.2 + (i % 3) * 0.12;
 
-    const isGold = i % 8 === 0;
-    const isWhite = i % 5 === 0 && !isGold;
+    const isGold = i % 10 === 0;
 
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
     ctx.strokeStyle = isGold
       ? '#FACC15'
-      : isWhite
-      ? (isDark ? '#E0F2FE' : '#0369A1')
-      : (isDark ? '#38BDF8' : '#0284C7');
+      : isDark
+      ? 'rgba(255, 255, 255, 0.4)'
+      : 'rgba(17, 17, 17, 0.25)';
     ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
-    ctx.lineWidth = isGold ? 2.5 : isWhite ? 2.0 : 1.5;
+    ctx.lineWidth = isGold ? 2.0 : 1.2;
     ctx.lineCap = 'round';
     ctx.stroke();
   }
   ctx.restore();
 
-  // 4. Relativistic Shockwave Rings (4 Expanding wavefronts)
+  // 4. Expanding Wavefront Rings
   ctx.save();
-  const ringCount = 4;
+  const ringCount = 3;
   for (let k = 0; k < ringCount; k++) {
-    const ringP = (k / ringCount + progress * 0.22 * 2.8) % 1;
-    const r = 70 + Math.pow(ringP, 1.6) * 1050;
+    const ringP = (k / ringCount + progress * 0.18 * 2.8) % 1;
+    const r = 70 + Math.pow(ringP, 1.6) * 1000;
 
     let ringAlpha = 0;
     if (ringP < 0.25) {
-      ringAlpha = (ringP / 0.25) * 0.26;
+      ringAlpha = (ringP / 0.25) * 0.15;
     } else {
-      ringAlpha = ((1 - ringP) / 0.75) * 0.26;
+      ringAlpha = ((1 - ringP) / 0.75) * 0.15;
     }
 
     if (ringAlpha > 0.01) {
       ctx.beginPath();
-      ctx.ellipse(cx, cy, r * 1.08, r * 0.94, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = isDark ? '#38BDF8' : '#0284C7';
+      ctx.ellipse(cx, cy, r * 1.05, r * 0.95, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(17, 17, 17, 0.12)';
       ctx.globalAlpha = ringAlpha;
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 1.0;
       ctx.stroke();
     }
   }
   ctx.restore();
 
-  // 5. Stardust specks (High-velocity particles)
+  // 5. Stardust Specks
   ctx.save();
-  for (let s = 0; s < 36; s++) {
-    const sAngle = (s / 36) * Math.PI * 2 + ((s * 23) % 9) * 0.08;
-    const sSpeed = 0.5 + (s % 4) * 0.1;
-    const sP = ((s * 0.0277) + progress * sSpeed * 2.8) % 1;
-    const sDist = 60 + Math.pow(sP, 2.2) * 900;
+  for (let s = 0; s < 32; s++) {
+    const sAngle = (s / 32) * Math.PI * 2 + ((s * 23) % 9) * 0.08;
+    const sSpeed = 0.45 + (s % 4) * 0.08;
+    const sP = ((s * 0.03125) + progress * sSpeed * 2.8) % 1;
+    const sDist = 60 + Math.pow(sP, 2.2) * 880;
 
     const px = cx + Math.cos(sAngle) * sDist;
     const py = cy + Math.sin(sAngle) * sDist;
@@ -1655,135 +1654,233 @@ function renderHyperdrive(
     else if (sP > 0.85) sAlpha = (1 - sP) / 0.15;
 
     ctx.beginPath();
-    ctx.arc(px, py, 1.2 + (s % 2) * 1.0, 0, Math.PI * 2);
-    ctx.fillStyle = s % 3 === 0 ? '#FACC15' : isDark ? '#BAE6FD' : '#0284C7';
-    ctx.globalAlpha = Math.max(0, Math.min(1, sAlpha * 0.6));
+    ctx.arc(px, py, 1.0 + (s % 2) * 0.8, 0, Math.PI * 2);
+    ctx.fillStyle = s % 4 === 0 ? '#FACC15' : isDark ? '#ffffff' : '#111111';
+    ctx.globalAlpha = Math.max(0, Math.min(1, sAlpha * 0.5));
     ctx.fill();
   }
   ctx.restore();
 
-  // 6. Contributor Avatars
+  // 6. Heavy Yellowish Ambient Glow & Soft Backdrop Fill BEHIND Avatars (zIndex 5)
+  ctx.save();
+  const backdropGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 450);
+  if (isDark) {
+    backdropGrad.addColorStop(0, 'rgba(13, 12, 18, 0.85)');
+    backdropGrad.addColorStop(0.4, 'rgba(13, 12, 18, 0.55)');
+    backdropGrad.addColorStop(0.65, 'rgba(13, 12, 18, 0.25)');
+    backdropGrad.addColorStop(1, 'rgba(13, 12, 18, 0)');
+  } else {
+    backdropGrad.addColorStop(0, 'rgba(245, 244, 241, 0.88)');
+    backdropGrad.addColorStop(0.4, 'rgba(245, 244, 241, 0.55)');
+    backdropGrad.addColorStop(0.65, 'rgba(245, 244, 241, 0.25)');
+    backdropGrad.addColorStop(1, 'rgba(245, 244, 241, 0)');
+  }
+  ctx.fillStyle = backdropGrad;
+  ctx.fillRect(cx - 450, cy - 450, 900, 900);
+
+  const centerGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 480);
+  if (isDark) {
+    centerGlow.addColorStop(0, 'rgba(250, 204, 21, 0.60)');
+    centerGlow.addColorStop(0.35, 'rgba(245, 158, 11, 0.35)');
+    centerGlow.addColorStop(0.6, 'rgba(234, 179, 8, 0.12)');
+    centerGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  } else {
+    centerGlow.addColorStop(0, 'rgba(250, 204, 21, 0.50)');
+    centerGlow.addColorStop(0.35, 'rgba(245, 158, 11, 0.28)');
+    centerGlow.addColorStop(0.6, 'rgba(234, 179, 8, 0.08)');
+    centerGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  }
+  ctx.fillStyle = centerGlow;
+  ctx.fillRect(cx - 480, cy - 480, 960, 960);
+  ctx.restore();
+
+  // 7. 36 Contributor Avatars flying outward (sorted back-to-front across 8 directional sectors)
   const sourceStargazers =
     data.stargazers && data.stargazers.length > 0 ? data.stargazers : sampleStargazers;
 
-  const count = 28;
+  const hash = (i: number, seed: number) => {
+    let h = (i * 374761393 + seed * 668265263) ^ 0x5bf03635;
+    h = Math.imul(h ^ (h >>> 13), 1274126177);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
+  };
+
+  const count = 36;
+  const avatarsToDraw: {
+    posX: number;
+    posY: number;
+    scaleVal: number;
+    alpha: number;
+    user: (typeof sourceStargazers)[0];
+    p: number;
+  }[] = [];
+
   for (let i = 0; i < count; i++) {
-    const angle = (i / count) * Math.PI * 2 + (i % 5) * 0.12;
-    const cosA = Math.cos(angle);
-    const sinA = Math.sin(angle);
+    // 8 directional sectors: 0=E, 1=NE, 2=N, 3=NW, 4=W, 5=SW, 6=S, 7=SE
+    const sector = i % 8;
+    const sectorAngle = (sector * Math.PI) / 4;
+    const angleJitter = (hash(i, 101) - 0.5) * (Math.PI / 6);
+    const baseAngle = sectorAngle + angleJitter;
+
+    const startDist = 220 + hash(i, 202) * 100;
+    const delay = (i * 0.038) + hash(i, 303) * 0.05;
+    const speed = 0.58 + (i % 5) * 0.04;
+    const spinDir = i % 2 === 0 ? 1 : -1;
+    const chipScale = 0.85 + hash(i, 606) * 0.28;
+
+    const rawP = progress * speed * 3.2 - delay;
+    if (rawP < 0) continue;
+
+    const p = rawP % 1;
+
+    const currentAngle = baseAngle + (p - 0.5) * 0.22 * spinDir;
+    const cosA = Math.cos(currentAngle);
+    const sinA = Math.sin(currentAngle);
     const absCos = Math.abs(cosA);
     const absSin = Math.abs(sinA);
-
-    const hudDist = Math.min(
-      absCos > 0.0001 ? 310 / absCos : 9999,
-      absSin > 0.0001 ? 170 / absSin : 9999
-    );
-    const startDist = hudDist * 0.35;
 
     const edgeDist = Math.min(
       absCos > 0.0001 ? 800 / absCos : 9999,
       absSin > 0.0001 ? 450 / absSin : 9999
     );
-    const exitDist = edgeDist + 140;
+    const exitDist = edgeDist + 150;
 
-    const speed = 0.22 + (i % 4) * 0.035;
-    const initialProgress = (i * (1 / count)) % 1;
-    const p = (initialProgress + progress * speed * 2.8) % 1;
-
-    const dist = startDist + (exitDist - startDist) * Math.pow(p, 2.2);
+    const distP = 0.20 * p + 0.80 * Math.pow(p, 1.35);
+    const dist = startDist + (exitDist - startDist) * distP;
     const posX = cx + cosA * dist;
     const posY = cy + sinA * dist;
 
-    const scaleVal = 0.38 + Math.pow(p, 1.8) * 1.35;
-    let alpha = 1;
-    if (p < 0.1) {
-      alpha = p / 0.1;
-    }
-
-    const r = Math.round(37 * scaleVal);
+    const scaleVal = (0.35 + distP * 1.45) * chipScale;
+    const alpha = p < 0.06 ? p / 0.06 : p > 0.88 ? (1 - p) / 0.12 : 1;
     const user = sourceStargazers[i % sourceStargazers.length];
-    const img = user ? assets.avatarImages.get(user.avatarUrl) : undefined;
+
+    avatarsToDraw.push({ posX, posY, scaleVal, alpha, user, p });
+  }
+
+  // Sort back-to-front so smaller/further avatars draw behind larger/closer ones
+  avatarsToDraw.sort((a, b) => a.p - b.p);
+
+  for (let k = 0; k < avatarsToDraw.length; k++) {
+    const item = avatarsToDraw[k];
+    const size = Math.round(88 * item.scaleVal);
+    const half = size / 2;
+    const cornerR = Math.round(size * 0.205);
+    const img = item.user ? assets.avatarImages.get(item.user.avatarUrl) : undefined;
+    const x = item.posX - half;
+    const y = item.posY - half;
 
     ctx.save();
-    ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
-    drawCircularAvatar(
-      ctx,
-      img,
-      user?.login || 'U',
-      posX,
-      posY,
-      r,
-      isDark ? 'rgba(56, 189, 248, 0.55)' : 'rgba(2, 132, 199, 0.4)',
-      2
-    );
+    ctx.globalAlpha = Math.max(0, Math.min(1, item.alpha));
+
+    // Card background fill & drop shadow matching HyperdriveCard.tsx
+    ctx.shadowColor = isDark ? 'rgba(0, 0, 0, 0.65)' : 'rgba(0, 0, 0, 0.08)';
+    ctx.shadowBlur = 18 * item.scaleVal;
+    ctx.shadowOffsetY = 6 * item.scaleVal;
+
+    drawRoundedRect(ctx, x, y, size, size, cornerR);
+    ctx.fillStyle = isDark ? 'rgba(13, 12, 18, 0.92)' : 'rgba(255, 255, 255, 0.96)';
+    ctx.fill();
+
+    // Border
+    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(15, 14, 16, 0.12)';
+    ctx.lineWidth = Math.max(1, 1.5 * item.scaleVal);
+    ctx.stroke();
+
+    // Clip for inner avatar image / fallback
+    ctx.clip();
+    if (img && img.naturalWidth > 0) {
+      ctx.drawImage(img, x, y, size, size);
+    } else {
+      ctx.fillStyle = isDark ? '#1D1C24' : '#E2E8F0';
+      ctx.fillRect(x, y, size, size);
+      ctx.fillStyle = isDark ? '#F5EDE7' : '#0F0E10';
+      ctx.font = `bold ${Math.round(size * 0.38)}px 'DM Sans', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText((item.user?.login || 'U').slice(0, 2).toUpperCase(), item.posX, item.posY);
+    }
     ctx.restore();
   }
 
-  // 7. Center Aerospace Cockpit Core HUD
-  const ease = easeOut(Math.min(1, progress * 2));
-  const hudW = 620;
-  const hudH = 340;
-  const hudX = cx - hudW / 2;
-  const hudY = cy - hudH / 2;
+  // 8. Center Hub (EXACT MATCH WITH REVOLVE)
+  const easeCenter = easeOut(Math.min(1, progress * 2));
+  ctx.save();
+  ctx.globalAlpha = easeCenter;
+
+  // 1. Owner avatar box (160px x 160px squircle, radius 36px at top 273.5)
+  const avatarSz = 160;
+  const avatarHalf = avatarSz / 2;
+  const avatarR = 36;
+  const avatarTop = 273.5;
+  const avatarCenterY = avatarTop + avatarHalf; // 353.5
 
   ctx.save();
-  ctx.globalAlpha = ease;
-
-  // Background Card
-  drawRoundedRect(ctx, hudX, hudY, hudW, hudH, 32);
-  ctx.fillStyle = isDark ? 'rgba(8, 14, 25, 0.88)' : 'rgba(255, 255, 255, 0.92)';
+  ctx.shadowColor = isDark ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0.12)';
+  ctx.shadowBlur = 60;
+  ctx.shadowOffsetY = 20;
+  drawRoundedRect(ctx, cx - avatarHalf, avatarTop, avatarSz, avatarSz, avatarR);
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.09)' : '#FFFFFF';
   ctx.fill();
-  ctx.strokeStyle = isDark ? 'rgba(56, 189, 248, 0.3)' : 'rgba(2, 132, 199, 0.2)';
-  ctx.lineWidth = 1.5;
+  ctx.restore();
+
+  ctx.save();
+  drawRoundedRect(ctx, cx - avatarHalf, avatarTop, avatarSz, avatarSz, avatarR);
+  ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.09)';
+  ctx.lineWidth = 2;
   ctx.stroke();
+  ctx.clip();
 
-  // Owner Mascot Avatar
-  if (assets.ownerImg) {
-    const avSize = 76;
-    const avX = cx - avSize / 2;
-    const avY = hudY + 28;
-    drawRoundedRect(ctx, avX, avY, avSize, avSize, 18);
-    ctx.save();
-    ctx.clip();
-    ctx.drawImage(assets.ownerImg, avX, avY, avSize, avSize);
-    ctx.restore();
-    drawRoundedRect(ctx, avX, avY, avSize, avSize, 18);
-    ctx.strokeStyle = isDark ? 'rgba(56, 189, 248, 0.4)' : 'rgba(2, 132, 199, 0.3)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+  if (assets.ownerImg && assets.ownerImg.naturalWidth > 0) {
+    ctx.drawImage(assets.ownerImg, cx - avatarHalf, avatarTop, avatarSz, avatarSz);
+  } else {
+    ctx.fillStyle = isDark ? '#F5EDE7' : '#0F0E10';
+    ctx.font = `bold 60px 'DM Sans', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText((data.repo ? data.repo.charAt(0).toUpperCase() : '★'), cx, avatarCenterY);
   }
+  ctx.restore();
 
-  // Repo Hierarchy Name
+  // 2. Repo full name: 46px extrabold, letter-spacing -0.025em at Y = 478
   const repoFullName = data.owner ? `${data.owner}/${data.repo}` : data.repo;
-  ctx.font = `bold 32px 'DM Sans', sans-serif`;
-  ctx.fillStyle = isDark ? '#FFFFFF' : '#0F172A';
+  ctx.save();
+  ctx.font = `800 46px 'DM Sans', sans-serif`;
+  ctx.fillStyle = isDark ? '#F5EDE7' : '#0F0E10';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText(repoFullName, cx, hudY + 135);
+  ctx.fillText(repoFullName, cx, 478);
+  ctx.restore();
 
-  // Big Star Count
-  const curStars = Math.round(data.stars * Math.min(1, progress * 3));
+  // 3. Star count row: Star (76px) + Number (100px) + "stars" (28px) at Y = 576
+  const curStars = Math.round(1 + easeCenter * (data.stars - 1));
   const countStr = curStars.toLocaleString();
-  ctx.font = `900 88px 'DM Sans', sans-serif`;
-  const countWidth = ctx.measureText(countStr).width;
-  const starR = 34;
-  const totalStarGroup = starR * 2 + 18 + countWidth;
-  const groupStart = cx - totalStarGroup / 2;
 
-  drawYellowStar(ctx, groupStart + starR, hudY + 215, starR);
+  ctx.save();
+  ctx.font = `900 100px 'DM Sans', sans-serif`;
+  const countW = ctx.measureText(countStr).width;
+  ctx.font = `500 28px 'DM Sans', sans-serif`;
+  const labelW = ctx.measureText('stars').width;
 
-  ctx.font = `900 88px 'DM Sans', sans-serif`;
-  ctx.fillStyle = isDark ? '#FFFFFF' : '#0F172A';
+  const starSz = 76;
+  const gap = 16;
+  const totalW = starSz + gap + countW + gap + labelW;
+  const startX = cx - totalW / 2;
+  const rowCenterY = 576;
+
+  // Star icon
+  drawStar(ctx, startX + starSz / 2, rowCenterY - 4, starSz / 2, '#FACC15', '#EAB308', 1.5);
+
+  // Count
+  ctx.font = `900 100px 'DM Sans', sans-serif`;
+  ctx.fillStyle = isDark ? '#F5EDE7' : '#0F0E10';
   ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(countStr, groupStart + starR * 2 + 18, hudY + 215);
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(countStr, startX + starSz + gap, rowCenterY + 34);
 
-  // Subtitle
-  ctx.font = `bold 12px 'DM Sans', sans-serif`;
-  ctx.fillStyle = isDark ? '#38BDF8' : '#0284C7';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('COMMUNITY STARGAZERS', cx, hudY + 295);
+  // "stars" label
+  ctx.font = `500 28px 'DM Sans', sans-serif`;
+  ctx.fillStyle = isDark ? '#A1958D' : '#64748B';
+  ctx.fillText('stars', startX + starSz + gap + countW + gap, rowCenterY + 30);
+  ctx.restore();
 
   ctx.restore();
 }
