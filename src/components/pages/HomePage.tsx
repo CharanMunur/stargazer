@@ -48,9 +48,9 @@ export default function HomePage() {
       <FadeIn delay={0.05} yOffset={10} duration={0.4} className="flex flex-col items-center text-center space-y-4 max-w-2xl mx-auto pt-6">
         <div className="flex items-center justify-center mb-2">
           <img
-            src="/stargazer.svg"
+            src={theme === "dark" ? "/stargazer-dark.svg" : "/stargazer-light.svg"}
             alt="Stargazer"
-            className="h-16 sm:h-20 md:h-24 w-auto object-contain mx-auto rounded-xl shadow-sm"
+            className="h-20 sm:h-24 md:h-28 w-auto object-contain mx-auto"
           />
         </div>
 
@@ -71,7 +71,7 @@ export default function HomePage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search templates..."
-              className="w-full pl-12 pr-5 py-3.5 bg-muted/40 hover:bg-muted/60 border border-input rounded-full text-base text-foreground placeholder:text-muted-foreground outline-none focus:border-ring focus:bg-background transition-all shadow-2xs"
+              className="w-full pl-12 pr-5 py-3 bg-muted/40 hover:bg-muted/60 border border-border hover:border-border/80 focus:border-ring rounded-full text-sm sm:text-base text-foreground placeholder:text-muted-foreground outline-none focus:bg-background transition-all shadow-2xs"
             />
           </div>
         </div>
@@ -83,10 +83,10 @@ export default function HomePage() {
           <FadeIn key={tmpl.id} delay={0.15 + idx * 0.05} yOffset={20}>
             <a
               href={`/generate?template=${tmpl.id}`}
-              className="group relative rounded-3xl bg-card hover:bg-muted/50 border border-border hover:border-border/80 p-2 sm:p-2.5 flex flex-col justify-between transition-colors duration-150 cursor-pointer shadow-xs block h-full text-card-foreground"
+              className="group relative rounded-3xl bg-card hover:bg-muted/40 border border-border/80 hover:border-border p-2.5 sm:p-3 flex flex-col justify-between transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs block h-full text-card-foreground"
             >
               {/* Live 16:9 Canvas Preview */}
-              <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-border relative flex items-center justify-center pointer-events-none">
+              <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-border/70 relative flex items-center justify-center pointer-events-none">
                 <div
                   className="absolute inset-0 pointer-events-none opacity-40"
                   style={{
@@ -161,12 +161,12 @@ export default function HomePage() {
                   <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
                     {tmpl.name}
                   </h2>
-                  <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1 rounded-full border border-border">
+                  <span className="text-xs font-semibold text-muted-foreground bg-muted/80 px-3 py-1 rounded-full border border-border/60">
                     {tmpl.tag}
                   </span>
                 </div>
 
-                <div className="w-full py-2.5 px-4 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm flex items-center justify-center gap-2 transition-colors">
+                <div className="w-full py-2.5 px-4 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99] shadow-2xs">
                   <span>Open in Studio</span>
                   <ArrowRight className="w-4 h-4" />
                 </div>
