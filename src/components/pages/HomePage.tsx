@@ -8,6 +8,7 @@ import {
   ConstellationCard,
   SpotlightCard,
   RevolveCard,
+  HyperdriveCard,
 } from "../templates";
 import { templatesData, initialSampleData } from "@/data/templates";
 
@@ -138,6 +139,14 @@ export default function HomePage() {
                   {tmpl.id === "constellation" && (
                     <ConstellationCard
                       key={`preview-constellation-${theme}`}
+                      data={initialSampleData}
+                      theme={theme}
+                      animated
+                    />
+                  )}
+                  {tmpl.id === "hyperdrive" && (
+                    <HyperdriveCard
+                      key={`preview-hyperdrive-${theme}`}
                       data={initialSampleData}
                       theme={theme}
                       animated

@@ -86,6 +86,12 @@ An organic particle cluster designed for contributor appreciation:
 * Central glow vignette maintaining 100% readability.
 * Natural fade-in entrance motion.
 
+### 5. Hyperdrive (Light-Speed Jump)
+Anamorphic light-speed acceleration beams with burst-speed contributor avatars and shockwave rings:
+* 48 anamorphic laser warp beams stretching across the canvas from a bright vanishing center.
+* High-velocity accelerating avatar bursts projecting toward screen boundaries with motion blur.
+* Expanding hyperdrive warp rings and sleek aerospace telemetry HUD.
+
 ---
 
 ## Quick Start

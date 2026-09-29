@@ -7,9 +7,10 @@ import {
   ConstellationCard,
   SpotlightCard,
   RevolveCard,
+  HyperdriveCard,
 } from '../templates';
 import type { TemplateData, StargazerUser } from '../templates/types';
-import { exportTemplateToVideo, exportTemplateToImage } from '@/lib/videoExporter';
+import { exportTemplateToVideo, exportTemplateToImage, getDefaultDurationForTemplate } from '@/lib/videoExporter';
 import { Separator } from '@/components/ui/separator';
 import { FadeIn } from '../helpers/FadeIn';
 import { templatesData, initialSampleData, type TemplateMeta } from '@/data/templates';
@@ -60,12 +61,22 @@ export default function StudioPage() {
       const qTemplate = (params.get('template') || params.get('generate')) as TemplateId;
       if (templatesData.some((t) => t.id === qTemplate)) {
         setTemplate(qTemplate);
+        // Auto-switch to MP4 if the template doesn't support PNG
+        const meta = templatesData.find((t) => t.id === qTemplate);
+        if (meta && !meta.hasImage) {
+          setFormat('mp4');
+        }
       }
     }
   }, []);
 
   const handleTemplateChange = (newTemplate: TemplateId) => {
     setTemplate(newTemplate);
+    // Auto-switch to MP4 if the new template doesn't support PNG
+    const meta = templatesData.find((t) => t.id === newTemplate);
+    if (meta && !meta.hasImage) {
+      setFormat('mp4');
+    }
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
       url.searchParams.set('template', newTemplate);
@@ -254,7 +265,7 @@ export default function StudioPage() {
           template,
           data: repoData,
           theme,
-          durationSeconds: 3.5,
+          durationSeconds: getDefaultDurationForTemplate(template),
           fps: 30,
           width: 1600,
           height: 900,
@@ -379,6 +390,14 @@ export default function StudioPage() {
               {template === 'revolve' && (
                 <RevolveCard
                   key={`card-revolve-${theme}-${repoData.repo}-${replayNonce}`}
+                  data={repoData}
+                  theme={theme}
+                  animated
+                />
+              )}
+              {template === 'hyperdrive' && (
+                <HyperdriveCard
+                  key={`card-hyperdrive-${theme}-${repoData.repo}-${replayNonce}`}
                   data={repoData}
                   theme={theme}
                   animated
@@ -530,20 +549,28 @@ export default function StudioPage() {
                 Format
               </label>
               <div className="grid grid-cols-2 p-1 rounded-full bg-muted/50 border border-border/70 gap-1">
-                {(['png', 'mp4'] as const).map((fmt) => (
-                  <button
-                    key={fmt}
-                    type="button"
-                    onClick={() => setFormat(fmt)}
-                    className={`py-2 px-3 text-sm rounded-full text-center transition-all cursor-pointer ${
-                      format === fmt
-                        ? 'bg-foreground text-background font-semibold shadow-2xs'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 font-medium'
-                    }`}
-                  >
-                    {fmt.toUpperCase()}
-                  </button>
-                ))}
+                {(['png', 'mp4'] as const).map((fmt) => {
+                  const currentMeta = templatesData.find((t) => t.id === template);
+                  const isDisabled = fmt === 'png' && currentMeta && !currentMeta.hasImage;
+                  return (
+                    <button
+                      key={fmt}
+                      type="button"
+                      disabled={!!isDisabled}
+                      onClick={() => !isDisabled && setFormat(fmt)}
+                      className={`py-2 px-3 text-sm rounded-full text-center transition-all ${
+                        isDisabled
+                          ? 'opacity-40 cursor-not-allowed text-muted-foreground font-medium'
+                          : format === fmt
+                          ? 'bg-foreground text-background font-semibold shadow-2xs cursor-pointer'
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 font-medium cursor-pointer'
+                      }`}
+                      title={isDisabled ? 'This template is animation-only (MP4)' : undefined}
+                    >
+                      {fmt.toUpperCase()}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

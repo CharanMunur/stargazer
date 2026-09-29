@@ -6,3 +6,4 @@ export * from './ConstellationCard';
 export * from './OrbitCard';
 export * from './SpotlightCard';
 export * from './RevolveCard';
+export * from './HyperdriveCard';

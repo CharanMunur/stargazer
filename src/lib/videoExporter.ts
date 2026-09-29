@@ -61,6 +61,29 @@ async function getSupportedEncoderConfig(width: number, height: number, bitrate:
   return null;
 }
 
+export function getDefaultDurationForTemplate(template: TemplateType): number {
+  switch (template) {
+    case 'infinity':
+    case 'ticker':
+      return 8.0;
+    case 'orbit':
+      return 8.0;
+    case 'constellation':
+      return 8.0;
+    case 'hyperdrive':
+      return 8.0;
+    case 'revolve':
+      return 8.0;
+    case 'spotlight':
+      return 8.0;
+    case 'milestone':
+    case 'counter':
+      return 8.0;
+    default:
+      return 8.0;
+  }
+}
+
 export async function exportTemplateToVideo(
   options: VideoExportOptions
 ): Promise<VideoExportResult> {
@@ -68,7 +91,7 @@ export async function exportTemplateToVideo(
     template,
     data,
     theme,
-    durationSeconds = 3.5,
+    durationSeconds = getDefaultDurationForTemplate(options.template),
     fps = 30,
     width = 1600,
     height = 900,
