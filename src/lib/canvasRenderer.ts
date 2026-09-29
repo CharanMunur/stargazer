@@ -1541,21 +1541,25 @@ function renderHyperdrive(
   const cx = 800;
   const cy = 450;
 
-  // 1. Background Fill: Obsidian in Dark, Warm Stone in Light
-  const bgColor = isDark ? '#09090b' : '#f5f5f0';
+  // Hyperdrive duration is 8.0s; convert progress (0..1) to actual elapsed seconds
+  const totalDuration = 8.0;
+  const timeSec = progress * totalDuration;
+
+  // 1. Background Fill: Obsidian in Dark, Warm Stone in Light matching HyperdriveCard.tsx
+  const bgColor = isDark ? '#0D0C12' : '#F5F4F1';
   ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, width, height);
 
-  // 2. Monochromatic Ambient Hyperspace Radial Glow
+  // 2. Continuous Radial Glow (Smooth falloff, zero sharp edges)
   const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 750);
   if (isDark) {
-    grad.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
-    grad.addColorStop(0.3, 'rgba(250, 204, 21, 0.02)');
-    grad.addColorStop(0.7, 'transparent');
+    grad.addColorStop(0, 'rgba(255, 255, 255, 0.06)');
+    grad.addColorStop(0.35, 'rgba(250, 204, 21, 0.02)');
+    grad.addColorStop(0.75, 'transparent');
   } else {
-    grad.addColorStop(0, 'rgba(0, 0, 0, 0.03)');
-    grad.addColorStop(0.3, 'rgba(250, 204, 21, 0.02)');
-    grad.addColorStop(0.7, 'transparent');
+    grad.addColorStop(0, 'rgba(0, 0, 0, 0.04)');
+    grad.addColorStop(0.35, 'rgba(250, 204, 21, 0.02)');
+    grad.addColorStop(0.75, 'transparent');
   }
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, width, height);
@@ -1576,7 +1580,7 @@ function renderHyperdrive(
 
     const speed = 0.3 + (i % 5) * 0.05;
     const initialProgress = (i * (1 / beamCount)) % 1;
-    const p = (initialProgress + progress * speed * 2.8) % 1;
+    const p = (initialProgress + timeSec * speed) % 1;
 
     const baseLength = 140 + (i % 4) * 70;
     const length = baseLength * (0.3 + Math.pow(p, 1.4) * 1.5);
@@ -1604,8 +1608,8 @@ function renderHyperdrive(
     ctx.strokeStyle = isGold
       ? '#FACC15'
       : isDark
-      ? 'rgba(255, 255, 255, 0.4)'
-      : 'rgba(17, 17, 17, 0.25)';
+      ? 'rgba(255, 255, 255, 0.35)'
+      : 'rgba(15, 14, 16, 0.22)';
     ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
     ctx.lineWidth = isGold ? 2.0 : 1.2;
     ctx.lineCap = 'round';
@@ -1617,7 +1621,7 @@ function renderHyperdrive(
   ctx.save();
   const ringCount = 3;
   for (let k = 0; k < ringCount; k++) {
-    const ringP = (k / ringCount + progress * 0.18 * 2.8) % 1;
+    const ringP = (k / ringCount + timeSec * 0.18) % 1;
     const r = 70 + Math.pow(ringP, 1.6) * 1000;
 
     let ringAlpha = 0;
@@ -1630,7 +1634,7 @@ function renderHyperdrive(
     if (ringAlpha > 0.01) {
       ctx.beginPath();
       ctx.ellipse(cx, cy, r * 1.05, r * 0.95, 0, 0, Math.PI * 2);
-      ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(17, 17, 17, 0.12)';
+      ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(15, 14, 16, 0.10)';
       ctx.globalAlpha = ringAlpha;
       ctx.lineWidth = 1.0;
       ctx.stroke();
@@ -1643,7 +1647,7 @@ function renderHyperdrive(
   for (let s = 0; s < 32; s++) {
     const sAngle = (s / 32) * Math.PI * 2 + ((s * 23) % 9) * 0.08;
     const sSpeed = 0.45 + (s % 4) * 0.08;
-    const sP = ((s * 0.03125) + progress * sSpeed * 2.8) % 1;
+    const sP = ((s * (1 / 32)) + timeSec * sSpeed) % 1;
     const sDist = 60 + Math.pow(sP, 2.2) * 880;
 
     const px = cx + Math.cos(sAngle) * sDist;
@@ -1655,24 +1659,26 @@ function renderHyperdrive(
 
     ctx.beginPath();
     ctx.arc(px, py, 1.0 + (s % 2) * 0.8, 0, Math.PI * 2);
-    ctx.fillStyle = s % 4 === 0 ? '#FACC15' : isDark ? '#ffffff' : '#111111';
+    ctx.fillStyle = s % 4 === 0 ? '#FACC15' : isDark ? '#ffffff' : '#0F0E10';
     ctx.globalAlpha = Math.max(0, Math.min(1, sAlpha * 0.5));
     ctx.fill();
   }
   ctx.restore();
 
-  // 6. Heavy Yellowish Ambient Glow & Soft Backdrop Fill BEHIND Avatars (zIndex 5)
+  // 6. Heavy Ambient Glow & Backdrop Fill BEHIND Avatars (zIndex 5)
   ctx.save();
   const backdropGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 450);
   if (isDark) {
     backdropGrad.addColorStop(0, 'rgba(13, 12, 18, 0.85)');
-    backdropGrad.addColorStop(0.4, 'rgba(13, 12, 18, 0.55)');
-    backdropGrad.addColorStop(0.65, 'rgba(13, 12, 18, 0.25)');
+    backdropGrad.addColorStop(0.4, 'rgba(13, 12, 18, 0.80)');
+    backdropGrad.addColorStop(0.65, 'rgba(13, 12, 18, 0.45)');
+    backdropGrad.addColorStop(0.85, 'rgba(13, 12, 18, 0)');
     backdropGrad.addColorStop(1, 'rgba(13, 12, 18, 0)');
   } else {
     backdropGrad.addColorStop(0, 'rgba(245, 244, 241, 0.88)');
-    backdropGrad.addColorStop(0.4, 'rgba(245, 244, 241, 0.55)');
-    backdropGrad.addColorStop(0.65, 'rgba(245, 244, 241, 0.25)');
+    backdropGrad.addColorStop(0.4, 'rgba(245, 244, 241, 0.83)');
+    backdropGrad.addColorStop(0.65, 'rgba(245, 244, 241, 0.48)');
+    backdropGrad.addColorStop(0.85, 'rgba(245, 244, 241, 0)');
     backdropGrad.addColorStop(1, 'rgba(245, 244, 241, 0)');
   }
   ctx.fillStyle = backdropGrad;
@@ -1680,21 +1686,23 @@ function renderHyperdrive(
 
   const centerGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 480);
   if (isDark) {
-    centerGlow.addColorStop(0, 'rgba(250, 204, 21, 0.60)');
-    centerGlow.addColorStop(0.35, 'rgba(245, 158, 11, 0.35)');
-    centerGlow.addColorStop(0.6, 'rgba(234, 179, 8, 0.12)');
+    centerGlow.addColorStop(0, 'rgba(250, 204, 21, 0.45)');
+    centerGlow.addColorStop(0.35, 'rgba(245, 158, 11, 0.25)');
+    centerGlow.addColorStop(0.6, 'rgba(234, 179, 8, 0.08)');
+    centerGlow.addColorStop(0.8, 'rgba(0, 0, 0, 0)');
     centerGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
   } else {
-    centerGlow.addColorStop(0, 'rgba(250, 204, 21, 0.50)');
-    centerGlow.addColorStop(0.35, 'rgba(245, 158, 11, 0.28)');
-    centerGlow.addColorStop(0.6, 'rgba(234, 179, 8, 0.08)');
+    centerGlow.addColorStop(0, 'rgba(250, 204, 21, 0.35)');
+    centerGlow.addColorStop(0.35, 'rgba(245, 158, 11, 0.18)');
+    centerGlow.addColorStop(0.6, 'rgba(234, 179, 8, 0.05)');
+    centerGlow.addColorStop(0.8, 'rgba(0, 0, 0, 0)');
     centerGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
   }
   ctx.fillStyle = centerGlow;
   ctx.fillRect(cx - 480, cy - 480, 960, 960);
   ctx.restore();
 
-  // 7. 36 Contributor Avatars flying outward (sorted back-to-front across 8 directional sectors)
+  // 7. 36 Contributor Avatars flying outward (88px chip size, scaled organically)
   const sourceStargazers =
     data.stargazers && data.stargazers.length > 0 ? data.stargazers : sampleStargazers;
 
@@ -1727,7 +1735,7 @@ function renderHyperdrive(
     const spinDir = i % 2 === 0 ? 1 : -1;
     const chipScale = 0.85 + hash(i, 606) * 0.28;
 
-    const rawP = progress * speed * 3.2 - delay;
+    const rawP = timeSec * speed - delay;
     if (rawP < 0) continue;
 
     const p = rawP % 1;
@@ -1761,9 +1769,9 @@ function renderHyperdrive(
 
   for (let k = 0; k < avatarsToDraw.length; k++) {
     const item = avatarsToDraw[k];
-    const size = Math.round(88 * item.scaleVal);
+    const size = 88 * item.scaleVal;
     const half = size / 2;
-    const cornerR = Math.round(size * 0.205);
+    const cornerR = 16 * item.scaleVal;
     const img = item.user ? assets.avatarImages.get(item.user.avatarUrl) : undefined;
     const x = item.posX - half;
     const y = item.posY - half;
@@ -1771,21 +1779,25 @@ function renderHyperdrive(
     ctx.save();
     ctx.globalAlpha = Math.max(0, Math.min(1, item.alpha));
 
-    // Card background fill & drop shadow matching HyperdriveCard.tsx
+    // Card shadow matching HyperdriveCard.tsx CSS box-shadow
     ctx.shadowColor = isDark ? 'rgba(0, 0, 0, 0.65)' : 'rgba(0, 0, 0, 0.08)';
-    ctx.shadowBlur = 18 * item.scaleVal;
-    ctx.shadowOffsetY = 6 * item.scaleVal;
+    ctx.shadowBlur = (isDark ? 24 : 20) * item.scaleVal;
+    ctx.shadowOffsetY = 10 * item.scaleVal;
+    ctx.shadowOffsetX = 0;
 
+    // Background fill
     drawRoundedRect(ctx, x, y, size, size, cornerR);
     ctx.fillStyle = isDark ? 'rgba(13, 12, 18, 0.92)' : 'rgba(255, 255, 255, 0.96)';
     ctx.fill();
 
-    // Border
-    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(15, 14, 16, 0.12)';
-    ctx.lineWidth = Math.max(1, 1.5 * item.scaleVal);
-    ctx.stroke();
+    // Disable shadow before drawing inner avatar and border
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
 
     // Clip for inner avatar image / fallback
+    ctx.save();
+    drawRoundedRect(ctx, x, y, size, size, cornerR);
     ctx.clip();
     if (img && img.naturalWidth > 0) {
       ctx.drawImage(img, x, y, size, size);
@@ -1799,12 +1811,32 @@ function renderHyperdrive(
       ctx.fillText((item.user?.login || 'U').slice(0, 2).toUpperCase(), item.posX, item.posY);
     }
     ctx.restore();
+
+    // Border on top matching 1.5px solid border in HyperdriveCard
+    drawRoundedRect(ctx, x, y, size, size, cornerR);
+    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(15, 14, 16, 0.12)';
+    ctx.lineWidth = Math.max(1, 1.5 * item.scaleVal);
+    ctx.stroke();
+
+    ctx.restore();
   }
 
-  // 8. Center Hub (EXACT MATCH WITH REVOLVE)
-  const easeCenter = easeOut(Math.min(1, progress * 2));
+  // 8. Center Hub (Entrance transition over 0.7s, count-up over 1.2s matching HyperdriveCard.tsx)
+  const hubP = Math.min(1, timeSec / 0.7);
+  const easeHub = 1 - Math.pow(1 - hubP, 3);
+  const hubScale = 0.8 + 0.2 * easeHub;
+  const hubOpacity = easeHub;
+
+  const countP = Math.min(1, timeSec / 1.2);
+  const easeCount = 1 - Math.pow(1 - countP, 3);
+  const curStars = Math.round(data.stars * easeCount);
+  const countStr = curStars.toLocaleString();
+
   ctx.save();
-  ctx.globalAlpha = easeCenter;
+  ctx.globalAlpha = hubOpacity;
+  ctx.translate(cx, cy);
+  ctx.scale(hubScale, hubScale);
+  ctx.translate(-cx, -cy);
 
   // 1. Owner avatar box (160px x 160px squircle, radius 36px at top 273.5)
   const avatarSz = 160;
@@ -1813,31 +1845,46 @@ function renderHyperdrive(
   const avatarTop = 273.5;
   const avatarCenterY = avatarTop + avatarHalf; // 353.5
 
+  // Golden glow around owner avatar box
   ctx.save();
+  ctx.shadowColor = isDark ? 'rgba(250, 204, 21, 0.16)' : 'rgba(250, 204, 21, 0.10)';
+  ctx.shadowBlur = 40;
+  ctx.shadowOffsetY = 0;
+  drawRoundedRect(ctx, cx - avatarHalf, avatarTop, avatarSz, avatarSz, avatarR);
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.09)' : '#FFFFFF';
+  ctx.fill();
+
+  // Dark drop shadow
   ctx.shadowColor = isDark ? 'rgba(0,0,0,0.65)' : 'rgba(0,0,0,0.12)';
   ctx.shadowBlur = 60;
   ctx.shadowOffsetY = 20;
   drawRoundedRect(ctx, cx - avatarHalf, avatarTop, avatarSz, avatarSz, avatarR);
-  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.09)' : '#FFFFFF';
   ctx.fill();
   ctx.restore();
 
+  // Avatar clip & draw
   ctx.save();
   drawRoundedRect(ctx, cx - avatarHalf, avatarTop, avatarSz, avatarSz, avatarR);
-  ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.09)';
-  ctx.lineWidth = 2;
-  ctx.stroke();
   ctx.clip();
-
   if (assets.ownerImg && assets.ownerImg.naturalWidth > 0) {
     ctx.drawImage(assets.ownerImg, cx - avatarHalf, avatarTop, avatarSz, avatarSz);
   } else {
+    ctx.fillStyle = isDark ? '#1D1C24' : '#E2E8F0';
+    ctx.fillRect(cx - avatarHalf, avatarTop, avatarSz, avatarSz);
     ctx.fillStyle = isDark ? '#F5EDE7' : '#0F0E10';
     ctx.font = `bold 60px 'DM Sans', sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText((data.repo ? data.repo.charAt(0).toUpperCase() : '★'), cx, avatarCenterY);
   }
+  ctx.restore();
+
+  // Border on top
+  ctx.save();
+  drawRoundedRect(ctx, cx - avatarHalf, avatarTop, avatarSz, avatarSz, avatarR);
+  ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.09)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
   ctx.restore();
 
   // 2. Repo full name: 46px extrabold, letter-spacing -0.025em at Y = 478
@@ -1851,9 +1898,6 @@ function renderHyperdrive(
   ctx.restore();
 
   // 3. Star count row: Star (76px) + Number (100px) + "stars" (28px) at Y = 576
-  const curStars = Math.round(1 + easeCenter * (data.stars - 1));
-  const countStr = curStars.toLocaleString();
-
   ctx.save();
   ctx.font = `900 100px 'DM Sans', sans-serif`;
   const countW = ctx.measureText(countStr).width;

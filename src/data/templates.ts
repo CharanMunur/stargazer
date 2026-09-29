@@ -11,8 +11,7 @@ export interface TemplateMeta {
     | 'constellation'
     | 'hyperdrive';
   name: string;
-  tag: string;
-  description: string;
+  isNew?: boolean;
   /** Whether this template supports static PNG export (false = animation-only, MP4 only) */
   hasImage: boolean;
 }
@@ -21,50 +20,39 @@ export const templatesData: readonly TemplateMeta[] = [
   {
     id: 'spotlight',
     name: 'Spotlight',
-    tag: 'Keynote Editorial',
-    description: 'Clean Apple-style keynote layout with display typography and an overlapping avatar stack.',
+    isNew: true,
     hasImage: true,
   },
   {
     id: 'hyperdrive',
     name: 'Hyperdrive',
-    tag: 'Light-Speed Jump',
-    description: 'Anamorphic light-speed acceleration beams with burst-speed contributor avatars and shockwave rings.',
+    isNew: true,
     hasImage: false,
   },
   {
     id: 'revolve',
     name: 'Revolve',
-    tag: 'Concentric Orbits',
-    description: 'Multi-ring concentric orbits revolving contributor avatars in opposing directions around live star metrics.',
+    isNew: true,
     hasImage: false,
   },
   {
     id: 'milestone',
     name: 'Milestone',
-    tag: 'Laurel Achievement',
-    description: 'Symmetrical laurel milestone card with dynamic metric counters and 16-contributor grid.',
     hasImage: true,
   },
   {
     id: 'infinity',
     name: 'Infinity',
-    tag: 'Marquee Loop',
-    description: 'Continuous horizontal glide marquee with momentum physics and contributor star badges.',
     hasImage: false,
   },
   {
     id: 'orbit',
-    name: '3D Orbit',
-    tag: '3D WebGL',
-    description: 'Multi-ring 3D spherical orbits rotating contributor avatars around your repository core.',
+    name: 'Orbit',
     hasImage: false,
   },
   {
     id: 'constellation',
     name: 'Constellation',
-    tag: 'Particle Graph',
-    description: 'Dynamic gravity nodes and floating avatars celebrating community stargazers.',
     hasImage: false,
   },
 ] as const;

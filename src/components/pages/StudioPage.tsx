@@ -608,15 +608,18 @@ export default function StudioPage() {
                       {other.id === 'infinity' && <InfinityCard data={initialSampleData} theme={theme} animated={false} />}
                       {other.id === 'orbit' && <OrbitCard data={initialSampleData} theme={theme} animated={false} />}
                       {other.id === 'constellation' && <ConstellationCard data={initialSampleData} theme={theme} animated={false} />}
+                      {other.id === 'hyperdrive' && <HyperdriveCard data={initialSampleData} theme={theme} animated={false} />}
                     </div>
                   </div>
                   <div className="flex items-center justify-between gap-1.5 px-1 py-1">
                     <span className="font-bold text-sm text-foreground">
                       {other.name}
                     </span>
-                    <span className="text-xs font-semibold text-muted-foreground bg-muted/80 px-3 py-1 rounded-full border border-border/60">
-                      {other.tag}
-                    </span>
+                    {other.isNew && (
+                      <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 tracking-wider">
+                        NEW
+                      </span>
+                    )}
                   </div>
                 </button>
               </FadeIn>

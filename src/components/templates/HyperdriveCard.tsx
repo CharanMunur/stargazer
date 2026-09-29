@@ -398,16 +398,16 @@ export const HyperdriveCard: React.FC<TemplateCardProps> = ({
             }}
           />
 
-          {/* Rich Yellow Radial Glow — strong hyperdrive energy */}
+          {/* Rich Yellow Radial Glow — refined ambient hyperdrive energy */}
           <div
             className="absolute rounded-full pointer-events-none blur-3xl"
             style={{
               width: 960,
               height: 960,
-              opacity: 0.85,
+              opacity: 0.70,
               background: isDark
-                ? 'radial-gradient(circle, rgba(250, 204, 21, 0.65) 0%, rgba(245, 158, 11, 0.40) 35%, rgba(234, 179, 8, 0.15) 60%, rgba(0, 0, 0, 0) 80%)'
-                : 'radial-gradient(circle, rgba(250, 204, 21, 0.55) 0%, rgba(245, 158, 11, 0.30) 35%, rgba(234, 179, 8, 0.10) 60%, rgba(0, 0, 0, 0) 80%)',
+                ? 'radial-gradient(circle, rgba(250, 204, 21, 0.45) 0%, rgba(245, 158, 11, 0.25) 35%, rgba(234, 179, 8, 0.08) 60%, rgba(0, 0, 0, 0) 80%)'
+                : 'radial-gradient(circle, rgba(250, 204, 21, 0.35) 0%, rgba(245, 158, 11, 0.18) 35%, rgba(234, 179, 8, 0.05) 60%, rgba(0, 0, 0, 0) 80%)',
             }}
           />
         </div>
@@ -488,8 +488,8 @@ export const HyperdriveCard: React.FC<TemplateCardProps> = ({
                 backgroundColor: isDark ? 'rgba(255,255,255,0.09)' : '#FFFFFF',
                 border: isDark ? '2px solid rgba(255,255,255,0.18)' : '2px solid rgba(0,0,0,0.09)',
                 boxShadow: isDark
-                  ? '0 20px 60px rgba(0,0,0,0.65), 0 0 50px rgba(250,204,21,0.25)'
-                  : '0 20px 60px rgba(0,0,0,0.12), 0 0 50px rgba(250,204,21,0.15)',
+                  ? '0 20px 60px rgba(0,0,0,0.65), 0 0 40px rgba(250,204,21,0.16)'
+                  : '0 20px 60px rgba(0,0,0,0.12), 0 0 40px rgba(250,204,21,0.10)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

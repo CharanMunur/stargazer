@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Search, ArrowRight } from "lucide-react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Search, ArrowUpRight } from "lucide-react";
 import { FadeIn } from "../helpers/FadeIn";
 import {
   MilestoneCard,
@@ -9,6 +9,8 @@ import {
   SpotlightCard,
   RevolveCard,
   HyperdriveCard,
+  ComingSoonCard,
+  ComingSoonCardWide,
 } from "../templates";
 import { templatesData, initialSampleData } from "@/data/templates";
 
@@ -35,18 +37,20 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
 
-  const filtered = templatesData.filter(
-    (t) =>
-      t.name.toLowerCase().includes(search.toLowerCase()) ||
-      t.tag.toLowerCase().includes(search.toLowerCase()) ||
-      t.description.toLowerCase().includes(search.toLowerCase())
-  );
+  // Filter templates by search keyword
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return templatesData;
+    return templatesData.filter((t) =>
+      t.name.toLowerCase().includes(q)
+    );
+  }, [search]);
 
   return (
-    <section className="w-full max-w-6xl mx-auto px-6 py-6 space-y-8">
+    <section className="w-full max-w-6xl mx-auto px-6 py-4 space-y-10">
       {/* Hero Header */}
-      <FadeIn delay={0.05} yOffset={10} duration={0.4} className="flex flex-col items-center text-center space-y-4 max-w-2xl mx-auto pt-6">
-        <div className="flex items-center justify-center mb-2">
+      <FadeIn delay={0.05} yOffset={10} duration={0.4} className="flex flex-col items-center text-center space-y-4 max-w-2xl mx-auto pt-4 sm:pt-6">
+        <div className="flex items-center justify-center mb-1">
           <img
             src={theme === "dark" ? "/stargazer-dark.svg" : "/stargazer-light.svg"}
             alt="Stargazer"
@@ -54,33 +58,42 @@ export default function HomePage() {
           />
         </div>
 
-        <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground leading-tight">
-          Turn your github stars into shareable videos and images
+        <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground leading-[1.15]">
+          Turn your GitHub stars into shareable videos and images
         </h1>
 
         <p className="text-sm md:text-base text-muted-foreground max-w-lg leading-relaxed">
           Select a template below to generate 1600 × 900 social cards and 60fps MP4 loops directly in your browser.
         </p>
 
-        {/* Search Pill Bar */}
-        <div className="w-full max-w-lg pt-3 pb-1">
+        {/* Search Bar */}
+        <div className="w-full max-w-lg pt-2 pb-1">
           <div className="relative flex items-center">
-            <Search className="absolute left-4.5 w-5 h-5 text-muted-foreground pointer-events-none" />
+            <Search className="absolute left-4.5 w-4.5 h-4.5 text-muted-foreground pointer-events-none" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search templates..."
-              className="w-full pl-12 pr-5 py-3 bg-muted/40 hover:bg-muted/60 border border-border hover:border-border/80 focus:border-ring rounded-full text-sm sm:text-base text-foreground placeholder:text-muted-foreground outline-none focus:bg-background transition-all shadow-2xs"
+              placeholder="Search templates by name, style, or effect..."
+              className="w-full pl-12 pr-5 py-3 bg-muted/40 hover:bg-muted/60 border border-border/80 hover:border-border focus:border-ring rounded-full text-sm sm:text-base text-foreground placeholder:text-muted-foreground outline-none focus:bg-background transition-all shadow-2xs"
             />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                className="absolute right-4 text-xs font-semibold text-muted-foreground hover:text-foreground px-2 py-0.5 rounded-full bg-muted/60 hover:bg-muted"
+              >
+                Clear
+              </button>
+            )}
           </div>
         </div>
       </FadeIn>
 
-      {/* Grid of Templates */}
+      {/* Template Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-5">
         {filtered.map((tmpl, idx) => (
-          <FadeIn key={tmpl.id} delay={0.15 + idx * 0.05} yOffset={20}>
+          <FadeIn key={tmpl.id} delay={0.1 + idx * 0.04} yOffset={16}>
             <a
               href={`/generate?template=${tmpl.id}`}
               className="group relative rounded-3xl bg-card hover:bg-muted/40 border border-border/80 hover:border-border p-2.5 sm:p-3 flex flex-col justify-between transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs block h-full text-card-foreground"
@@ -155,30 +168,54 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Content: Name, Tag, and Open in Studio button */}
-              <div className="pt-3.5 pb-0.5 space-y-3">
-                <div className="flex items-center justify-between px-1.5">
+              {/* Content: Name (left) and Open in Studio button in place of tag (right) */}
+              <div className="pt-3 pb-1 flex items-center justify-between px-1">
+                <div className="flex items-center gap-2">
                   <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
                     {tmpl.name}
                   </h2>
-                  <span className="text-xs font-semibold text-muted-foreground bg-muted/80 px-3 py-1 rounded-full border border-border/60">
-                    {tmpl.tag}
-                  </span>
+                  {tmpl.isNew && (
+                    <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 tracking-wider">
+                      NEW
+                    </span>
+                  )}
                 </div>
 
-                <div className="w-full py-2.5 px-4 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.99] shadow-2xs">
+                <div className="py-1.5 px-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs">
                   <span>Open in Studio</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.2]" />
                 </div>
               </div>
             </a>
           </FadeIn>
         ))}
+
+        {/* When templates count is odd, fill the empty cell in the 2-column grid */}
+        {filtered.length % 2 !== 0 && (
+          <FadeIn delay={0.1 + filtered.length * 0.04} yOffset={16}>
+            <ComingSoonCard />
+          </FadeIn>
+        )}
+
+        {/* When templates count is even and > 0, display the wide coming soon card across both columns */}
+        {filtered.length > 0 && filtered.length % 2 === 0 && (
+          <FadeIn delay={0.1 + filtered.length * 0.04} yOffset={16} className="col-span-1 md:col-span-2">
+            <ComingSoonCardWide />
+          </FadeIn>
+        )}
       </div>
 
       {filtered.length === 0 && (
-        <div className="text-center py-16 text-sm text-muted-foreground">
-          No templates match "{search}".
+        <div className="text-center py-20 text-sm text-muted-foreground space-y-3">
+          <p className="text-base font-semibold text-foreground">No templates found</p>
+          <p>No results matched "{search}".</p>
+          <button
+            type="button"
+            onClick={() => setSearch("")}
+            className="text-xs font-semibold text-primary hover:underline"
+          >
+            Clear search
+          </button>
         </div>
       )}
     </section>
