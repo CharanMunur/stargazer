@@ -76,15 +76,18 @@ export const HyperdriveCard: React.FC<TemplateCardProps> = ({
   const subColor = isDark ? '#A1958D' : '#64748B';
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    const el = containerRef.current;
+    if (!el) return;
     const updateScale = () => {
-      if (containerRef.current) {
-        setScale(containerRef.current.clientWidth / 1600);
+      const width = el.clientWidth;
+      if (width > 0) {
+        const newScale = width / 1600;
+        setScale((prev) => (Math.abs(prev - newScale) > 0.001 ? newScale : prev));
       }
     };
     updateScale();
     const observer = new ResizeObserver(updateScale);
-    observer.observe(containerRef.current);
+    observer.observe(el);
     return () => observer.disconnect();
   }, []);
 

@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { FadeIn } from '../helpers/FadeIn';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 const tocSections = [
   {
@@ -80,23 +88,21 @@ export default function HowToPage() {
     <div className="w-full max-w-6xl mx-auto px-6 py-8">
       {/* Breadcrumb Header */}
       <FadeIn delay={0.05} yOffset={10} duration={0.4} className="mb-8">
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-muted-foreground">
-          <a
-            href="/"
-            className="h-8 px-3.5 inline-flex items-center rounded-full bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors border border-border/50 text-xs sm:text-sm"
-          >
-            Home
-          </a>
-          <span className="text-muted-foreground/40 font-normal">/</span>
-          <a
-            href="/generate"
-            className="h-8 px-3.5 inline-flex items-center rounded-full bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors border border-border/50 text-xs sm:text-sm"
-          >
-            Studio
-          </a>
-          <span className="text-muted-foreground/40 font-normal">/</span>
-          <span className="font-semibold text-foreground px-1.5 py-0.5">{`How to`}</span>
-        </nav>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/generate">Studio</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>How to Generate PAT</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </FadeIn>
 
       {/* Main Documentation 2-Column Layout */}

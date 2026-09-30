@@ -11,7 +11,6 @@
 
 <p align="center">
   <a href="https://github.com/CharanMunur/stargazer/stargazers"><img src="https://img.shields.io/github/stars/CharanMunur/stargazer?style=flat-square&color=FACC15" alt="GitHub stars" /></a>
-  <a href="https://github.com/CharanMunur/stargazer/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License" /></a>
   <img src="https://img.shields.io/badge/100%25-Client--Side-emerald?style=flat-square" alt="Client Side" />
   <img src="https://img.shields.io/badge/60fps-WebCodecs%20MP4-purple?style=flat-square" alt="60fps MP4" />
 </p>
@@ -47,14 +46,14 @@ bun install
 bun dev
 ```
 
-Visit [http://localhost:4321](http://localhost:4321) to explore or launch the studio at [http://localhost:4321/generate](http://localhost:4321/generate).
+Visit [http://localhost:3000](http://localhost:3000) to explore or launch the studio at [http://localhost:3000/generate](http://localhost:3000/generate).
 
 ---
 
 ## Built With
 
 - **[Astro](https://astro.build)** + **[React](https://react.dev)** – Static shell with interactive islands.
-- **[Tailwind CSS](https://tailwindcss.com)** – Design system tokens and styling.
+- **[Tailwind CSS](https://tailwindcss.com)** + **[shadcn/ui](https://ui.shadcn.com)** – Design system tokens, UI primitives, and styling.
 - **[Framer Motion](https://www.framer.com/motion/)** – Kinetic transitions and spring physics.
 - **[HTML5 Canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)** + **[mp4-muxer](https://github.com/Vanilagy/mp4-muxer)** – Zero-backend 60fps MP4 video encoding via WebCodecs.
 - **[Lenis](https://github.com/darkroomengineering/lenis)** – Smooth inertia scrolling.
@@ -65,12 +64,10 @@ Visit [http://localhost:4321](http://localhost:4321) to explore or launch the st
 
 Pull requests are welcome. Feel free to open an issue or submit a PR for new canvas animations, layout ideas, or improvements.
 
-1. Fork the repo and create your branch (`git checkout -b feature/cool-animation`).
+1. Fork the repo and create your branch (`git checkout -b feature/animation-name`).
 2. Add your changes.
 3. Open a Pull Request.
 
 ---
 
-## License
-
-[MIT](LICENSE) © [Charan Munur](https://github.com/CharanMunur)
+Designed and developed by [CharanMunur](https://github.com/CharanMunur)

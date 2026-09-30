@@ -12,6 +12,15 @@ import {
 import type { TemplateData, StargazerUser } from '../templates/types';
 import { exportTemplateToVideo, exportTemplateToImage, getDefaultDurationForTemplate } from '@/lib/videoExporter';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { FadeIn } from '../helpers/FadeIn';
 import { templatesData, initialSampleData, type TemplateMeta } from '@/data/templates';
 import sampleStargazers from '@/data/sampleStargazers.json';
@@ -299,16 +308,17 @@ export default function StudioPage() {
     <div className="w-full max-w-6xl mx-auto px-6 py-8 space-y-8">
       {/* 1. Header: Breadcrumbs + Title & Badges */}
       <FadeIn delay={0.05} yOffset={10} duration={0.4} className="space-y-3">
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-muted-foreground">
-          <a
-            href="/"
-            className="h-8 px-3.5 inline-flex items-center rounded-full bg-muted/70 hover:bg-muted text-muted-foreground hover:text-foreground font-medium transition-colors border border-border/50 text-xs sm:text-sm"
-          >
-            Home
-          </a>
-          <span className="text-muted-foreground/40 font-normal">/</span>
-          <span className="font-semibold text-foreground px-1.5 py-0.5">{currentMeta.name}</span>
-        </nav>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">Home</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>{currentMeta.name}</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
         <div className="pt-1">
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
@@ -492,32 +502,30 @@ export default function StudioPage() {
           </form>
 
           {/* Options: Theme, Stargazers, Format */}
-          <div className="space-y-3.5">
+          <div className="space-y-3.5 min-w-0">
             {/* Theme Toggle (Segmented Pill) */}
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-foreground block">
                 Theme
               </label>
-              <div className="grid grid-cols-2 p-1.5 rounded-full bg-muted/40 border border-border/80 gap-1.5">
-                {(['dark', 'light'] as const).map((th) => (
-                  <button
-                    key={th}
-                    type="button"
-                    onClick={() => {
-                      userCustomizedTheme.current = true;
-                      setTheme(th);
-                    }}
-                    className={`flex items-center justify-center gap-2 h-10 py-2 px-4 text-sm rounded-full transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                      theme === th
-                        ? 'bg-foreground text-background font-semibold shadow-2xs'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 font-medium'
-                    }`}
-                  >
-                    {th === 'dark' ? <Moon className="w-4 h-4 shrink-0" /> : <Sun className="w-4 h-4 shrink-0" />}
-                    <span>{th.charAt(0).toUpperCase() + th.slice(1)}</span>
-                  </button>
-                ))}
-              </div>
+              <Tabs
+                value={theme}
+                onValueChange={(val) => {
+                  userCustomizedTheme.current = true;
+                  setTheme(val as 'dark' | 'light');
+                }}
+              >
+                <TabsList>
+                  <TabsTrigger value="dark" className="flex items-center justify-center gap-1.5 sm:gap-2">
+                    <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                    <span className="truncate">Dark</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="light" className="flex items-center justify-center gap-1.5 sm:gap-2">
+                    <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                    <span className="truncate">Light</span>
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
 
             {/* Stargazers Order Toggle (Segmented Pill) */}
@@ -525,22 +533,15 @@ export default function StudioPage() {
               <label className="text-sm font-medium text-foreground block">
                 Stargazers
               </label>
-              <div className="grid grid-cols-2 p-1.5 rounded-full bg-muted/40 border border-border/80 gap-1.5">
-                {(['latest', 'earliest'] as const).map((ord) => (
-                  <button
-                    key={ord}
-                    type="button"
-                    onClick={() => handleOrderChange(ord)}
-                    className={`h-10 py-2 px-4 text-sm rounded-full text-center flex items-center justify-center transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                      stargazerOrder === ord
-                        ? 'bg-foreground text-background font-semibold shadow-2xs'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 font-medium'
-                    }`}
-                  >
-                    {ord === 'latest' ? 'Latest' : 'Earliest'}
-                  </button>
-                ))}
-              </div>
+              <Tabs
+                value={stargazerOrder}
+                onValueChange={(val) => handleOrderChange(val as 'latest' | 'earliest')}
+              >
+                <TabsList>
+                  <TabsTrigger value="latest">Latest</TabsTrigger>
+                  <TabsTrigger value="earliest">Earliest</TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
 
             {/* Format Toggle (Segmented Pill) */}
@@ -548,30 +549,23 @@ export default function StudioPage() {
               <label className="text-sm font-medium text-foreground block">
                 Format
               </label>
-              <div className="grid grid-cols-2 p-1.5 rounded-full bg-muted/40 border border-border/80 gap-1.5">
-                {(['png', 'mp4'] as const).map((fmt) => {
-                  const currentMeta = templatesData.find((t) => t.id === template);
-                  const isDisabled = fmt === 'png' && currentMeta && !currentMeta.hasImage;
-                  return (
-                    <button
-                      key={fmt}
-                      type="button"
-                      disabled={!!isDisabled}
-                      onClick={() => !isDisabled && setFormat(fmt)}
-                      className={`h-10 py-2 px-4 text-sm rounded-full text-center flex items-center justify-center transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                        isDisabled
-                          ? 'opacity-40 cursor-not-allowed text-muted-foreground font-medium'
-                          : format === fmt
-                          ? 'bg-foreground text-background font-semibold shadow-2xs cursor-pointer'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/80 font-medium cursor-pointer'
-                      }`}
-                      title={isDisabled ? 'This template is animation-only (MP4)' : undefined}
-                    >
-                      {fmt.toUpperCase()}
-                    </button>
-                  );
-                })}
-              </div>
+              <Tabs
+                value={format}
+                onValueChange={(val) => setFormat(val as 'png' | 'mp4')}
+              >
+                <TabsList>
+                  <TabsTrigger
+                    value="png"
+                    disabled={!currentMeta.hasImage}
+                    title={!currentMeta.hasImage ? 'This template is animation-only (MP4)' : undefined}
+                  >
+                    PNG
+                  </TabsTrigger>
+                  <TabsTrigger value="mp4">
+                    MP4
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
 
             {error && (

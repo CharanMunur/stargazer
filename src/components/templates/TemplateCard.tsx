@@ -12,6 +12,7 @@ import {
   RevolveCard,
   HyperdriveCard,
 } from "../templates";
+import { Badge } from "@/components/ui/badge";
 
 interface TemplateCardProps {
   template: TemplateMeta;
@@ -103,16 +104,9 @@ export default function TemplateCard({ template, theme, index }: TemplateCardPro
               {template.name}
             </h2>
             {template.isNew && (
-              <span
-                className="inline-flex items-center text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-full tracking-wider"
-                style={{
-                  color: "#E6A441",
-                  background: "rgba(230,164,65,0.12)",
-                  border: "1px solid rgba(230,164,65,0.30)",
-                }}
-              >
+              <Badge variant="orange">
                 NEW
-              </span>
+              </Badge>
             )}
           </div>
 

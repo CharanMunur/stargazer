@@ -132,9 +132,15 @@ export const RevolveCard: React.FC<TemplateCardProps> = ({
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const obs = new ResizeObserver(entries => {
-      for (const e of entries) setScale(e.contentRect.width / 1600);
-    });
+    const updateScale = () => {
+      const width = el.clientWidth;
+      if (width > 0) {
+        const newScale = width / 1600;
+        setScale((prev) => (Math.abs(prev - newScale) > 0.001 ? newScale : prev));
+      }
+    };
+    updateScale();
+    const obs = new ResizeObserver(updateScale);
     obs.observe(el);
     return () => obs.disconnect();
   }, []);

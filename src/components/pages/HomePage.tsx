@@ -7,13 +7,18 @@ import {
 } from "../templates";
 import TemplateCard from "../templates/TemplateCard";
 import { templatesData } from "@/data/templates";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [filterMode, setFilterMode] = useState<"all" | "new">("all");
-  const [filterOpen, setFilterOpen] = useState(false);
-  const filterMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let lastDark = document.documentElement.classList.contains("dark");
@@ -33,18 +38,6 @@ export default function HomePage() {
     });
     return () => observer.disconnect();
   }, []);
-
-  // Close filter dropdown on outside click
-  useEffect(() => {
-    if (!filterOpen) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (filterMenuRef.current && !filterMenuRef.current.contains(e.target as Node)) {
-        setFilterOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [filterOpen]);
 
   // Filter templates by search keyword
   const filtered = useMemo(() => {
@@ -118,60 +111,26 @@ export default function HomePage() {
           {filtered.length} {filtered.length === 1 ? "template" : "templates"}
         </div>
 
-        {/* Filter dropdown on top right */}
-        <div className="relative" ref={filterMenuRef}>
-          <button
-            type="button"
-            onClick={() => setFilterOpen((prev) => !prev)}
-            className="h-10 inline-flex items-center gap-2 px-4 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/50 text-foreground transition-all hover:border-border cursor-pointer backdrop-blur-md shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
-            title="Filter templates view"
-            aria-label="Filter templates"
-          >
-            <SlidersHorizontal className="w-4 h-4 shrink-0 text-muted-foreground" />
-            <span>{filterMode === "all" ? "All Templates" : "New Releases"}</span>
-            <ChevronDown
-              className={`w-3.5 h-3.5 shrink-0 text-muted-foreground transition-transform duration-200 ${
-                filterOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-
-          {filterOpen && (
-            <div className="absolute right-0 top-full mt-2 w-52 rounded-2xl bg-background/80 backdrop-blur-md border border-border/70 shadow-lg p-1.5 z-30 animate-in fade-in-50 zoom-in-95">
-              <button
-                type="button"
-                onClick={() => {
-                  setFilterMode("all");
-                  setFilterOpen(false);
-                }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                  filterMode === "all"
-                    ? "bg-muted text-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                }`}
-              >
-                <span>All Templates</span>
-                {filterMode === "all" && <Check className="w-4 h-4 text-foreground shrink-0" />}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setFilterMode("new");
-                  setFilterOpen(false);
-                }}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium text-left transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                  filterMode === "new"
-                    ? "bg-muted text-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                }`}
-              >
-                <span>New Releases</span>
-                {filterMode === "new" && <Check className="w-4 h-4 text-foreground shrink-0" />}
-              </button>
-            </div>
-          )}
-        </div>
+        {/* Filter dropdown using shadcn DropdownMenu */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="glass" size="default" className="gap-2 font-normal text-foreground">
+              <SlidersHorizontal className="w-4 h-4 shrink-0 text-muted-foreground" />
+              <span>{filterMode === "all" ? "All Templates" : "New Releases"}</span>
+              <ChevronDown className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-52">
+            <DropdownMenuItem onClick={() => setFilterMode("all")}>
+              <span>All Templates</span>
+              {filterMode === "all" && <Check className="w-4 h-4 text-foreground shrink-0" />}
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setFilterMode("new")}>
+              <span>New Releases</span>
+              {filterMode === "new" && <Check className="w-4 h-4 text-foreground shrink-0" />}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Templates Display Area */}
