@@ -4,42 +4,141 @@ interface Props {
 }
 
 const { className = "" } = Astro.props;
+const currentYear = new Date().getFullYear();
 ---
 
-<footer class={`border-t border-border/60 py-8 text-sm text-muted-foreground ${className}`} role="contentinfo">
-  <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-    <div class="flex items-center gap-1.5 text-muted-foreground">
-      <span>Designed and developed by</span>
-      <a
-        href="https://charanmunur.in"
-        target="_blank"
-        rel="noreferrer"
-        class="text-foreground hover:underline font-semibold transition-colors"
-      >
-        charanmunur
-      </a>
+<footer class={`border-t border-border/60 bg-background/50 text-sm text-muted-foreground pt-12 pb-8 transition-[background-color,border-color,color] duration-300 ease-[ease] ${className}`} role="contentinfo">
+  <div class="max-w-6xl mx-auto px-6">
+    {/* Main Top Grid */}
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-8 lg:gap-12 pb-10">
+      {/* Brand & Mission Column (Spans 2 columns on desktop) */}
+      <div class="md:col-span-2 space-y-3.5">
+        <a href="/" class="inline-flex items-center text-foreground hover:opacity-90 transition-opacity" aria-label="Stargazer Home">
+          <img
+            src="/stargazer-dark.svg"
+            alt="Stargazer"
+            class="h-12 sm:h-14 w-auto object-contain dark:block hidden shrink-0 select-none"
+          />
+          <img
+            src="/stargazer-light.svg"
+            alt="Stargazer"
+            class="h-12 sm:h-14 w-auto object-contain dark:hidden block shrink-0 select-none"
+          />
+        </a>
+
+        <p class="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-sm">
+          Turn your GitHub stars into living art. Generate high-definition milestone cards and 60fps MP4 loops directly in your browser with client-side rendering.
+        </p>
+      </div>
+
+      {/* Navigation Column: Product */}
+      <div class="space-y-3">
+        <span class="text-sm font-semibold tracking-tight text-foreground block">
+          Product
+        </span>
+        <ul class="space-y-2 text-xs sm:text-sm">
+          <li>
+            <a href="/" class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm">
+              Templates
+            </a>
+          </li>
+          <li>
+            <a href="/generate" class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm">
+              Studio
+            </a>
+          </li>
+          <li>
+            <a href="/how-to" class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm">
+              How to Generate
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      {/* Navigation Column: Legal & Compliance */}
+      <div class="space-y-3">
+        <span class="text-sm font-semibold tracking-tight text-foreground block">
+          Legal
+        </span>
+        <ul class="space-y-2 text-xs sm:text-sm">
+          <li>
+            <a href="/privacy" class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm">
+              Privacy Policy
+            </a>
+          </li>
+          <li>
+            <a href="/terms" class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm">
+              Terms of Service
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      {/* Navigation Column: Resources & Crawlers */}
+      <div class="space-y-3">
+        <span class="text-sm font-semibold tracking-tight text-foreground block">
+          Resources
+        </span>
+        <ul class="space-y-2 text-xs sm:text-sm">
+          <li>
+            <a
+              href="https://github.com/CharanMunur/stargazer"
+              target="_blank"
+              rel="noreferrer"
+              class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm inline-flex items-center gap-1"
+            >
+              <span>GitHub</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://github.com/CharanMunur/stargazer/issues"
+              target="_blank"
+              rel="noreferrer"
+              class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+            >
+              Issues
+            </a>
+          </li>
+          <li>
+            <a
+              href="/sitemap.xml"
+              target="_blank"
+              class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+            >
+              Sitemap
+            </a>
+          </li>
+          <li>
+            <a
+              href="/robots.txt"
+              target="_blank"
+              class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+            >
+              robots.txt
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
 
-    <div class="flex items-center gap-6 flex-wrap justify-center sm:justify-end text-sm font-medium">
-      <a href="/" class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm">Templates</a>
-      <a href="/generate" class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm">Studio</a>
-      <a href="/how-to" class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm">How to</a>
-      <a
-        href="https://github.com/CharanMunur/stargazer"
-        target="_blank"
-        rel="noreferrer"
-        class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-      >
-        GitHub
-      </a>
-      <a
-        href="https://github.com/CharanMunur/stargazer/issues"
-        target="_blank"
-        rel="noreferrer"
-        class="hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
-      >
-        Issues
-      </a>
+    {/* Bottom Row Divider */}
+    <div class="pt-6 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm sm:text-base text-muted-foreground">
+      <p>
+        &copy; {currentYear} Stargazer. Open source released under the MIT License.
+      </p>
+
+      <div class="flex items-center gap-1.5">
+        <span>Designed and developed by</span>
+        <a
+          href="https://charanmunur.in"
+          target="_blank"
+          rel="noreferrer"
+          class="text-foreground hover:underline font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
+        >
+          charanmunur
+        </a>
+      </div>
     </div>
   </div>
 </footer>

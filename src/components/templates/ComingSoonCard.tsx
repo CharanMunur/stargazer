@@ -26,12 +26,12 @@ export const ComingSoonCard: React.FC = () => {
             <img
               src="/stargazer-dark.svg"
               alt="Stargazer"
-              className="hidden dark:block h-16 sm:h-20 w-auto object-contain select-none"
+              className="hidden dark:block h-12 sm:h-14 w-auto object-contain select-none"
             />
             <img
               src="/stargazer-light.svg"
               alt="Stargazer"
-              className="block dark:hidden h-16 sm:h-20 w-auto object-contain select-none"
+              className="block dark:hidden h-12 sm:h-14 w-auto object-contain select-none"
             />
           </div>
 
@@ -123,12 +123,12 @@ export const ComingSoonCardWide: React.FC = () => {
           <img
             src="/stargazer-dark.svg"
             alt="Stargazer"
-            className="hidden dark:block h-16 sm:h-20 w-auto object-contain select-none"
+            className="hidden dark:block h-12 sm:h-14 w-auto object-contain select-none"
           />
           <img
             src="/stargazer-light.svg"
             alt="Stargazer"
-            className="block dark:hidden h-16 sm:h-20 w-auto object-contain select-none"
+            className="block dark:hidden h-12 sm:h-14 w-auto object-contain select-none"
           />
         </div>
       </div>

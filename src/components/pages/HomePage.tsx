@@ -1,18 +1,12 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { Search, ArrowUpRight, SlidersHorizontal, ChevronDown, Check } from "lucide-react";
+import { Search, SlidersHorizontal, ChevronDown, Check } from "lucide-react";
 import { FadeIn } from "../helpers/FadeIn";
 import {
-  MilestoneCard,
-  InfinityCard,
-  OrbitCard,
-  ConstellationCard,
-  SpotlightCard,
-  RevolveCard,
-  HyperdriveCard,
   ComingSoonCard,
   ComingSoonCardWide,
 } from "../templates";
-import { templatesData, initialSampleData } from "@/data/templates";
+import TemplateCard from "../templates/TemplateCard";
+import { templatesData } from "@/data/templates";
 
 export default function HomePage() {
   const [search, setSearch] = useState("");
@@ -71,101 +65,7 @@ export default function HomePage() {
 
   // Reusable template card renderer
   const renderTemplateCard = (tmpl: (typeof templatesData)[number], idx: number) => (
-    <FadeIn key={tmpl.id} delay={0.06 + (idx % 6) * 0.03} yOffset={16}>
-      <a
-        href={`/generate?template=${tmpl.id}`}
-        className="group relative rounded-3xl bg-card hover:bg-muted/40 border border-border/80 hover:border-border p-2.5 sm:p-3 flex flex-col justify-between transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs block h-full text-card-foreground"
-      >
-        {/* Live 16:9 Canvas Preview */}
-        <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-border/70 relative flex items-center justify-center pointer-events-none">
-          <div
-            className="absolute inset-0 pointer-events-none opacity-40"
-            style={{
-              backgroundImage:
-                "linear-gradient(to right, var(--border) 1px, transparent 1px), linear-gradient(to bottom, var(--border) 1px, transparent 1px)",
-              backgroundSize: "16px 16px",
-            }}
-          />
-          <div className="w-full h-full relative z-10">
-            {tmpl.id === "spotlight" && (
-              <SpotlightCard
-                key={`preview-spotlight-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-            {tmpl.id === "revolve" && (
-              <RevolveCard
-                key={`preview-revolve-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-            {tmpl.id === "milestone" && (
-              <MilestoneCard
-                key={`preview-milestone-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-            {tmpl.id === "infinity" && (
-              <InfinityCard
-                key={`preview-infinity-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-            {tmpl.id === "orbit" && (
-              <OrbitCard
-                key={`preview-orbit-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-            {tmpl.id === "constellation" && (
-              <ConstellationCard
-                key={`preview-constellation-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-            {tmpl.id === "hyperdrive" && (
-              <HyperdriveCard
-                key={`preview-hyperdrive-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-          </div>
-        </div>
-
-        {/* Content: Name (left) and Open in Studio button in place of tag (right) */}
-        <div className="pt-4 sm:pt-4.5 pb-1.5 flex items-center justify-between px-1">
-          <div className="flex items-center gap-2">
-            <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
-              {tmpl.name}
-            </h2>
-            {tmpl.isNew && (
-              <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 tracking-wider">
-                NEW
-              </span>
-            )}
-          </div>
-
-          <div className="h-9 sm:h-10 px-4 rounded-full bg-primary text-primary-foreground font-semibold text-xs sm:text-sm flex items-center gap-1.5 shadow-2xs group-hover:bg-primary/90 transition-colors shrink-0">
-            <span>Open in Studio</span>
-            <ArrowUpRight className="w-4 h-4 stroke-[2.2] shrink-0" />
-          </div>
-        </div>
-      </a>
-    </FadeIn>
+    <TemplateCard key={tmpl.id} template={tmpl} theme={theme} index={idx} />
   );
 
   return (
@@ -176,7 +76,7 @@ export default function HomePage() {
           <img
             src={theme === "dark" ? "/stargazer-dark.svg" : "/stargazer-light.svg"}
             alt="Stargazer"
-            className="h-20 sm:h-24 md:h-28 w-auto object-contain mx-auto"
+            className="h-14 sm:h-16 md:h-20 w-auto object-contain mx-auto"
           />
         </div>
 
