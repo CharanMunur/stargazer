@@ -9,7 +9,8 @@ export interface TemplateMeta {
     | 'infinity'
     | 'orbit'
     | 'constellation'
-    | 'hyperdrive';
+    | 'hyperdrive'
+    | 'blackhole';
   name: string;
   isNew?: boolean;
   /** Whether this template supports static PNG export (false = animation-only, MP4 only) */
@@ -17,6 +18,12 @@ export interface TemplateMeta {
 }
 
 export const templatesData: readonly TemplateMeta[] = [
+  {
+    id: 'blackhole',
+    name: 'Blackhole',
+    isNew: true,
+    hasImage: true,
+  },
   {
     id: 'revolve',
     name: 'Revolve',

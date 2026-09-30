@@ -7,4 +7,5 @@ export * from './OrbitCard';
 export * from './SpotlightCard';
 export * from './RevolveCard';
 export * from './HyperdriveCard';
+export * from './BlackholeCard';
 export * from './ComingSoonCard';

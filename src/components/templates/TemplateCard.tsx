@@ -11,6 +11,7 @@ import {
   SpotlightCard,
   RevolveCard,
   HyperdriveCard,
+  BlackholeCard,
 } from "../templates";
 import { Badge } from "@/components/ui/badge";
 
@@ -89,6 +90,14 @@ export default function TemplateCard({ template, theme, index }: TemplateCardPro
             {template.id === "hyperdrive" && (
               <HyperdriveCard
                 key={`preview-hyperdrive-${theme}`}
+                data={initialSampleData}
+                theme={theme}
+                animated
+              />
+            )}
+            {template.id === "blackhole" && (
+              <BlackholeCard
+                key={`preview-blackhole-${theme}`}
                 data={initialSampleData}
                 theme={theme}
                 animated

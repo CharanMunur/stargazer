@@ -10,9 +10,12 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/CharanMunur/stargazer/stargazers"><img src="https://img.shields.io/github/stars/CharanMunur/stargazer?style=flat-square&color=FACC15" alt="GitHub stars" /></a>
-  <img src="https://img.shields.io/badge/100%25-Client--Side-emerald?style=flat-square" alt="Client Side" />
-  <img src="https://img.shields.io/badge/60fps-WebCodecs%20MP4-purple?style=flat-square" alt="60fps MP4" />
+  <img src="https://img.shields.io/badge/Astro-BC52EE?style=flat-square&logo=astro&logoColor=white" alt="Astro" />
+  <img src="https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=flat-square&logo=framer&logoColor=white" alt="Framer Motion" />
+  <img src="https://img.shields.io/badge/WebCodecs-E34F26?style=flat-square&logo=html5&logoColor=white" alt="WebCodecs" />
 </p>
 
 ---
@@ -50,22 +53,12 @@ Visit [http://localhost:3000](http://localhost:3000) to explore or launch the st
 
 ---
 
-## Built With
-
-- **[Astro](https://astro.build)** + **[React](https://react.dev)** – Static shell with interactive islands.
-- **[Tailwind CSS](https://tailwindcss.com)** + **[shadcn/ui](https://ui.shadcn.com)** – Design system tokens, UI primitives, and styling.
-- **[Framer Motion](https://www.framer.com/motion/)** – Kinetic transitions and spring physics.
-- **[HTML5 Canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)** + **[mp4-muxer](https://github.com/Vanilagy/mp4-muxer)** – Zero-backend 60fps MP4 video encoding via WebCodecs.
-- **[Lenis](https://github.com/darkroomengineering/lenis)** – Smooth inertia scrolling.
-
----
-
 ## Contributing
 
-Pull requests are welcome. Feel free to open an issue or submit a PR for new canvas animations, layout ideas, or improvements.
+Pull requests are welcome. Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for strict contribution guidelines, non-negotiable rules, and template architecture standards before submitting a PR.
 
 1. Fork the repo and create your branch (`git checkout -b feature/animation-name`).
-2. Add your changes.
+2. Add your changes and verify with `bun run build`.
 3. Open a Pull Request.
 
 ---

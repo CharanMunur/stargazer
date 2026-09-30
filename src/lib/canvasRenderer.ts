@@ -9,9 +9,7 @@ export type TemplateType =
   | 'orbit'
   | 'constellation'
   | 'hyperdrive'
-  // legacy aliases kept for backward compat
-  | 'counter'
-  | 'ticker';
+  | 'blackhole';
 
 export interface ScatterPoint {
   x: number;
@@ -290,9 +288,9 @@ export async function preloadTemplateAssets(
       : sampleStargazers;
 
   let avatarUrls: string[] = [];
-  if (template === 'counter' || template === 'milestone') {
+  if (template === 'milestone') {
     avatarUrls = sourceStargazers.slice(0, 16).map((s) => s.avatarUrl).filter(Boolean);
-  } else if (template === 'ticker' || template === 'infinity') {
+  } else if (template === 'infinity') {
     avatarUrls = sourceStargazers.slice(0, 24).map((s) => s.avatarUrl).filter(Boolean);
   } else if (template === 'revolve') {
     avatarUrls = sourceStargazers.slice(0, 55).map((s) => s.avatarUrl).filter(Boolean);
@@ -304,10 +302,12 @@ export async function preloadTemplateAssets(
     avatarUrls = sourceStargazers.slice(0, 8).map((s) => s.avatarUrl).filter(Boolean);
   } else if (template === 'hyperdrive') {
     avatarUrls = sourceStargazers.slice(0, 36).map((s) => s.avatarUrl).filter(Boolean);
+  } else if (template === 'blackhole') {
+    avatarUrls = sourceStargazers.slice(0, 48).map((s) => s.avatarUrl).filter(Boolean);
   }
 
   const [leafImg, ownerImg, ...loadedAvatars] = await Promise.all([
-    (template === 'counter' || template === 'milestone') ? loadLeafImage(theme) : Promise.resolve(null),
+    template === 'milestone' ? loadLeafImage(theme) : Promise.resolve(null),
     data.ownerAvatarUrl ? loadImage(data.ownerAvatarUrl) : Promise.resolve(null),
     ...avatarUrls.map((u) => loadImage(u, 2500)),
   ]);
@@ -548,13 +548,15 @@ function renderCounter(
   }
 
   // Counters: Stars (400), Forks (800), Days (1200)
-  const tCount = Math.max(0, Math.min(1, (progress - 0.1) / 0.35));
+  const tSec = progress * 8.0;
+  const tCount = Math.max(0, Math.min(1, (tSec - 0.15) / 0.60));
   const easeCount = easeOut(tCount);
   const countYOffset = 15 * (1 - easeCount);
 
-  const curStars = Math.round(data.stars * easeCount);
-  const curForks = Math.round(data.forks * easeCount);
-  const curDays = Math.round(data.days * easeCount);
+  const numEase = easeOut(Math.min(1.0, tSec / 1.40));
+  const curStars = Math.round(data.stars * numEase);
+  const curForks = Math.round(data.forks * numEase);
+  const curDays = Math.round(data.days * numEase);
 
   if (easeCount > 0) {
     ctx.save();
@@ -599,9 +601,9 @@ function renderCounter(
   const stepY = 120 + 26;  // 146px
 
   for (let i = 0; i < 16; i++) {
-    const startT = 0.20 + (i / 16) * 0.35;
-    if (progress < startT) continue;
-    const localT = easeOut(Math.min(1, (progress - startT) / 0.20));
+    const startDelay = 0.25 + i * 0.03;
+    if (tSec < startDelay) continue;
+    const localT = easeOut(Math.min(1.0, (tSec - startDelay) / 0.40));
 
     const row = Math.floor(i / 8);
     const col = i % 8;
@@ -700,10 +702,12 @@ function renderTicker(
   }
 
   // Uniform avatar size: 160px diameter (r = 80), gap 60px -> pitch 220px
+  const tSec = progress * 8.0;
   const baseAvatarRadius = 80;
   const pitch = 220;
   const totalWidth = count * pitch;
-  const scrollOffset = (progress * totalWidth) % totalWidth;
+  const marqueeDur = Math.max(6, count * 0.8);
+  const scrollOffset = ((tSec / marqueeDur) * totalWidth) % totalWidth;
 
   // Center Y for avatar = 392, star center Y = 513
   const avatarCenterY = 392;
@@ -736,7 +740,7 @@ function renderTicker(
 
   // Bottom-Right Star Count matching TickerCard.tsx:
   // right-[140px] bottom-[80px], 130px bold + 90px normal
-  const easeCount = easeOut(Math.min(1, progress * 1.5));
+  const easeCount = easeOut(Math.min(1.0, tSec / 1.20));
   const curStars = Math.round(data.stars * easeCount);
   const numStr = curStars.toLocaleString();
 
@@ -843,8 +847,9 @@ function renderOrbit(
   const baseSize = 160.0;
   const spacing = 240.0;
 
-  // Elastic overshoot & bounce back
-  const pNorm = Math.min(1.0, progress / 0.70);
+  // Elastic overshoot & bounce back (2.4s sweep matching OrbitCard.tsx)
+  const tSec = progress * 8.0;
+  const pNorm = Math.min(1.0, tSec / 2.40);
   const easeT = easeOutBack(pNorm, 1.35);
   const maxScroll = (count - 1) * spacing;
   const scrollOffset = easeT * maxScroll;
@@ -972,17 +977,18 @@ function renderConstellation(
   ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, width, height);
 
+  const tSec = progress * 8.0;
   const allStargazers =
     data.stargazers && data.stargazers.length > 0
       ? data.stargazers
       : sampleStargazers;
   const points = assets.constellationPoints || [];
 
-  // Draw scatter avatars popping in one by one organically
+  // Draw scatter avatars popping in one by one organically matching ConstellationCard.tsx
   for (let idx = 0; idx < points.length; idx++) {
     const pt = points[idx];
-    const startP = (idx / (points.length || 1)) * 0.65;
-    const fadeProgress = Math.max(0, Math.min(1, (progress - startP) / 0.20));
+    const startDelay = (idx / (points.length || 1)) * 0.70;
+    const fadeProgress = Math.max(0, Math.min(1, (tSec - startDelay) / 0.40));
     if (fadeProgress <= 0) continue;
 
     const curScale = 0.3 + 0.7 * easeOut(fadeProgress);
@@ -1017,7 +1023,7 @@ function renderConstellation(
   // Soft Radial Fade Backdrop behind Main Content (ellipse 920px x 500px at 800, 450)
   const centerX = 800;
   const centerY = 450;
-  const backdropAlpha = Math.max(0, Math.min(1, progress * 4));
+  const backdropAlpha = Math.max(0, Math.min(1, tSec / 0.50));
 
   ctx.save();
   ctx.globalAlpha = backdropAlpha;
@@ -1047,7 +1053,7 @@ function renderConstellation(
 
   // Center Content: Mascot Avatar (362px), Title (468px), Star Count (560px)
   // 1. Center mascot avatar (108px)
-  const pMascot = Math.max(0, Math.min(1, (progress - 0.15) / 0.20));
+  const pMascot = Math.max(0, Math.min(1, (tSec - 0.20) / 0.50));
   if (pMascot > 0) {
     const easeMascot = easeOut(pMascot);
     ctx.save();
@@ -1067,7 +1073,7 @@ function renderConstellation(
   }
 
   // 2. Title: owner / repo
-  const pTitle = Math.max(0, Math.min(1, (progress - 0.22) / 0.20));
+  const pTitle = Math.max(0, Math.min(1, (tSec - 0.30) / 0.50));
   if (pTitle > 0) {
     const easeTitle = easeOut(pTitle);
     ctx.save();
@@ -1083,13 +1089,13 @@ function renderConstellation(
   }
 
   // 3. Star count with Amber Lucide-style star icon
-  const pCount = Math.max(0, Math.min(1, (progress - 0.28) / 0.25));
+  const pCount = Math.max(0, Math.min(1, (tSec - 0.40) / 0.50));
   if (pCount > 0) {
     const easeCount = easeOut(pCount);
     ctx.save();
     ctx.globalAlpha = easeCount;
     const countY = 560 + 15 * (1 - easeCount);
-    const curStars = Math.round(1 + easeCount * (data.stars - 1));
+    const curStars = Math.round(1 + easeOut(Math.min(1.0, tSec / 1.20)) * (data.stars - 1));
     const starCountStr = curStars.toLocaleString();
 
     ctx.font = `bold 64px 'DM Sans', sans-serif`;
@@ -1155,7 +1161,8 @@ function renderSpotlight(
   ctx.restore();
 
   // 1. Center Title at Y = 350
-  const tTitle = Math.max(0, Math.min(1, (progress - 0.05) / 0.20));
+  const tSec = progress * 8.0;
+  const tTitle = Math.max(0, Math.min(1, (tSec - 0.20) / 0.55));
   if (tTitle > 0) {
     const easeTitle = easeOut(tTitle);
     const titleY = 350 + 20 * (1 - easeTitle);
@@ -1171,11 +1178,12 @@ function renderSpotlight(
   }
 
   // 2. Big Star Count at Y = 465
-  const tCount = Math.max(0, Math.min(1, (progress - 0.12) / 0.25));
+  const tCount = Math.max(0, Math.min(1, (tSec - 0.35) / 0.50));
   if (tCount > 0) {
     const easeCount = easeOut(tCount);
     const countScale = 0.9 + 0.1 * easeCount;
-    const curStars = Math.round(data.stars * easeCount);
+    const numEase = easeOut(Math.min(1.0, tSec / 1.20));
+    const curStars = Math.round(data.stars * numEase);
     const countStr = curStars.toLocaleString();
 
     ctx.save();
@@ -1241,8 +1249,8 @@ function renderSpotlight(
     const u = visible[i];
     const img = u.avatarUrl ? assets.avatarImages.get(u.avatarUrl) : undefined;
     const ax = stackStartX + i * step;
-    const startP = 0.20 + (i / visible.length) * 0.25;
-    const itemProgress = Math.max(0, Math.min(1, (progress - startP) / 0.15));
+    const startDelay = 0.50 + i * 0.05;
+    const itemProgress = Math.max(0, Math.min(1, (tSec - startDelay) / 0.40));
     if (itemProgress <= 0) continue;
 
     const easeItem = easeOut(itemProgress);
@@ -1274,8 +1282,8 @@ function renderSpotlight(
 
   // Plus Remaining Pill
   if (remaining > 0) {
-    const pillStartP = 0.45;
-    const pillProgress = Math.max(0, Math.min(1, (progress - pillStartP) / 0.15));
+    const pillStartDelay = 0.50 + visible.length * 0.05;
+    const pillProgress = Math.max(0, Math.min(1, (tSec - pillStartDelay) / 0.40));
     if (pillProgress > 0) {
       const easePill = easeOut(pillProgress);
       const pillX = stackStartX + avatarsW - avatarR + pillGap;
@@ -1344,14 +1352,14 @@ function renderRevolve(
     [17, 830, 86, 90, true, (22.5 * Math.PI) / 180],
   ];
 
-  const totalCycles = 3.5;
+  const tSec = progress * 8.0;
   const allStargazers =
     data.stargazers && data.stargazers.length > 0 ? data.stargazers : sampleStargazers;
 
   // Draw ring tracks and avatars
   for (let ri = 0; ri < rings.length; ri++) {
     const [count, radius, chipSize, dur, clockwise, offset] = rings[ri];
-    const ringAlpha = Math.max(0, Math.min(1, (progress - ri * 0.08) / 0.15));
+    const ringAlpha = Math.max(0, Math.min(1, (tSec - ri * 0.35) / 0.60));
     if (ringAlpha <= 0) continue;
 
     ctx.save();
@@ -1371,12 +1379,11 @@ function renderRevolve(
       rings.slice(0, ri).reduce((s, r) => s + r[0], 0),
       rings.slice(0, ri + 1).reduce((s, r) => s + r[0], 0)
     );
-    const speed = (totalCycles / dur) * Math.PI * 2;
     const dirSign = clockwise ? 1 : -1;
 
     for (let i = 0; i < avatars.length; i++) {
       const u = avatars[i];
-      const angle = offset + (i / count) * Math.PI * 2 + dirSign * progress * speed;
+      const angle = offset + (i / count) * Math.PI * 2 + dirSign * (tSec / dur) * Math.PI * 2;
       const ax = CX + Math.cos(angle) * radius;
       const ay = CY + Math.sin(angle) * radius;
       const half = chipSize / 2;
@@ -1429,7 +1436,7 @@ function renderRevolve(
 
   // Center Hub matching RevolveCard.tsx flex layout
   // Center Y: avatar center at 353.5px, repo name at 478px, star count row at 576px
-  const pCenter = Math.min(1, progress / 0.20);
+  const pCenter = Math.min(1.0, tSec / 0.60);
   const easeCenter = easeOut(pCenter);
   const centerScale = 0.8 + 0.2 * easeCenter;
 
@@ -1491,7 +1498,8 @@ function renderRevolve(
   ctx.restore();
 
   // 3. Star count row: Star (76px) + Number (100px) + "stars" (28px) at Y = 576
-  const curStars = Math.round(data.stars * easeCenter);
+  const numEase = easeOut(Math.min(1.0, tSec / 1.40));
+  const curStars = Math.round(data.stars * numEase);
   const countStr = curStars.toLocaleString();
 
   ctx.save();
@@ -1929,6 +1937,257 @@ function renderHyperdrive(
   ctx.restore();
 }
 
+function renderBlackhole(
+  ctx: CanvasRenderingContext2D,
+  data: TemplateData,
+  theme: 'dark' | 'light',
+  progress: number,
+  assets: PreloadedAssets
+) {
+  const isDark = theme === 'dark';
+
+  // 1. Background Fill
+  ctx.save();
+  ctx.fillStyle = isDark ? '#08080C' : '#FAFAF9';
+  ctx.fillRect(0, 0, 1600, 900);
+
+  // Radial ambient background glow (Matching DOM 68% circle at 50% 50% spanning out to corners at 920px)
+  const glowGrad = ctx.createRadialGradient(800, 450, 0, 800, 450, 920);
+  glowGrad.addColorStop(0, isDark ? 'rgba(234, 179, 8, 0.38)' : 'rgba(250, 204, 21, 0.42)');
+  glowGrad.addColorStop(0.38, isDark ? 'rgba(168, 85, 247, 0.24)' : 'rgba(221, 214, 254, 0.28)');
+  glowGrad.addColorStop(0.68, isDark ? 'rgba(168, 85, 247, 0.10)' : 'rgba(221, 214, 254, 0.12)');
+  glowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = glowGrad;
+  ctx.fillRect(0, 0, 1600, 900);
+
+  // 2. 4 Curved Corner Background Spiral Lines (100% Synced with Avatar Flow)
+  const CORNER_ANGLES = [
+    Math.PI / 4,
+    (3 * Math.PI) / 4,
+    (5 * Math.PI) / 4,
+    (7 * Math.PI) / 4,
+  ];
+  const R_START = 920;
+  const R_END = 150;
+  const SWEEP_ANGLE = 1.7 * Math.PI;
+
+  ctx.save();
+  CORNER_ANGLES.forEach((baseAngle) => {
+    ctx.beginPath();
+    const steps = 90;
+    for (let i = 0; i <= steps; i++) {
+      const t = 1 - i / steps; // 1 at outer corner, 0 at center
+      const r = R_START * t + R_END * (1 - t);
+      const angle = baseAngle + (1 - t) * SWEEP_ANGLE;
+      const x = 800 + r * Math.cos(angle);
+      const y = 450 + r * Math.sin(angle);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = isDark ? 'rgba(234, 179, 8, 0.16)' : 'rgba(234, 179, 8, 0.22)';
+    ctx.lineWidth = 4;
+    ctx.setLineDash([]);
+    ctx.stroke();
+
+    // Secondary parallel accent curve
+    ctx.beginPath();
+    for (let i = 0; i <= steps; i++) {
+      const t = 1 - i / steps;
+      const r = (R_START + 75) * t + (R_END + 35) * (1 - t);
+      const angle = baseAngle + (1 - t) * SWEEP_ANGLE + 0.12;
+      const x = 800 + r * Math.cos(angle);
+      const y = 450 + r * Math.sin(angle);
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)';
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([8, 8]);
+    ctx.stroke();
+  });
+  ctx.restore();
+
+  // 3. Render 4 Curved Avatar Streams
+  const stargazers = data.stargazers?.length ? data.stargazers : sampleStargazers;
+  const avatarList: any[] = [];
+  while (avatarList.length < 48) {
+    avatarList.push(...stargazers);
+  }
+  const items = avatarList.slice(0, 48);
+
+  // Group into 4 arms
+  const armAvatars: Array<Array<{ user: any; idx: number }>> = [[], [], [], []];
+  items.forEach((user, i) => {
+    armAvatars[i % 4].push({ user, idx: i });
+  });
+
+  armAvatars.forEach((armList, armIdx) => {
+    const baseAngle = CORNER_ANGLES[armIdx];
+    const armCount = armList.length;
+
+    armList.forEach(({ user, idx }, itemIdx) => {
+      const localOffset = itemIdx / armCount;
+      const p = (localOffset + progress) % 1;
+      const currentP = 1 - p;
+
+      const r = R_START * currentP + R_END * (1 - currentP);
+      const angle = baseAngle + (1 - currentP) * SWEEP_ANGLE;
+
+      const x = 800 + r * Math.cos(angle);
+      const y = 450 + r * Math.sin(angle);
+
+      const chipSize = 68 + 32 * currentP; // 68px inner to 100px outer (Enlarged)
+      const opacity = Math.sin(currentP * Math.PI);
+      const alpha = Math.max(0.08, opacity);
+
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(x, y);
+
+      const chipR = chipSize * 0.28;
+      const imgKey = user.avatarUrl || user.login || `user-${idx}`;
+      const img = assets.avatarImages.get(imgKey);
+
+      // Drop shadow
+      ctx.shadowColor = isDark ? 'rgba(0, 0, 0, 0.6)' : 'rgba(0, 0, 0, 0.1)';
+      ctx.shadowBlur = 16;
+      ctx.shadowOffsetY = 6;
+
+      drawRoundedRect(ctx, -chipSize / 2, -chipSize / 2, chipSize, chipSize, chipR);
+      ctx.fillStyle = isDark ? 'rgba(22, 20, 30, 0.95)' : 'rgba(255, 255, 255, 0.97)';
+      ctx.fill();
+
+      // Reset shadow for clip
+      ctx.shadowColor = 'transparent';
+
+      ctx.save();
+      drawRoundedRect(ctx, -chipSize / 2, -chipSize / 2, chipSize, chipSize, chipR);
+      ctx.clip();
+
+      if (img && img.naturalWidth > 0) {
+        ctx.drawImage(img, -chipSize / 2, -chipSize / 2, chipSize, chipSize);
+      } else {
+        ctx.fillStyle = isDark ? '#2A2736' : '#E2E8F0';
+        ctx.fillRect(-chipSize / 2, -chipSize / 2, chipSize, chipSize);
+        ctx.fillStyle = isDark ? '#FFFFFF' : '#0F172A';
+        ctx.font = `bold ${chipSize * 0.38}px 'DM Sans', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText((user.login || 'S').charAt(0).toUpperCase(), 0, 0);
+      }
+      ctx.restore();
+
+      // Border
+      drawRoundedRect(ctx, -chipSize / 2, -chipSize / 2, chipSize, chipSize, chipR);
+      ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+    });
+  });
+
+  // 4. Render Frameless Center Hub (Matching Revolve Editorial standard)
+  const tSec = progress * 16.0;
+  const numEase = 1 - Math.pow(1 - Math.min(1.0, tSec / 2.60), 3);
+  const countVal = Math.round(data.stars * numEase);
+  const countStr = countVal.toLocaleString();
+  const repoFullName = data.owner ? `${data.owner}/${data.repo}` : data.repo;
+  const titleColor = isDark ? '#F5EDE7' : '#0F0E10';
+  const subColor = isDark ? '#A1958D' : '#64748B';
+
+  const cx = 800;
+  const avatarSz = 160;
+  const avatarTop = 273.5;
+  const avatarCenterY = avatarTop + avatarSz / 2;
+  const avatarR = 36;
+
+  // Center purple & golden radial halo (Wide spread)
+  ctx.save();
+  const centerHalo = ctx.createRadialGradient(cx, 450, 0, cx, 450, 480);
+  centerHalo.addColorStop(0, isDark ? 'rgba(234, 179, 8, 0.45)' : 'rgba(250, 204, 21, 0.40)');
+  centerHalo.addColorStop(0.35, isDark ? 'rgba(168, 85, 247, 0.26)' : 'rgba(192, 132, 252, 0.22)');
+  centerHalo.addColorStop(0.70, isDark ? 'rgba(168, 85, 247, 0.10)' : 'rgba(192, 132, 252, 0.08)');
+  centerHalo.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  ctx.fillStyle = centerHalo;
+  ctx.fillRect(cx - 480, 450 - 480, 960, 960);
+  ctx.restore();
+
+  // Owner Avatar Golden Glow Shadow
+  ctx.save();
+  ctx.shadowColor = isDark ? 'rgba(234, 179, 8, 0.55)' : 'rgba(234, 179, 8, 0.38)';
+  ctx.shadowBlur = 60;
+  drawRoundedRect(ctx, cx - avatarSz / 2, avatarTop, avatarSz, avatarSz, avatarR);
+  ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.09)' : '#FFFFFF';
+  ctx.fill();
+
+  ctx.shadowColor = isDark ? 'rgba(0, 0, 0, 0.75)' : 'rgba(0, 0, 0, 0.15)';
+  ctx.shadowBlur = 60;
+  ctx.shadowOffsetY = 20;
+  drawRoundedRect(ctx, cx - avatarSz / 2, avatarTop, avatarSz, avatarSz, avatarR);
+  ctx.fill();
+  ctx.restore();
+
+  // Avatar Image Clip
+  ctx.save();
+  drawRoundedRect(ctx, cx - avatarSz / 2, avatarTop, avatarSz, avatarSz, avatarR);
+  ctx.clip();
+  if (assets.ownerImg && assets.ownerImg.naturalWidth > 0) {
+    ctx.drawImage(assets.ownerImg, cx - avatarSz / 2, avatarTop, avatarSz, avatarSz);
+  } else {
+    ctx.fillStyle = isDark ? '#1D1C24' : '#E2E8F0';
+    ctx.fillRect(cx - avatarSz / 2, avatarTop, avatarSz, avatarSz);
+    ctx.fillStyle = titleColor;
+    ctx.font = `bold 60px 'DM Sans', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText((data.repo ? data.repo.charAt(0).toUpperCase() : '★'), cx, avatarCenterY);
+  }
+  ctx.restore();
+
+  // Avatar Border
+  ctx.save();
+  drawRoundedRect(ctx, cx - avatarSz / 2, avatarTop, avatarSz, avatarSz, avatarR);
+  ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(0, 0, 0, 0.09)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+
+  // Repo Full Name
+  ctx.save();
+  ctx.font = `800 46px 'DM Sans', sans-serif`;
+  ctx.fillStyle = titleColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(repoFullName, cx, 478);
+  ctx.restore();
+
+  // Star Count Row
+  ctx.save();
+  ctx.font = `900 100px 'DM Sans', sans-serif`;
+  const countW = ctx.measureText(countStr).width;
+  ctx.font = `500 28px 'DM Sans', sans-serif`;
+  const labelW = ctx.measureText('stars').width;
+
+  const starSz = 76;
+  const gap = 16;
+  const totalW = starSz + gap + countW + gap + labelW;
+  const startX = cx - totalW / 2;
+  const rowCenterY = 576;
+
+  drawStar(ctx, startX + starSz / 2, rowCenterY - 4, starSz / 2, '#FACC15', '#EAB308', 1.1);
+
+  ctx.font = `900 100px 'DM Sans', sans-serif`;
+  ctx.fillStyle = titleColor;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillText(countStr, startX + starSz + gap, rowCenterY + 34);
+
+  ctx.font = `500 28px 'DM Sans', sans-serif`;
+  ctx.fillStyle = subColor;
+  ctx.fillText('stars', startX + starSz + gap + countW + gap, rowCenterY + 30);
+  ctx.restore();
+}
+
 // Main rendering dispatcher
 export function renderTemplateFrame(
   ctx: CanvasRenderingContext2D,
@@ -1938,9 +2197,9 @@ export function renderTemplateFrame(
   progress: number,
   assets: PreloadedAssets
 ) {
-  if (template === 'counter' || template === 'milestone') {
+  if (template === 'milestone') {
     renderCounter(ctx, data, theme, progress, assets);
-  } else if (template === 'ticker' || template === 'infinity') {
+  } else if (template === 'infinity') {
     renderTicker(ctx, data, theme, progress, assets);
   } else if (template === 'revolve') {
     renderRevolve(ctx, data, theme, progress, assets);
@@ -1952,6 +2211,8 @@ export function renderTemplateFrame(
     renderSpotlight(ctx, data, theme, progress, assets);
   } else if (template === 'hyperdrive') {
     renderHyperdrive(ctx, data, theme, progress, assets);
+  } else if (template === 'blackhole') {
+    renderBlackhole(ctx, data, theme, progress, assets);
   }
 }
 

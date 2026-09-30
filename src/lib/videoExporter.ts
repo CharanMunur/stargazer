@@ -64,7 +64,6 @@ async function getSupportedEncoderConfig(width: number, height: number, bitrate:
 export function getDefaultDurationForTemplate(template: TemplateType): number {
   switch (template) {
     case 'infinity':
-    case 'ticker':
       return 8.0;
     case 'orbit':
       return 8.0;
@@ -76,8 +75,9 @@ export function getDefaultDurationForTemplate(template: TemplateType): number {
       return 8.0;
     case 'spotlight':
       return 8.0;
+    case 'blackhole':
+      return 16.0;
     case 'milestone':
-    case 'counter':
       return 8.0;
     default:
       return 8.0;

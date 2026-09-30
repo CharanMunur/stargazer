@@ -8,6 +8,7 @@ import {
   SpotlightCard,
   RevolveCard,
   HyperdriveCard,
+  BlackholeCard,
 } from '../templates';
 import type { TemplateData, StargazerUser } from '../templates/types';
 import { exportTemplateToVideo, exportTemplateToImage, getDefaultDurationForTemplate } from '@/lib/videoExporter';
@@ -22,6 +23,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { FadeIn } from '../helpers/FadeIn';
+import { Badge } from '@/components/ui/badge';
 import { templatesData, initialSampleData, type TemplateMeta } from '@/data/templates';
 import sampleStargazers from '@/data/sampleStargazers.json';
 
@@ -413,6 +415,14 @@ export default function StudioPage() {
                   animated
                 />
               )}
+              {template === 'blackhole' && (
+                <BlackholeCard
+                  key={`card-blackhole-${theme}-${repoData.repo}-${replayNonce}`}
+                  data={repoData}
+                  theme={theme}
+                  animated
+                />
+              )}
             </div>
           </div>
 
@@ -631,6 +641,7 @@ function BrowseTemplateCard({
           {template.id === 'orbit' && <OrbitCard data={initialSampleData} theme={theme} animated={isHovered} />}
           {template.id === 'constellation' && <ConstellationCard data={initialSampleData} theme={theme} animated={isHovered} />}
           {template.id === 'hyperdrive' && <HyperdriveCard data={initialSampleData} theme={theme} animated={isHovered} />}
+          {template.id === 'blackhole' && <BlackholeCard data={initialSampleData} theme={theme} animated={isHovered} />}
         </div>
       </div>
       <div className="flex items-center justify-between gap-1.5 px-1 py-1">
@@ -638,9 +649,9 @@ function BrowseTemplateCard({
           {template.name}
         </span>
         {template.isNew && (
-          <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 tracking-wider">
+          <Badge variant="orange">
             NEW
-          </span>
+          </Badge>
         )}
       </div>
     </button>

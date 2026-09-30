@@ -1,0 +1,223 @@
+---
+// Standalone floating Buy Me a Coffee widget component
+---
+
+<!-- Buy Me a Coffee Official Widget Script -->
+<script
+  is:inline
+  data-name="BMC-Widget"
+  data-cfasync="false"
+  src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+  data-id="charanmunur"
+  data-description="Support me on Buy me a coffee!"
+  data-message=""
+  data-color="#FFDD00"
+  data-position="Right"
+  data-x_margin="20"
+  data-y_margin="20"
+></script>
+
+<!-- Floating White Container Widget -->
+<div id="bmc-floating-wrapper">
+  <div id="bmc-btn-square">
+    <button id="bmc-dismiss-btn" aria-label="Dismiss widget">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6 6 18"/>
+        <path d="m6 6 12 12"/>
+      </svg>
+    </button>
+    <a
+      href="https://buymeacoffee.com/charanmunur"
+      target="_blank"
+      rel="noreferrer"
+      id="bmc-sublabel"
+      class="text-xs sm:text-sm font-bold text-neutral-900 hover:underline tracking-tight text-center select-none no-underline"
+    >
+      Support My Work 💛
+    </a>
+  </div>
+</div>
+
+<style is:global>
+  #bmc-floating-wrapper {
+    position: fixed !important;
+    right: 20px !important;
+    bottom: 20px !important;
+    z-index: 999999 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(16px);
+    transition: opacity 0.35s ease, transform 0.35s ease !important;
+  }
+
+  @media (min-width: 768px) {
+    #bmc-floating-wrapper {
+      right: 24px !important;
+      bottom: 24px !important;
+    }
+  }
+
+  #bmc-floating-wrapper.bmc-dismissed {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  #bmc-btn-square {
+    position: relative !important;
+    background-color: #ffffff !important;
+    border-radius: 20px !important;
+    padding: 16px 20px 14px !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid rgba(229, 231, 235, 1) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+
+  #bmc-dismiss-btn {
+    position: absolute !important;
+    top: 6px !important;
+    right: 6px !important;
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 9999px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #71717a !important;
+    background: #f4f4f5 !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: color 0.15s ease, background-color 0.15s ease, transform 0.15s ease !important;
+    padding: 0 !important;
+    z-index: 9999999 !important;
+    pointer-events: auto !important;
+  }
+
+  #bmc-dismiss-btn:hover {
+    color: #09090b !important;
+    background-color: #e4e4e7 !important;
+    transform: scale(1.05);
+  }
+
+  #bmc-wbtn {
+    position: relative !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    top: auto !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    let isDismissed = false;
+
+    function dismissWidget(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      isDismissed = true;
+      const wrapper = document.getElementById('bmc-floating-wrapper');
+      if (wrapper) {
+        wrapper.classList.add('bmc-dismissed');
+        wrapper.style.setProperty('display', 'none', 'important');
+        wrapper.style.setProperty('opacity', '0', 'important');
+        wrapper.style.setProperty('pointer-events', 'none', 'important');
+      }
+      const bmcBtn = document.getElementById('bmc-wbtn');
+      if (bmcBtn) {
+        bmcBtn.style.setProperty('display', 'none', 'important');
+      }
+    }
+
+    document.addEventListener(
+      'click',
+      function (e) {
+        const btn = e.target && e.target.closest ? e.target.closest('#bmc-dismiss-btn') : null;
+        if (btn) {
+          dismissWidget(e);
+        }
+      },
+      true
+    );
+
+    function initBmcWidget() {
+      const wrapper = document.getElementById('bmc-floating-wrapper');
+      const btnSquare = document.getElementById('bmc-btn-square');
+      const dismissBtn = document.getElementById('bmc-dismiss-btn');
+      const sublabel = document.getElementById('bmc-sublabel');
+      if (!wrapper || !btnSquare) return;
+
+      if (dismissBtn) {
+        dismissBtn.onclick = dismissWidget;
+      }
+
+      const moveBmcButton = () => {
+        const bmcBtn = document.getElementById('bmc-wbtn');
+        if (bmcBtn && bmcBtn.parentElement !== btnSquare) {
+          btnSquare.insertBefore(bmcBtn, sublabel);
+        }
+      };
+
+      const updateVisibility = () => {
+        if (isDismissed || wrapper.classList.contains('bmc-dismissed')) {
+          dismissWidget();
+          return;
+        }
+
+        moveBmcButton();
+        const isStudioPage = window.location.pathname.startsWith('/generate');
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const show = isStudioPage || docHeight <= 0 || (window.scrollY / docHeight) >= 0.30;
+
+        if (show) {
+          wrapper.style.setProperty('display', 'flex', 'important');
+          wrapper.style.opacity = '1';
+          wrapper.style.pointerEvents = 'auto';
+          wrapper.style.transform = 'translateY(0)';
+          const bmcBtn = document.getElementById('bmc-wbtn');
+          if (bmcBtn) bmcBtn.style.display = 'flex';
+        } else {
+          wrapper.style.setProperty('display', 'none', 'important');
+          wrapper.style.opacity = '0';
+          wrapper.style.pointerEvents = 'none';
+          wrapper.style.transform = 'translateY(16px)';
+        }
+      };
+
+      window.addEventListener('scroll', updateVisibility, { passive: true });
+      updateVisibility();
+
+      const intervalId = setInterval(() => {
+        if (isDismissed || wrapper.classList.contains('bmc-dismissed')) {
+          clearInterval(intervalId);
+          return;
+        }
+        updateVisibility();
+        if (document.getElementById('bmc-wbtn')) {
+          clearInterval(intervalId);
+        }
+      }, 200);
+      setTimeout(() => clearInterval(intervalId), 6000);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initBmcWidget);
+    } else {
+      initBmcWidget();
+    }
+  })();
+</script>
