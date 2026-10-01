@@ -86,6 +86,10 @@ export default {
         "4.5": "1.125rem",
       },
       keyframes: {
+        "fade-down": {
+          "0%": { opacity: "0", transform: "translateY(-8px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
         "marquee-left": {
           "0%": { transform: "translateX(0%)" },
           "100%": { transform: "translateX(-50%)" },
@@ -108,6 +112,7 @@ export default {
         },
       },
       animation: {
+        "fade-down": "fade-down 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both",
         "marquee-left": "marquee-left 20s linear infinite",
         "marquee-right": "marquee-right 20s linear infinite",
         "dot-flicker": "dot-flicker 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",

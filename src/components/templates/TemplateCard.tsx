@@ -23,7 +23,7 @@ interface TemplateCardProps {
 
 export default function TemplateCard({ template, theme, index }: TemplateCardProps) {
   return (
-    <FadeIn delay={0.06 + (index % 6) * 0.03} yOffset={16}>
+    <FadeIn delay={0.1 + (index % 6) * 0.03} yOffset={16}>
       <a
         href={`/generate?template=${template.id}`}
         className="group relative rounded-3xl bg-card hover:bg-muted/40 border border-border/80 hover:border-border p-2.5 sm:p-3 flex flex-col justify-between transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs block h-full text-card-foreground"

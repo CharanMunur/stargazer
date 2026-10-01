@@ -184,14 +184,12 @@
         const show = isStudioPage || docHeight <= 0 || (window.scrollY / docHeight) >= 0.30;
 
         if (show) {
-          wrapper.style.setProperty('display', 'flex', 'important');
           wrapper.style.opacity = '1';
           wrapper.style.pointerEvents = 'auto';
           wrapper.style.transform = 'translateY(0)';
           const bmcBtn = document.getElementById('bmc-wbtn');
           if (bmcBtn) bmcBtn.style.display = 'flex';
         } else {
-          wrapper.style.setProperty('display', 'none', 'important');
           wrapper.style.opacity = '0';
           wrapper.style.pointerEvents = 'none';
           wrapper.style.transform = 'translateY(16px)';
