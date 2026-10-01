@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export type GitHubStarsProps = {
   /** GitHub repository in `owner/repo` or `repoName` format. Default: "CharanMunur/stargazer" */
@@ -54,13 +55,18 @@ export function GitHubStars({
     .toLowerCase();
 
   return (
-    <a
+    <motion.a
       href={`https://github.com/${repo}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="h-11 inline-flex items-center gap-3 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/50 px-4.5 text-sm font-medium tracking-tight text-foreground transition-all hover:border-border cursor-pointer backdrop-blur-md shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
+      initial={{ opacity: 0, y: -8, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.4, delay: 0.08, ease: "easeOut" }}
+      whileHover={{ scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
+      className="group h-11 inline-flex items-center gap-3 rounded-full border border-border/70 bg-muted/30 hover:bg-muted/50 px-4.5 text-sm font-medium tracking-tight text-foreground transition-colors hover:border-border cursor-pointer backdrop-blur-md shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
     >
-      <span className="shrink-0 flex items-center justify-center w-5 h-5">
+      <span className="shrink-0 flex items-center justify-center w-5 h-5 transition-transform duration-200 group-hover:scale-110">
         <img
           src="/social/github.svg"
           alt="GitHub"
@@ -76,9 +82,18 @@ export function GitHubStars({
       <div className="h-5 w-px shrink-0 bg-border/80" aria-hidden="true" />
 
       <div className="flex items-center gap-1.5">
-        <span className="text-sm text-foreground/90 font-semibold leading-none inline-flex items-center">
-          {formattedStars}
-        </span>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={formattedStars}
+            initial={{ opacity: 0.6, y: -2 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0.6, y: 2 }}
+            transition={{ duration: 0.2 }}
+            className="text-sm text-foreground/90 font-semibold leading-none inline-flex items-center"
+          >
+            {formattedStars}
+          </motion.span>
+        </AnimatePresence>
 
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -86,7 +101,7 @@ export function GitHubStars({
           height="16"
           viewBox="0 0 24 24"
           fill="none"
-          className="shrink-0 relative -top-[0.5px]"
+          className="shrink-0 relative -top-[0.5px] transition-transform duration-200 group-hover:scale-115 group-hover:rotate-12"
           style={{ color: "rgb(234, 179, 8)" }}
         >
           <path
@@ -95,7 +110,7 @@ export function GitHubStars({
           />
         </svg>
       </div>
-    </a>
+    </motion.a>
   );
 }
 
