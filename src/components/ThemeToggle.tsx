@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon } from '@/components/ui/reicon';
 
 export default function ThemeToggle({ className }: { className?: string }) {
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');

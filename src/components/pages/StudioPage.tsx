@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Download, RefreshCw, RotateCcw, Sun, Moon } from 'lucide-react';
+import { Download, RefreshCw, RotateCcw, Sun, Moon } from '@/components/ui/reicon';
 import {
   MilestoneCard,
   InfinityCard,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { Search, SlidersHorizontal, ChevronDown, Check } from "lucide-react";
+import { Search, Filter, ChevronDown, Check } from "@/components/ui/reicon";
 import { FadeIn } from "../helpers/FadeIn";
 import {
   ComingSoonCard,
@@ -116,7 +116,7 @@ export default function HomePage() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="glass" size="default" className="gap-2 font-normal text-foreground">
-                <SlidersHorizontal className="w-4 h-4 shrink-0 text-muted-foreground" />
+                <Filter className="w-4 h-4 shrink-0 text-muted-foreground" />
                 <span>{filterMode === "all" ? "All Templates" : "New Releases"}</span>
                 <ChevronDown className="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
               </Button>

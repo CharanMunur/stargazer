@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight } from '@/components/ui/reicon';
 import { FadeIn } from '../helpers/FadeIn';
 import {
   Breadcrumb,

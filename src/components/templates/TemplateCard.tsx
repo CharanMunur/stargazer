@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "@/components/ui/reicon";
 import { FadeIn } from "../helpers/FadeIn";
 import type { TemplateMeta } from "@/data/templates";
 import { initialSampleData } from "@/data/templates";
