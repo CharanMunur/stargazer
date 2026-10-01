@@ -322,10 +322,21 @@ export default function StudioPage() {
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="pt-1">
+        <div className="pt-1 flex items-baseline gap-3">
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
             {currentMeta.name}
           </h1>
+          <span className="text-sm sm:text-base text-muted-foreground font-medium">
+            by{" "}
+            <a
+              href={currentMeta.url}
+              target="_blank"
+              rel="noreferrer"
+              className="hover:underline text-foreground font-semibold transition-colors"
+            >
+              {currentMeta.by}
+            </a>
+          </span>
         </div>
       </FadeIn>
 
@@ -633,6 +644,13 @@ function BrowseTemplateCard({
       className="group rounded-3xl bg-card hover:bg-muted/40 border border-border/80 hover:border-border p-2.5 text-left flex flex-col justify-between transition-colors duration-200 cursor-pointer shadow-2xs hover:shadow-xs w-full text-card-foreground"
     >
       <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-border/70 relative flex items-center justify-center pointer-events-none mb-2 isolate">
+        {template.isNew && (
+          <div className="absolute top-2.5 right-2.5 z-20">
+            <Badge variant="orange">
+              NEW
+            </Badge>
+          </div>
+        )}
         <div className="w-full h-full relative z-10 pointer-events-none">
           {template.id === 'spotlight' && <SpotlightCard data={initialSampleData} theme={theme} animated={isHovered} />}
           {template.id === 'revolve' && <RevolveCard data={initialSampleData} theme={theme} animated={isHovered} />}
@@ -644,15 +662,13 @@ function BrowseTemplateCard({
           {template.id === 'blackhole' && <BlackholeCard data={initialSampleData} theme={theme} animated={isHovered} />}
         </div>
       </div>
-      <div className="flex items-center justify-between gap-1.5 px-1 py-1">
-        <span className="font-bold text-sm text-foreground">
+      <div className="flex items-baseline justify-between gap-1.5 px-1 py-1 min-w-0">
+        <span className="font-bold text-sm text-foreground shrink-0">
           {template.name}
         </span>
-        {template.isNew && (
-          <Badge variant="orange">
-            NEW
-          </Badge>
-        )}
+        <span className="text-xs text-muted-foreground font-medium truncate">
+          by {template.by}
+        </span>
       </div>
     </button>
   );

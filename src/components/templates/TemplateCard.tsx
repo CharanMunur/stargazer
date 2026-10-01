@@ -30,6 +30,15 @@ export default function TemplateCard({ template, theme, index }: TemplateCardPro
       >
         {/* Live 16:9 Canvas Preview */}
         <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-border/70 relative flex items-center justify-center pointer-events-none">
+          {/* Overlaid Floating NEW Badge */}
+          {template.isNew && (
+            <div className="absolute top-3 right-3 z-20 pointer-events-auto">
+              <Badge variant="orange" className="shadow-xs backdrop-blur-xs">
+                NEW
+              </Badge>
+            </div>
+          )}
+
           <div
             className="absolute inset-0 pointer-events-none opacity-40"
             style={{
@@ -106,17 +115,24 @@ export default function TemplateCard({ template, theme, index }: TemplateCardPro
           </div>
         </div>
 
-        {/* Bottom bar: name + NEW badge left, orange arrow right */}
-        <div className="pt-4 sm:pt-4.5 pb-1.5 flex items-center justify-between px-1">
-          <div className="flex items-center gap-2">
-            <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground">
+        {/* Bottom bar: Title + Author credit left, Arrow icon right */}
+        <div className="pt-3.5 sm:pt-4 pb-1 flex items-center justify-between px-1 gap-2">
+          <div className="flex items-baseline gap-2 min-w-0">
+            <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground shrink-0">
               {template.name}
             </h2>
-            {template.isNew && (
-              <Badge variant="orange">
-                NEW
-              </Badge>
-            )}
+            <span className="text-xs text-muted-foreground font-medium truncate">
+              by{" "}
+              <a
+                href={template.url}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="hover:underline text-foreground/80 hover:text-foreground font-semibold transition-colors"
+              >
+                {template.by}
+              </a>
+            </span>
           </div>
 
           <ArrowUpRight
