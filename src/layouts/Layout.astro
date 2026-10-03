@@ -1,0 +1,167 @@
+---
+import ThemeToggle from '../components/ThemeToggle';
+import GitHubStars from '../components/GitHubStars';
+import SmoothScroll from '../components/helpers/SmoothScroll';
+import Footer from '../components/Footer.astro';
+import BuyMeACoffeeWidget from '../components/BuyMeACoffeeWidget.astro';
+import '../styles/globals.css';
+
+export interface Props {
+  title?: string;
+  description?: string;
+  image?: string;
+  type?: string;
+  schema?: Record<string, any> | Array<Record<string, any>>;
+  noindex?: boolean;
+}
+
+const siteUrl = Astro.site ? Astro.site.origin : 'https://stargazer.charanmunur.in';
+const pathname = Astro.url.pathname;
+const canonicalURL = new URL(pathname, siteUrl).href.replace(/\/$/, '') || siteUrl;
+
+const {
+  title = 'Stargazer — Turn your GitHub stars into shareable videos and images',
+  description = 'Turn your GitHub stargazers into living art. Generate high-definition cards and 60fps MP4 videos directly in your browser.',
+  image = '/og-image.png',
+  type = 'website',
+  schema,
+  noindex = false,
+} = Astro.props;
+
+const socialImageURL = new URL(image, siteUrl).href;
+
+// Default WebSite & WebApplication Schema.org JSON-LD
+const defaultSchemas = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${siteUrl}/#website`,
+    'url': siteUrl,
+    'name': 'Stargazer',
+    'description': 'Turn your GitHub stargazers into living art. Generate 1600×900 social cards and 60fps MP4 loops directly in your browser.',
+    'publisher': {
+      '@type': 'Person',
+      'name': 'CharanMunur',
+      'url': 'https://charanmunur.in',
+    },
+    'inLanguage': 'en-US',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebApplication',
+    '@id': `${siteUrl}/#application`,
+    'name': 'Stargazer',
+    'url': siteUrl,
+    'applicationCategory': 'DeveloperApplication',
+    'operatingSystem': 'All',
+    'browserRequirements': 'Requires HTML5 Canvas & Web Media Encoders',
+    'description': 'Browser-based generator that turns GitHub stargazers into 1600x900 social cards and 60fps MP4 loops.',
+    'offers': {
+      '@type': 'Offer',
+      'price': '0',
+      'priceCurrency': 'USD',
+    },
+    'author': {
+      '@type': 'Person',
+      'name': 'CharanMunur',
+      'url': 'https://charanmunur.in',
+    },
+  },
+];
+
+const pageSchemas = schema ? (Array.isArray(schema) ? schema : [schema]) : [];
+const allSchemas = [...defaultSchemas, ...pageSchemas];
+---
+
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href={canonicalURL} />
+
+    <!-- Primary Meta Tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <meta name="author" content="CharanMunur" />
+    <meta
+      name="keywords"
+      content="github stargazers, stargazer video generator, github stars video, stargazer cards, github stats card, open source video generator, github milestone generator, developer tool"
+    />
+    <meta
+      name="robots"
+      content={noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'}
+    />
+    <meta name="googlebot" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+
+    <!-- Mobile Chrome & Overscroll Theme Color -->
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+
+    <!-- Open Graph / Facebook / iMessage / WhatsApp / Discord -->
+    <meta property="og:site_name" content="Stargazer" />
+    <meta property="og:type" content={type} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={socialImageURL} />
+    <meta property="og:image:secure_url" content={socialImageURL} />
+    <meta property="og:image:type" content={image.endsWith('.jpg') || image.endsWith('.jpeg') ? 'image/jpeg' : 'image/png'} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Stargazer — Turn your GitHub stars into shareable videos and images" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageURL} />
+    <meta name="twitter:image:src" content={socialImageURL} />
+    <meta name="twitter:image:alt" content="Stargazer — Turn your GitHub stars into shareable videos and images" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Quicksand:wght@300..700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Structured Data (JSON-LD) -->
+    {allSchemas.map((s) => (
+      <script type="application/ld+json" set:html={JSON.stringify(s)} />
+    ))}
+
+    <!-- Theme Inline Initialization -->
+    <script is:inline>
+      const savedTheme = localStorage.getItem('stargazer-theme') || 'dark';
+      document.documentElement.classList[savedTheme === 'dark' ? 'add' : 'remove']('dark');
+    </script>
+  </head>
+  <body class="min-h-screen bg-background text-foreground flex flex-col justify-between font-sans antialiased">
+    <SmoothScroll client:load />
+    <div class="fixed top-5 right-5 md:top-6 md:right-6 z-50 flex items-center gap-2.5">
+      <ThemeToggle client:load />
+      <GitHubStars client:load repo="CharanMunur/stargazer" />
+    </div>
+
+    <main class="flex-1 w-full pt-8 md:pt-12 pb-16">
+      <slot />
+    </main>
+
+    <Footer />
+    <BuyMeACoffeeWidget />
+  </body>
+</html>

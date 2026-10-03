@@ -7,6 +7,7 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "audit:links": "npx linkinator http://localhost:3000 --recurse",
     "astro": "astro"
   },
   "dependencies": {

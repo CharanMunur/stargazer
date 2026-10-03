@@ -1,55 +1,31 @@
 ---
+import Layout from '../layouts/Layout.astro';
 import PrivacyPage from '../components/pages/PrivacyPage';
-import ThemeToggle from '../components/ThemeToggle';
-import GitHubStars from '../components/GitHubStars';
-import SmoothScroll from '../components/helpers/SmoothScroll';
-import Footer from '../components/Footer.astro';
-import BuyMeACoffeeWidget from '../components/BuyMeACoffeeWidget.astro';
-import '../styles/globals.css';
+
+const privacyBreadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  'itemListElement': [
+    {
+      '@type': 'ListItem',
+      'position': 1,
+      'name': 'Home',
+      'item': 'https://stargazer.charanmunur.in/',
+    },
+    {
+      '@type': 'ListItem',
+      'position': 2,
+      'name': 'Privacy Policy',
+      'item': 'https://stargazer.charanmunur.in/privacy',
+    },
+  ],
+};
 ---
 
-<html lang="en" class="dark">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="generator" content={Astro.generator} />
-    <title>Privacy Policy — Stargazer</title>
-    <meta
-      name="description"
-      content="Stargazer Privacy Policy. Zero data collection, memory-only token handling, and client-side processing."
-    />
-    <meta property="og:title" content="Privacy Policy — Stargazer" />
-    <meta property="og:description" content="Stargazer Privacy Policy. Zero data collection, memory-only token handling, and client-side processing." />
-    <meta property="og:image" content="/og-image.png" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Privacy Policy — Stargazer" />
-    <meta name="twitter:description" content="Stargazer Privacy Policy. Zero data collection, memory-only token handling, and client-side processing." />
-    <meta name="twitter:image" content="/og-image.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Quicksand:wght@300..700&display=swap"
-      rel="stylesheet"
-    />
-    <script is:inline>
-      const savedTheme = localStorage.getItem('stargazer-theme') || 'dark';
-      document.documentElement.classList[savedTheme === 'dark' ? 'add' : 'remove']('dark');
-    </script>
-  </head>
-  <body class="min-h-screen bg-background text-foreground flex flex-col justify-between font-sans antialiased">
-    <SmoothScroll client:load />
-    <div class="fixed top-5 right-5 md:top-6 md:right-6 z-50 flex items-center gap-2.5">
-      <ThemeToggle client:load />
-      <GitHubStars client:load repo="CharanMunur/stargazer" />
-    </div>
-
-    <main class="flex-1 w-full pt-8 md:pt-12 pb-16">
-      <PrivacyPage client:load />
-    </main>
-
-    <Footer />
-    <BuyMeACoffeeWidget />
-  </body>
-</html>
+<Layout
+  title="Privacy Policy — Stargazer"
+  description="Stargazer Privacy Policy. Zero data collection, memory-only token handling, and client-side processing."
+  schema={privacyBreadcrumbSchema}
+>
+  <PrivacyPage client:load />
+</Layout>

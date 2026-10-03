@@ -1,55 +1,78 @@
 ---
+import Layout from '../layouts/Layout.astro';
 import HowToPage from '../components/pages/HowToPage';
-import ThemeToggle from '../components/ThemeToggle';
-import GitHubStars from '../components/GitHubStars';
-import SmoothScroll from '../components/helpers/SmoothScroll';
-import Footer from '../components/Footer.astro';
-import BuyMeACoffeeWidget from '../components/BuyMeACoffeeWidget.astro';
-import '../styles/globals.css';
+
+const howToSchemas = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    'name': 'How to Generate GitHub Stargazer Cards and Videos',
+    'description': 'Step-by-step guide to generating a GitHub Personal Access Token (PAT) and creating custom stargazer milestone cards and 60fps MP4 loops.',
+    'image': 'https://stargazer.charanmunur.in/og-image.png',
+    'totalTime': 'PT2M',
+    'estimatedCost': {
+      '@type': 'MonetaryAmount',
+      'currency': 'USD',
+      'value': '0',
+    },
+    'step': [
+      {
+        '@type': 'HowToStep',
+        'name': 'Open Token Settings',
+        'text': 'Navigate to your GitHub account settings under Developer Settings -> Personal Access Tokens.',
+        'url': 'https://stargazer.charanmunur.in/how-to#open-token-settings',
+      },
+      {
+        '@type': 'HowToStep',
+        'name': 'Select Classic Token',
+        'text': 'Choose Tokens (classic) and click Generate new token.',
+        'url': 'https://stargazer.charanmunur.in/how-to#select-classic-token',
+      },
+      {
+        '@type': 'HowToStep',
+        'name': 'Select public_repo Scope',
+        'text': 'Check the public_repo scope to grant access to public repository stargazers.',
+        'url': 'https://stargazer.charanmunur.in/how-to#select-public-repo-scope',
+      },
+      {
+        '@type': 'HowToStep',
+        'name': 'Generate & Copy Token',
+        'text': 'Click Generate Token and copy your PAT string.',
+        'url': 'https://stargazer.charanmunur.in/how-to#generate-and-copy-token',
+      },
+      {
+        '@type': 'HowToStep',
+        'name': 'Export PNG or MP4',
+        'text': 'Enter your repository and PAT in Stargazer Studio to render and download your 60fps video or PNG card.',
+        'url': 'https://stargazer.charanmunur.in/how-to#export-png-or-mp4',
+      },
+    ],
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      {
+        '@type': 'ListItem',
+        'position': 1,
+        'name': 'Home',
+        'item': 'https://stargazer.charanmunur.in/',
+      },
+      {
+        '@type': 'ListItem',
+        'position': 2,
+        'name': 'How to Generate',
+        'item': 'https://stargazer.charanmunur.in/how-to',
+      },
+    ],
+  },
+];
 ---
 
-<html lang="en" class="dark">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="generator" content={Astro.generator} />
-    <title>How to Generate — Stargazer</title>
-    <meta
-      name="description"
-      content="Step-by-step guide to generating a GitHub Personal Access Token and creating custom stargazer milestone cards and 60fps videos."
-    />
-    <meta property="og:title" content="How to Generate — Stargazer" />
-    <meta property="og:description" content="Step-by-step guide to generating a GitHub Personal Access Token and creating custom stargazer milestone cards and 60fps videos." />
-    <meta property="og:image" content="/og-image.png" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="How to Generate — Stargazer" />
-    <meta name="twitter:description" content="Step-by-step guide to generating a GitHub Personal Access Token and creating custom stargazer milestone cards and 60fps videos." />
-    <meta name="twitter:image" content="/og-image.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Quicksand:wght@300..700&display=swap"
-      rel="stylesheet"
-    />
-    <script is:inline>
-      const savedTheme = localStorage.getItem('stargazer-theme') || 'dark';
-      document.documentElement.classList[savedTheme === 'dark' ? 'add' : 'remove']('dark');
-    </script>
-  </head>
-  <body class="min-h-screen bg-background text-foreground flex flex-col justify-between font-sans antialiased">
-    <SmoothScroll client:load />
-    <div class="fixed top-5 right-5 md:top-6 md:right-6 z-50 flex items-center gap-2.5">
-      <ThemeToggle client:load />
-      <GitHubStars client:load repo="CharanMunur/stargazer" />
-    </div>
-
-    <main class="flex-1 w-full pt-8 md:pt-12 pb-16">
-      <HowToPage client:load />
-    </main>
-
-    <Footer />
-    <BuyMeACoffeeWidget />
-  </body>
-</html>
+<Layout
+  title="How to Generate — Stargazer"
+  description="Step-by-step guide to generating a GitHub Personal Access Token and creating custom stargazer milestone cards and 60fps videos."
+  schema={howToSchemas}
+>
+  <HowToPage client:load />
+</Layout>
