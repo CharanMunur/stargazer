@@ -16,6 +16,7 @@
   <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Framer_Motion-0055FF?style=flat-square&logo=framer&logoColor=white" alt="Framer Motion" />
   <img src="https://img.shields.io/badge/WebCodecs-E34F26?style=flat-square&logo=html5&logoColor=white" alt="WebCodecs" />
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square" alt="License: MIT" />
 </p>
 
 ---
@@ -60,6 +61,12 @@ Pull requests are welcome. Please read our [CONTRIBUTING.md](CONTRIBUTING.md) fo
 1. Fork the repo and create your branch (`git checkout -b feature/animation-name`).
 2. Add your changes and verify with `bun run build`.
 3. Open a Pull Request.
+
+---
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
 
 ---
 
