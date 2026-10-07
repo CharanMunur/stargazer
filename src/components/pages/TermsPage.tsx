@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { FadeIn } from '../helpers/FadeIn';
+import { OnThisPage, type TocItem } from '@/components/ui/OnThisPage';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,7 +10,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 
-const termsSections = [
+const termsSections: TocItem[] = [
   { id: 'acceptance', title: 'Acceptance of Terms' },
   { id: 'license-grant', title: 'Open-Source License' },
   { id: 'rendered-assets', title: 'Intellectual Property & Exports' },
@@ -20,42 +21,6 @@ const termsSections = [
 ];
 
 export default function TermsPage() {
-  const [activeId, setActiveId] = useState<string>('acceptance');
-
-  useEffect(() => {
-    const ids = termsSections.map((s) => s.id);
-
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 140;
-
-      for (let i = ids.length - 1; i >= 0; i--) {
-        const id = ids[i];
-        const el = document.getElementById(id);
-        if (el && el.offsetTop <= scrollPosition) {
-          setActiveId(id);
-          return;
-        }
-      }
-
-      if (ids[0]) {
-        setActiveId(ids[0]);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    e.preventDefault();
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-      setActiveId(id);
-      history.pushState(null, '', `#${id}`);
-    }
-  };
 
   return (
     <div className="w-full max-w-6xl mx-auto px-6 py-8">
@@ -252,37 +217,7 @@ export default function TermsPage() {
         </article>
 
         {/* Right Column: Clean "On This Page" Sidebar matching HowToPage */}
-        <aside className="hidden lg:block w-64 shrink-0 sticky top-24 self-start space-y-6">
-          <FadeIn delay={0.15} yOffset={10} duration={0.4}>
-            <div className="space-y-3">
-              <p className="text-sm font-medium text-foreground">
-                On This Page
-              </p>
-
-              <nav className="space-y-3 text-sm" aria-label="On this page">
-                {termsSections.map((section) => {
-                  const isSectionActive = activeId === section.id;
-
-                  return (
-                    <div key={section.id} className="space-y-1.5">
-                      <a
-                        href={`#${section.id}`}
-                        onClick={(e) => scrollTo(e, section.id)}
-                        className={`block transition-colors cursor-pointer ${
-                          isSectionActive
-                            ? 'text-foreground font-medium'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        {section.title}
-                      </a>
-                    </div>
-                  );
-                })}
-              </nav>
-            </div>
-          </FadeIn>
-        </aside>
+        <OnThisPage items={termsSections} />
       </div>
     </div>
   );

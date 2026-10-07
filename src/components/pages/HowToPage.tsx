@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { ArrowUpRight } from '@/components/ui/reicon';
 import { FadeIn } from '../helpers/FadeIn';
+import { OnThisPage, type TocItem } from '@/components/ui/OnThisPage';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -10,79 +11,13 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 
-const tocSections = [
-  {
-    id: 'creating-pat',
-    title: 'Creating a GitHub PAT',
-    items: [
-      { id: 'open-token-settings', title: 'Open Token Settings' },
-      { id: 'select-classic-token', title: 'Select Classic Token' },
-      { id: 'set-note-and-expiration', title: 'Set Note & Expiration' },
-      { id: 'select-public-repo-scope', title: 'Select public_repo Scope' },
-      { id: 'generate-and-copy-token', title: 'Generate & Copy Token' },
-    ],
-  },
-  {
-    id: 'customizing-card',
-    title: 'Customizing & Exporting',
-    items: [
-      { id: 'enter-repo-and-pat', title: 'Enter Repository & Token' },
-      { id: 'fetch-stargazers', title: 'Fetch Live Stargazers' },
-      { id: 'choose-stargazer-order', title: 'Choose Stargazer Order' },
-      { id: 'select-theme-and-template', title: 'Select Theme & Template' },
-      { id: 'export-png-or-mp4', title: 'Export PNG or 60fps MP4' },
-    ],
-  },
-  {
-    id: 'core-principles',
-    title: 'Core Principles',
-    items: [],
-  },
+const howToSections: TocItem[] = [
+  { id: 'creating-pat', title: 'Creating a GitHub PAT' },
+  { id: 'customizing-card', title: 'Customizing & Exporting' },
+  { id: 'core-principles', title: 'Core Principles' },
 ];
 
 export default function HowToPage() {
-  const [activeId, setActiveId] = useState<string>('creating-pat');
-
-  useEffect(() => {
-    const allIds: string[] = [];
-    for (const section of tocSections) {
-      allIds.push(section.id);
-      for (const item of section.items) {
-        allIds.push(item.id);
-      }
-    }
-
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 140;
-
-      for (let i = allIds.length - 1; i >= 0; i--) {
-        const id = allIds[i];
-        const el = document.getElementById(id);
-        if (el && el.offsetTop <= scrollPosition) {
-          setActiveId(id);
-          return;
-        }
-      }
-
-      if (allIds[0]) {
-        setActiveId(allIds[0]);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollTo = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    e.preventDefault();
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-      setActiveId(id);
-      history.pushState(null, '', `#${id}`);
-    }
-  };
 
   return (
     <div className="w-full max-w-6xl mx-auto px-6 py-8">
@@ -297,60 +232,7 @@ export default function HowToPage() {
         </article>
 
         {/* Right Column: Clean shadcn-Style "On This Page" Sidebar */}
-        <aside className="hidden lg:block w-64 shrink-0 sticky top-24 self-start space-y-6">
-          <FadeIn delay={0.15} yOffset={10} duration={0.4}>
-            <div className="space-y-3">
-              <p className="text-sm font-medium text-foreground">
-                On This Page
-              </p>
-
-              <nav className="space-y-3 text-sm" aria-label="On this page">
-                {tocSections.map((section) => {
-                  const isSectionActive = activeId === section.id;
-
-                  return (
-                    <div key={section.id} className="space-y-1.5">
-                      <a
-                        href={`#${section.id}`}
-                        onClick={(e) => scrollTo(e, section.id)}
-                        className={`block transition-colors cursor-pointer ${
-                          isSectionActive
-                            ? 'text-foreground font-medium'
-                            : 'text-muted-foreground hover:text-foreground'
-                        }`}
-                      >
-                        {section.title}
-                      </a>
-
-                      {section.items.length > 0 && (
-                        <ul className="pl-3.5 border-l border-border/40 space-y-1">
-                          {section.items.map((item) => {
-                            const isItemActive = activeId === item.id;
-                            return (
-                              <li key={item.id}>
-                                <a
-                                  href={`#${item.id}`}
-                                  onClick={(e) => scrollTo(e, item.id)}
-                                  className={`block text-xs py-0.5 transition-colors cursor-pointer ${
-                                    isItemActive
-                                      ? 'text-foreground font-medium'
-                                      : 'text-muted-foreground hover:text-foreground'
-                                  }`}
-                                >
-                                  {item.title}
-                                </a>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      )}
-                    </div>
-                  );
-                })}
-              </nav>
-            </div>
-          </FadeIn>
-        </aside>
+        <OnThisPage items={howToSections} />
       </div>
     </div>
   );
