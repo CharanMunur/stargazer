@@ -1,6 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { TemplateCardProps } from './types';
 import sampleStargazers from '../../data/sampleStargazers.json';
+
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 // 5-point yellow star matching Go drawYellowStar
 const YellowStar: React.FC<{ size?: number }> = ({ size = 28 }) => (
@@ -41,7 +43,7 @@ export const OrbitCard: React.FC<TemplateCardProps> = ({
   const primaryAccent = '#E87443';
 
   // Responsive scale down to fit container width
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const updateScale = () => {

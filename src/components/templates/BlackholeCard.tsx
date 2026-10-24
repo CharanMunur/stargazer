@@ -1,7 +1,9 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import type { TemplateCardProps } from './types';
 import sampleStargazers from '../../data/sampleStargazers.json';
+
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 function AnimatedNumber({ value, animated = true }: { value: number; animated?: boolean }) {
   const [displayValue, setDisplayValue] = useState(animated ? 0 : value);
@@ -76,7 +78,7 @@ export const BlackholeCard: React.FC<TemplateCardProps> = ({
   }, [data?.stargazers]);
 
   // Responsive scale guard
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const updateScale = () => {
       if (containerRef.current) {
         const width = containerRef.current.offsetWidth;

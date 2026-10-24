@@ -1,8 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import type { TemplateCardProps } from './types';
 import sampleStargazers from '../../data/sampleStargazers.json';
+
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 function AnimatedNumber({ value, animated = true }: { value: number; animated?: boolean }) {
   const [displayValue, setDisplayValue] = useState(animated ? 0 : value);
@@ -134,7 +136,7 @@ export const ConstellationCard: React.FC<TemplateCardProps> = ({
   const avatarBorderColor = isDark ? '#342A27' : '#E2E8F0';
 
   // Responsive scale down to fit container width
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const updateScale = () => {

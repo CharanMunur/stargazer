@@ -1,8 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { LaurelLeaf } from './LaurelLeaf';
 import type { TemplateCardProps } from './types';
 import sampleStargazers from '../../data/sampleStargazers.json';
+
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 const ringColors = [
   '#f97316', // orange
@@ -62,7 +64,7 @@ export const MilestoneCard: React.FC<TemplateCardProps> = ({
   const labelColor = isDark ? '#8A7E78' : '#888888';
 
   // Responsive scale down to fit container width
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const updateScale = () => {

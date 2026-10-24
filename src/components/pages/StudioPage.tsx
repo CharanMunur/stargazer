@@ -33,6 +33,7 @@ export default function StudioPage() {
   const [token, setToken] = useState('');
   const [repo, setRepo] = useState('CharanMunur/Portfolio');
   const [template, setTemplate] = useState<TemplateId>('spotlight');
+  const [previewReplayKey, setPreviewReplayKey] = useState(0);
   const [format, setFormat] = useState<'png' | 'mp4'>('png');
   const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   const userCustomizedTheme = useRef(false);
@@ -43,7 +44,6 @@ export default function StudioPage() {
   const [exporting, setExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState<{ percent: number; text: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [replayNonce, setReplayNonce] = useState(0);
 
   // Synchronize initial theme with html class, but respect user manual selection and ignore scroll class mutations
   useEffect(() => {
@@ -357,22 +357,11 @@ export default function StudioPage() {
               }}
             />
 
-            {/* Replay action badge */}
-            <button
-              type="button"
-              onClick={() => setReplayNonce((n) => n + 1)}
-              className="absolute top-4 right-4 z-20 h-8.5 px-3.5 rounded-full bg-background/80 backdrop-blur-md hover:bg-background text-muted-foreground hover:text-foreground text-xs font-medium border border-border/80 transition-colors shadow-2xs cursor-pointer flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
-              title="Replay animation"
-            >
-              <RotateCcw className="w-3.5 h-3.5 shrink-0" />
-              <span>Replay</span>
-            </button>
-
             {/* Live Canvas */}
-            <div ref={cardContainerRef} className="w-full aspect-[16/9] relative z-10">
+            <div ref={cardContainerRef} key={`preview-${previewReplayKey}`} className="w-full aspect-[16/9] relative z-10">
               {template === 'milestone' && (
                 <MilestoneCard
-                  key={`card-milestone-${theme}-${repoData.repo}-${replayNonce}`}
+                  key={`card-milestone-${theme}-${repoData.repo}`}
                   data={repoData}
                   theme={theme}
                   animated
@@ -380,7 +369,7 @@ export default function StudioPage() {
               )}
               {template === 'infinity' && (
                 <InfinityCard
-                  key={`card-infinity-${theme}-${repoData.repo}-${replayNonce}`}
+                  key={`card-infinity-${theme}-${repoData.repo}`}
                   data={repoData}
                   theme={theme}
                   animated
@@ -388,7 +377,7 @@ export default function StudioPage() {
               )}
               {template === 'orbit' && (
                 <OrbitCard
-                  key={`card-orbit-${theme}-${repoData.repo}-${replayNonce}`}
+                  key={`card-orbit-${theme}-${repoData.repo}`}
                   data={repoData}
                   theme={theme}
                   animated
@@ -396,7 +385,7 @@ export default function StudioPage() {
               )}
               {template === 'constellation' && (
                 <ConstellationCard
-                  key={`card-constellation-${theme}-${repoData.repo}-${replayNonce}`}
+                  key={`card-constellation-${theme}-${repoData.repo}`}
                   data={repoData}
                   theme={theme}
                   animated
@@ -404,7 +393,7 @@ export default function StudioPage() {
               )}
               {template === 'spotlight' && (
                 <SpotlightCard
-                  key={`card-spotlight-${theme}-${repoData.repo}-${replayNonce}`}
+                  key={`card-spotlight-${theme}-${repoData.repo}`}
                   data={repoData}
                   theme={theme}
                   animated
@@ -412,7 +401,7 @@ export default function StudioPage() {
               )}
               {template === 'revolve' && (
                 <RevolveCard
-                  key={`card-revolve-${theme}-${repoData.repo}-${replayNonce}`}
+                  key={`card-revolve-${theme}-${repoData.repo}`}
                   data={repoData}
                   theme={theme}
                   animated
@@ -420,7 +409,7 @@ export default function StudioPage() {
               )}
               {template === 'hyperdrive' && (
                 <HyperdriveCard
-                  key={`card-hyperdrive-${theme}-${repoData.repo}-${replayNonce}`}
+                  key={`card-hyperdrive-${theme}-${repoData.repo}`}
                   data={repoData}
                   theme={theme}
                   animated
@@ -428,13 +417,23 @@ export default function StudioPage() {
               )}
               {template === 'blackhole' && (
                 <BlackholeCard
-                  key={`card-blackhole-${theme}-${repoData.repo}-${replayNonce}`}
+                  key={`card-blackhole-${theme}-${repoData.repo}`}
                   data={repoData}
                   theme={theme}
                   animated
                 />
               )}
             </div>
+
+            <button
+              type="button"
+              onClick={() => setPreviewReplayKey((key) => key + 1)}
+              aria-label={`Replay ${currentMeta.name} preview`}
+              title="Replay preview"
+              className="absolute top-3 right-3 z-20 inline-flex h-9 w-9 items-center justify-center rounded-full border border-border/80 bg-background/90 text-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <RotateCcw className="h-4 w-4" />
+            </button>
           </div>
 
           {/* Download Action Button Under Template */}
@@ -612,7 +611,6 @@ export default function StudioPage() {
               <FadeIn key={other.id} delay={0.25 + idx * 0.05} yOffset={15}>
                 <BrowseTemplateCard
                   template={other}
-                  theme={theme}
                   onClick={() => handleTemplateChange(other.id)}
                 />
               </FadeIn>
@@ -630,10 +628,21 @@ function BrowseTemplateCard({
   onClick,
 }: {
   template: (typeof templatesData)[number];
-  theme: 'dark' | 'light';
   onClick: () => void;
 }) {
   const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updatePreference = () => setPrefersReducedMotion(mediaQuery.matches);
+    updatePreference();
+    mediaQuery.addEventListener('change', updatePreference);
+    return () => mediaQuery.removeEventListener('change', updatePreference);
+  }, []);
+
+  const animated = (isHovered || isFocused) && !prefersReducedMotion;
 
   return (
     <button
@@ -641,6 +650,8 @@ function BrowseTemplateCard({
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
       className="group rounded-3xl bg-card hover:bg-muted/40 border border-border/80 hover:border-border p-2.5 text-left flex flex-col justify-between transition-colors duration-200 cursor-pointer shadow-2xs hover:shadow-xs w-full text-card-foreground"
     >
       <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-border/70 relative flex items-center justify-center pointer-events-none mb-2 isolate">
@@ -651,16 +662,29 @@ function BrowseTemplateCard({
             </Badge>
           </div>
         )}
-        <div className="w-full h-full relative z-10 pointer-events-none">
-          {template.id === 'spotlight' && <SpotlightCard data={initialSampleData} theme={theme} animated={isHovered} />}
-          {template.id === 'revolve' && <RevolveCard data={initialSampleData} theme={theme} animated={isHovered} />}
-          {template.id === 'milestone' && <MilestoneCard data={initialSampleData} theme={theme} animated={isHovered} />}
-          {template.id === 'infinity' && <InfinityCard data={initialSampleData} theme={theme} animated={isHovered} />}
-          {template.id === 'orbit' && <OrbitCard data={initialSampleData} theme={theme} animated={isHovered} />}
-          {template.id === 'constellation' && <ConstellationCard data={initialSampleData} theme={theme} animated={isHovered} />}
-          {template.id === 'hyperdrive' && <HyperdriveCard data={initialSampleData} theme={theme} animated={isHovered} />}
-          {template.id === 'blackhole' && <BlackholeCard data={initialSampleData} theme={theme} animated={isHovered} />}
-        </div>
+        {animated ? (
+          <video
+            src={`/templates/${template.id}.mp4`}
+            poster={`/templates/${template.id}.png`}
+            className="absolute inset-0 z-10 h-full w-full object-cover"
+            autoPlay
+            muted
+            playsInline
+            preload="none"
+            tabIndex={-1}
+            aria-hidden="true"
+            onEnded={(event) => event.currentTarget.pause()}
+          />
+        ) : (
+          <img
+            src={`/templates/${template.id}.png`}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 z-10 h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        )}
       </div>
       <div className="flex items-baseline justify-between gap-1.5 px-1 py-1 min-w-0">
         <span className="font-bold text-sm text-foreground shrink-0">

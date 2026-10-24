@@ -1,7 +1,9 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import type { TemplateCardProps } from './types';
 import sampleStargazers from '../../data/sampleStargazers.json';
+
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 function AnimatedNumber({ value, animated = true }: { value: number; animated?: boolean }) {
   const [displayValue, setDisplayValue] = useState(animated ? 0 : value);
@@ -129,7 +131,7 @@ export const RevolveCard: React.FC<TemplateCardProps> = ({
   const titleColor = isDark ? '#F5EDE7' : '#0F0E10';
   const subColor = isDark ? '#A1958D' : '#64748B';
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const updateScale = () => {

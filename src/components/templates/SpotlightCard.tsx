@@ -1,8 +1,10 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
 import type { TemplateCardProps } from './types';
 import sampleStargazers from '@/data/sampleStargazers.json';
+
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 function AnimatedNumber({ value, animated }: { value: number; animated: boolean }) {
   const [displayValue, setDisplayValue] = useState(animated ? 0 : value);
@@ -49,7 +51,7 @@ export const SpotlightCard: React.FC<TemplateCardProps> = ({
   const cardBorderColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.08)';
   const avatarBorderColor = isDark ? '#1C1B1F' : '#FFFFFF';
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const updateScale = () => {

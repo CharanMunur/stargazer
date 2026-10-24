@@ -24,6 +24,12 @@ export interface VideoExportResult {
   mimeType: string;
 }
 
+async function waitForFonts(): Promise<void> {
+  if (typeof document !== 'undefined' && 'fonts' in document) {
+    await document.fonts.ready;
+  }
+}
+
 // Find a supported WebCodecs encoder configuration
 async function getSupportedEncoderConfig(width: number, height: number, bitrate: number) {
   if (typeof window === 'undefined' || typeof (window as any).VideoEncoder === 'undefined') {
@@ -99,6 +105,7 @@ export async function exportTemplateToVideo(
   } = options;
 
   onProgress(0.05, 'Preloading assets...');
+  await waitForFonts();
   const assets: PreloadedAssets = await preloadTemplateAssets(template, data, theme);
 
   const canvas = document.createElement('canvas');
@@ -283,6 +290,7 @@ export async function exportTemplateToImage(
     height = 900,
   } = options;
 
+  await waitForFonts();
   const assets: PreloadedAssets = await preloadTemplateAssets(template, data, theme);
 
   const canvas = document.createElement('canvas');

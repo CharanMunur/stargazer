@@ -1,7 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import type { TemplateCardProps } from './types';
 import sampleStargazers from '../../data/sampleStargazers.json';
+
+const useIsomorphicLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
 function AnimatedNumber({ value, animated = true }: { value: number; animated?: boolean }) {
   const [displayValue, setDisplayValue] = useState(animated ? 0 : value);
@@ -64,7 +66,7 @@ export const InfinityCard: React.FC<TemplateCardProps> = ({
   const labelColor = isDark ? '#B8AAA3' : '#000000';
 
   // Responsive scale down to fit container width
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = containerRef.current;
     if (!el) return;
     const updateScale = () => {

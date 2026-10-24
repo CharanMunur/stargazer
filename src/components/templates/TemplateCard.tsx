@@ -1,24 +1,68 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "@/components/ui/reicon";
 import { FadeIn } from "../helpers/FadeIn";
 import type { TemplateMeta } from "@/data/templates";
-import { initialSampleData } from "@/data/templates";
-import {
-  MilestoneCard,
-  InfinityCard,
-  OrbitCard,
-  ConstellationCard,
-  SpotlightCard,
-  RevolveCard,
-  HyperdriveCard,
-  BlackholeCard,
-} from "../templates";
 import { Badge } from "@/components/ui/badge";
 
 interface TemplateCardProps {
   template: TemplateMeta;
   theme: "dark" | "light";
   index: number;
+}
+
+function LocalVideoPreview({ templateId }: { templateId: TemplateMeta["id"] }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+  const [shouldLoad, setShouldLoad] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotionPreference = () => setReducedMotion(mediaQuery.matches);
+    updateMotionPreference();
+    mediaQuery.addEventListener("change", updateMotionPreference);
+
+    const element = containerRef.current;
+    if (!element) {
+      return () => mediaQuery.removeEventListener("change", updateMotionPreference);
+    }
+
+    if (!("IntersectionObserver" in window)) {
+      setShouldLoad(true);
+      setIsVisible(true);
+      return () => mediaQuery.removeEventListener("change", updateMotionPreference);
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+        if (entry.isIntersecting) setShouldLoad(true);
+      },
+      { threshold: 0.15, rootMargin: "100px" }
+    );
+
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener("change", updateMotionPreference);
+    };
+  }, []);
+
+  return (
+    <div ref={containerRef} className="absolute inset-0" aria-hidden="true">
+      <video
+        className="h-full w-full object-cover"
+        src={shouldLoad ? `/templates/${templateId}.mp4` : undefined}
+        poster={`/templates/${templateId}.png`}
+        autoPlay={isVisible && !reducedMotion}
+        loop
+        muted
+        playsInline
+        preload="none"
+        tabIndex={-1}
+      />
+    </div>
+  );
 }
 
 export default function TemplateCard({ template, theme, index }: TemplateCardProps) {
@@ -47,72 +91,7 @@ export default function TemplateCard({ template, theme, index }: TemplateCardPro
               backgroundSize: "16px 16px",
             }}
           />
-          <div className="w-full h-full relative z-10">
-            {template.id === "spotlight" && (
-              <SpotlightCard
-                key={`preview-spotlight-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-            {template.id === "revolve" && (
-              <RevolveCard
-                key={`preview-revolve-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-            {template.id === "milestone" && (
-              <MilestoneCard
-                key={`preview-milestone-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-            {template.id === "infinity" && (
-              <InfinityCard
-                key={`preview-infinity-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-            {template.id === "orbit" && (
-              <OrbitCard
-                key={`preview-orbit-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-            {template.id === "constellation" && (
-              <ConstellationCard
-                key={`preview-constellation-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-            {template.id === "hyperdrive" && (
-              <HyperdriveCard
-                key={`preview-hyperdrive-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-            {template.id === "blackhole" && (
-              <BlackholeCard
-                key={`preview-blackhole-${theme}`}
-                data={initialSampleData}
-                theme={theme}
-                animated
-              />
-            )}
-          </div>
+          <LocalVideoPreview templateId={template.id} />
         </div>
 
         {/* Bottom bar: Title + Author credit left, Arrow icon right */}
