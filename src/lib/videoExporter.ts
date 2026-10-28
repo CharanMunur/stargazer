@@ -136,11 +136,28 @@ export async function exportTemplateToVideo(
       });
 
       let encoderError: any = null;
+      const totalFrames = Math.round(durationSeconds * fps);
+      let encodedFrames = 0;
+      let reportedProgress = 0.1;
+      const reportWebCodecsProgress = (progress: number, statusText: string) => {
+        const nextProgress = Math.max(reportedProgress, progress);
+        reportedProgress = nextProgress;
+        onProgress(nextProgress, statusText);
+      };
       const VideoEncoderClass = (window as any).VideoEncoder;
       const VideoFrameClass = (window as any).VideoFrame;
 
       const videoEncoder = new VideoEncoderClass({
-        output: (chunk: any, meta: any) => muxer.addVideoChunk(chunk, meta),
+        output: (chunk: any, meta: any) => {
+          muxer.addVideoChunk(chunk, meta);
+          encodedFrames++;
+          if (encodedFrames % 6 === 0 || encodedFrames === totalFrames) {
+            reportWebCodecsProgress(
+              0.15 + (encodedFrames / totalFrames) * 0.82,
+              `Encoded frame ${encodedFrames} of ${totalFrames}...`
+            );
+          }
+        },
         error: (e: any) => {
           encoderError = e;
           console.error('VideoEncoder error:', e);
@@ -149,7 +166,6 @@ export async function exportTemplateToVideo(
 
       videoEncoder.configure(encoderSupport.config);
 
-      const totalFrames = Math.round(durationSeconds * fps);
       for (let i = 0; i < totalFrames; i++) {
         if (encoderError) throw encoderError;
 
@@ -166,17 +182,19 @@ export async function exportTemplateToVideo(
         frame.close();
 
         if (i % 6 === 0 || i === totalFrames - 1) {
-          onProgress(
-            0.15 + (i / totalFrames) * 0.8,
-            `Encoding frame ${i + 1} of ${totalFrames}...`
+          reportWebCodecsProgress(
+            0.1 + ((i + 1) / totalFrames) * 0.55,
+            `Rendering frame ${i + 1} of ${totalFrames}...`
           );
           // Yield to main thread so UI updates smoothly
           await new Promise((resolve) => setTimeout(resolve, 0));
         }
       }
 
-      onProgress(0.97, 'Finalizing MP4 container...');
+      reportWebCodecsProgress(reportedProgress, 'Finishing video encoding...');
       await videoEncoder.flush();
+      reportWebCodecsProgress(0.97, 'Video encoding complete.');
+      reportWebCodecsProgress(0.985, 'Packing MP4 file...');
       muxer.finalize();
 
       const { buffer } = muxer.target as ArrayBufferTarget;

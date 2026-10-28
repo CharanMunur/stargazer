@@ -1,0 +1,110 @@
+---
+// Preview Video & Image Generator Page
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Generating Template Previews</title>
+  </head>
+  <body style="font-family: sans-serif; padding: 2rem; background: #111; color: #fff;">
+    <h1>Stargazer Preview Generator</h1>
+    <p id="status">Initializing...</p>
+    <div id="logs" style="font-family: monospace; font-size: 13px; line-height: 1.6; white-space: pre-wrap;"></div>
+
+    <script>
+      import { templatesData, initialSampleData } from '../data/templates';
+      import { exportTemplateToImage, exportTemplateToVideo, getDefaultDurationForTemplate } from '../lib/videoExporter';
+      import type { TemplateType } from '../lib/canvasRenderer';
+
+      const previewThemes: Record<TemplateType, 'dark' | 'light'> = {
+        blackhole: 'dark',
+        revolve: 'light',
+        spotlight: 'dark',
+        hyperdrive: 'light',
+        milestone: 'light',
+        infinity: 'dark',
+        orbit: 'light',
+        constellation: 'light',
+      };
+
+      const statusEl = document.getElementById('status')!;
+      const logsEl = document.getElementById('logs')!;
+
+      function log(msg: string) {
+        console.log(msg);
+        logsEl.textContent += msg + '\n';
+      }
+
+      async function run() {
+        try {
+          const templates = templatesData.map((t) => t.id);
+          log(`Found ${templates.length} templates to process: ${templates.join(', ')}`);
+
+          for (let idx = 0; idx < templates.length; idx++) {
+            const templateId = templates[idx];
+            const duration = getDefaultDurationForTemplate(templateId as any);
+            const theme = previewThemes[templateId as TemplateType];
+            statusEl.textContent = `Processing [${idx + 1}/${templates.length}]: ${templateId} ${theme} (${duration}s)...`;
+            log(`\n--- Starting ${templateId} ${theme} (${duration}s at 1600x900) ---`);
+
+            const poster = await exportTemplateToImage({
+              template: templateId as TemplateType,
+              data: initialSampleData,
+              theme,
+              width: 1600,
+              height: 900,
+            });
+            const posterRes = await fetch(`http://localhost:3001/?name=${templateId}.png`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'image/png' },
+              body: await (await fetch(poster)).blob(),
+            });
+            if (!posterRes.ok) {
+              throw new Error(`Failed to save ${templateId}.png: ${await posterRes.text()}`);
+            }
+
+            // Render at full 1600x900 coordinate system with natural duration
+            const videoResult = await exportTemplateToVideo({
+              template: templateId as any,
+              data: initialSampleData,
+              theme,
+              durationSeconds: duration,
+              fps: 30,
+              width: 1600,
+              height: 900,
+              onProgress: (p, text) => {
+                statusEl.textContent = `[${idx + 1}/${templates.length}] ${templateId}: ${(p * 100).toFixed(0)}% - ${text}`;
+              },
+            });
+
+            const sizeMb = (videoResult.blob.size / (1024 * 1024)).toFixed(2);
+            log(`Video rendered (${sizeMb} MB). Saving to public/templates/${templateId}.mp4...`);
+
+            const res = await fetch(`http://localhost:3001/?name=${templateId}.mp4`, {
+              method: 'POST',
+              body: videoResult.blob,
+            });
+
+            if (!res.ok) {
+              throw new Error(`Failed to save ${templateId}.mp4: ${await res.text()}`);
+            }
+
+            log(`Successfully saved ${templateId}.mp4!`);
+          }
+
+          statusEl.textContent = 'ALL_PREVIEWS_COMPLETED';
+          log('\nAll themed template previews generated successfully.');
+        } catch (err: any) {
+          statusEl.textContent = 'ERROR: ' + err.message;
+          log('\n❌ ERROR: ' + err.message + '\n' + err.stack);
+        }
+      }
+
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(run, 500);
+      });
+    </script>
+  </body>
+</html>

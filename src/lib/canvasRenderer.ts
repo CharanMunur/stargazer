@@ -218,6 +218,22 @@ function easeOut(t: number): number {
   return 1 - Math.pow(1 - Math.max(0, Math.min(1, t)), 3);
 }
 
+function cubicBezierEase(t: number, x1: number, y1: number, x2: number, y2: number): number {
+  const sample = (a1: number, a2: number, p: number) =>
+    3 * (1 - p) ** 2 * p * a1 + 3 * (1 - p) * p ** 2 * a2 + p ** 3;
+  const target = Math.max(0, Math.min(1, t));
+  let low = 0;
+  let high = 1;
+
+  for (let i = 0; i < 16; i++) {
+    const mid = (low + high) / 2;
+    if (sample(x1, x2, mid) < target) low = mid;
+    else high = mid;
+  }
+
+  return sample(y1, y2, (low + high) / 2);
+}
+
 // Exact easeOutBack formula with elastic overshoot
 function easeOutBack(t: number, s = 1.35): number {
   const clamped = Math.max(0, Math.min(1, t));
@@ -1833,6 +1849,15 @@ function renderBlackhole(
   assets: PreloadedAssets
 ) {
   const isDark = theme === 'dark';
+  const CORNER_ANGLES = [
+    Math.PI / 4,
+    (3 * Math.PI) / 4,
+    (5 * Math.PI) / 4,
+    (7 * Math.PI) / 4,
+  ];
+  const R_START = 920;
+  const R_END = 150;
+  const SWEEP_ANGLE = 1.7 * Math.PI;
 
   // 1. Background Fill
   ctx.save();
@@ -1849,16 +1874,6 @@ function renderBlackhole(
   ctx.fillRect(0, 0, 1600, 900);
 
   // 2. 4 Curved Corner Background Spiral Lines (100% Synced with Avatar Flow)
-  const CORNER_ANGLES = [
-    Math.PI / 4,
-    (3 * Math.PI) / 4,
-    (5 * Math.PI) / 4,
-    (7 * Math.PI) / 4,
-  ];
-  const R_START = 920;
-  const R_END = 150;
-  const SWEEP_ANGLE = 1.7 * Math.PI;
-
   ctx.save();
   CORNER_ANGLES.forEach((baseAngle) => {
     ctx.beginPath();
@@ -1928,12 +1943,13 @@ function renderBlackhole(
       const opacity = Math.sin(currentP * Math.PI);
       const alpha = Math.max(0.08, opacity);
 
+      const imgKey = user.avatarUrl || user.login || `user-${idx}`;
+
       ctx.save();
       ctx.globalAlpha = alpha;
       ctx.translate(x, y);
 
       const chipR = chipSize * 0.28;
-      const imgKey = user.avatarUrl || user.login || `user-${idx}`;
       const img = assets.avatarImages.get(imgKey);
 
       // Drop shadow
@@ -1999,6 +2015,16 @@ function renderBlackhole(
   ctx.fillStyle = centerHalo;
   ctx.fillRect(cx - 480, 450 - 480, 960, 960);
   ctx.restore();
+
+  // Match BlackholeCard's 250ms delayed, 1.4s center hub entrance.
+  const hubProgress = Math.max(0, Math.min(1, (tSec - 0.25) / 1.4));
+  const hubEase = cubicBezierEase(hubProgress, 0.16, 1, 0.3, 1);
+  const hubScale = 0.75 + 0.25 * hubEase;
+  ctx.save();
+  ctx.globalAlpha = hubEase;
+  ctx.translate(cx, 450);
+  ctx.scale(hubScale, hubScale);
+  ctx.translate(-cx, -450);
 
   // Owner Avatar Golden Glow Shadow
   ctx.save();
@@ -2073,6 +2099,7 @@ function renderBlackhole(
   ctx.font = `500 28px 'DM Sans', sans-serif`;
   ctx.fillStyle = subColor;
   ctx.fillText('stars', startX + starSz + gap + countW + gap, rowCenterY + 30);
+  ctx.restore();
   ctx.restore();
 }
 

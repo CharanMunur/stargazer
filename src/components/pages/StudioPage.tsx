@@ -277,7 +277,7 @@ export default function StudioPage() {
           data: repoData,
           theme,
           durationSeconds: getDefaultDurationForTemplate(template),
-          fps: 30,
+          fps: template === 'blackhole' ? 24 : 30,
           width: 1600,
           height: 900,
           onProgress: (p, text) => {
@@ -305,6 +305,30 @@ export default function StudioPage() {
 
   const currentMeta = templatesData.find((t) => t.id === template) || templatesData[0];
   const otherTemplates = templatesData.filter((t) => t.id !== template);
+  const renderDownloadButton = (placementClass: string) => (
+    <button
+      type="button"
+      disabled={exporting || loading}
+      onClick={handleExport}
+      className={`w-full h-12 py-3 px-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 transition-all shadow-2xs active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0 ${placementClass}`}
+    >
+      {exporting ? (
+        <>
+          <RefreshCw className="mr-2 h-4.5 w-4.5 animate-spin shrink-0" />
+          <span>
+            {exportProgress
+              ? `${exportProgress.text} (${exportProgress.percent}%)`
+              : 'Exporting...'}
+          </span>
+        </>
+      ) : (
+        <>
+          <Download className="mr-2 h-4.5 w-4.5 shrink-0" />
+          <span>Download {format.toUpperCase()}</span>
+        </>
+      )}
+    </button>
+  );
 
   return (
     <div className="w-full max-w-6xl mx-auto px-6 py-8 space-y-8">
@@ -342,8 +366,8 @@ export default function StudioPage() {
 
       {/* Main Section: Template Canvas on Left, Controls on Right - Top & Bottom Aligned */}
       <FadeIn delay={0.1} yOffset={15} duration={0.45} className="w-full">
-        <div className="flex flex-col lg:flex-row lg:items-stretch items-start gap-6 lg:gap-8">
-        {/* Left Column: 16:9 Canvas Stage & Download Action Button */}
+        <div className="flex flex-col xl:flex-row xl:items-stretch gap-6 lg:gap-8">
+        {/* Left Column: Preview and desktop download action */}
         <div className="flex-1 w-full min-w-0 flex flex-col justify-between gap-3.5">
           {/* Central Canvas Stage */}
           <div className="w-full aspect-[16/9] rounded-2xl border border-border bg-card shadow-xs overflow-hidden relative flex items-center justify-center">
@@ -436,33 +460,11 @@ export default function StudioPage() {
             </button>
           </div>
 
-          {/* Download Action Button Under Template */}
-          <button
-            type="button"
-            disabled={exporting || loading}
-            onClick={handleExport}
-            className="w-full h-12 py-3 px-6 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold text-sm sm:text-base flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50 transition-all shadow-2xs active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring shrink-0"
-          >
-            {exporting ? (
-              <>
-                <RefreshCw className="mr-2 h-4.5 w-4.5 animate-spin shrink-0" />
-                <span>
-                  {exportProgress
-                    ? `${exportProgress.text} (${exportProgress.percent}%)`
-                    : 'Exporting...'}
-                </span>
-              </>
-            ) : (
-              <>
-                <Download className="mr-2 h-4.5 w-4.5 shrink-0" />
-                <span>Download {format.toUpperCase()}</span>
-              </>
-            )}
-          </button>
+          {renderDownloadButton('hidden xl:flex')}
         </div>
 
-        {/* Right Column: Controls - Top and Bottom Aligned with Template Canvas and Download Button */}
-        <div className="w-full lg:w-80 shrink-0 flex flex-col justify-between gap-4">
+        {/* Right Column: Controls and Download Action */}
+        <div className="w-full xl:w-80 shrink-0 flex flex-col justify-between gap-4">
           {/* Repo & Required PAT Form */}
           <form onSubmit={handleFetchSubmit} className="space-y-3.5">
             {/* Repo Input */}
@@ -594,6 +596,9 @@ export default function StudioPage() {
               </div>
             )}
           </div>
+
+          {renderDownloadButton('flex xl:hidden')}
+
         </div>
       </div>
       </FadeIn>

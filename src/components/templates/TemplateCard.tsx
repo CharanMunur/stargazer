@@ -68,15 +68,22 @@ function LocalVideoPreview({ templateId }: { templateId: TemplateMeta["id"] }) {
 export default function TemplateCard({ template, theme, index }: TemplateCardProps) {
   return (
     <FadeIn delay={0.1 + (index % 6) * 0.03} yOffset={16}>
-      <a
-        href={`/generate?template=${template.id}`}
+      <div
         className="group relative rounded-3xl bg-card hover:bg-muted/40 border border-border/80 hover:border-border p-2.5 sm:p-3 flex flex-col justify-between transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-xs block h-full text-card-foreground"
       >
+        <a
+          href={`/generate?template=${template.id}`}
+          aria-label={`Open ${template.name} template`}
+          className="absolute inset-0 z-10 rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <span className="sr-only">Open {template.name} template</span>
+        </a>
+
         {/* Live 16:9 Canvas Preview */}
         <div className="w-full aspect-[16/9] rounded-2xl overflow-hidden bg-background border border-border/70 relative flex items-center justify-center pointer-events-none">
           {/* Overlaid Floating NEW Badge */}
           {template.isNew && (
-            <div className="absolute top-3 right-3 z-20 pointer-events-auto">
+            <div className="absolute top-3 right-3 z-20 pointer-events-none">
               <Badge variant="orange" className="shadow-xs backdrop-blur-xs">
                 NEW
               </Badge>
@@ -95,7 +102,7 @@ export default function TemplateCard({ template, theme, index }: TemplateCardPro
         </div>
 
         {/* Bottom bar: Title + Author credit left, Arrow icon right */}
-        <div className="pt-3.5 sm:pt-4 pb-1 flex items-center justify-between px-1 gap-2">
+        <div className="relative z-20 pt-3.5 sm:pt-4 pb-1 flex items-center justify-between px-1 gap-2 pointer-events-none">
           <div className="flex items-baseline gap-2 min-w-0">
             <h2 className="text-base sm:text-lg font-bold tracking-tight text-foreground shrink-0">
               {template.name}
@@ -107,7 +114,7 @@ export default function TemplateCard({ template, theme, index }: TemplateCardPro
                 target="_blank"
                 rel="noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="hover:underline text-foreground/80 hover:text-foreground font-semibold transition-colors"
+                className="pointer-events-auto hover:underline text-foreground/80 hover:text-foreground font-semibold transition-colors"
               >
                 {template.by}
               </a>
@@ -120,7 +127,7 @@ export default function TemplateCard({ template, theme, index }: TemplateCardPro
             strokeWidth={2.5}
           />
         </div>
-      </a>
+      </div>
     </FadeIn>
   );
 }

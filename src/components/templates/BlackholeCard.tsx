@@ -55,6 +55,27 @@ const CORNER_ANGLES = [
 const R_START = 920; // Expanded outer radius to cover 1600x900 canvas edges
 const R_END = 150;   // Meeting point near center
 const SWEEP_ANGLE = 1.7 * Math.PI; // 306° curve sweep per arm
+const CX = 800;
+const CY = 450;
+
+const SPIRAL_PATHS = CORNER_ANGLES.map((baseAngle) => {
+  const primary: string[] = [];
+  const secondary: string[] = [];
+  const steps = 90;
+
+  for (let i = 0; i <= steps; i++) {
+    const t = 1 - i / steps;
+    const r = R_START * t + R_END * (1 - t);
+    const angle = baseAngle + (1 - t) * SWEEP_ANGLE;
+    primary.push(`${i === 0 ? 'M' : 'L'} ${(CX + r * Math.cos(angle)).toFixed(1)} ${(CY + r * Math.sin(angle)).toFixed(1)}`);
+
+    const r2 = (R_START + 75) * t + (R_END + 35) * (1 - t);
+    const angle2 = baseAngle + (1 - t) * SWEEP_ANGLE + 0.12;
+    secondary.push(`${i === 0 ? 'M' : 'L'} ${(CX + r2 * Math.cos(angle2)).toFixed(1)} ${(CY + r2 * Math.sin(angle2)).toFixed(1)}`);
+  }
+
+  return { primary: primary.join(' '), secondary: secondary.join(' ') };
+});
 
 export const BlackholeCard: React.FC<TemplateCardProps> = ({
   data,
@@ -63,8 +84,8 @@ export const BlackholeCard: React.FC<TemplateCardProps> = ({
   className = '',
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const avatarRefs = useRef<Array<HTMLDivElement | null>>([]);
   const [scale, setScale] = useState(1);
-  const [progress, setProgress] = useState(0);
 
   const isDark = theme === 'dark';
 
@@ -93,27 +114,6 @@ export const BlackholeCard: React.FC<TemplateCardProps> = ({
     return () => observer.disconnect();
   }, []);
 
-  // Continuous smooth animation loop
-  useEffect(() => {
-    if (!animated) return;
-    let animFrame: number;
-    let startTimestamp: number | null = null;
-    const loopDuration = 16000; // 16s cycle
-
-    const step = (timestamp: number) => {
-      if (!startTimestamp) startTimestamp = timestamp;
-      const elapsed = timestamp - startTimestamp;
-      const currentProgress = (elapsed % loopDuration) / loopDuration;
-      setProgress(currentProgress);
-      animFrame = requestAnimationFrame(step);
-    };
-
-    animFrame = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(animFrame);
-  }, [animated]);
-
-  const CX = 800;
-  const CY = 450;
   const repoFullName = data.owner ? `${data.owner}/${data.repo}` : data.repo;
 
   const bgColor = isDark ? '#08080C' : '#FAFAF9';
@@ -130,6 +130,52 @@ export const BlackholeCard: React.FC<TemplateCardProps> = ({
     });
     return arms;
   }, [stargazersList]);
+
+  // Animate only the avatar nodes. Keeping this loop outside React avoids
+  // reconciling all 48 image chips on every frame.
+  useEffect(() => {
+    const updateAvatars = (progress: number) => {
+      armAvatars.forEach((armList, armIdx) => {
+        const baseAngle = CORNER_ANGLES[armIdx];
+        const armCount = armList.length;
+
+        armList.forEach(({ idx }, itemIdx) => {
+          const element = avatarRefs.current[idx];
+          if (!element) return;
+
+          const localOffset = itemIdx / armCount;
+          const currentP = 1 - ((localOffset + progress) % 1);
+          const r = R_START * currentP + R_END * (1 - currentP);
+          const angle = baseAngle + (1 - currentP) * SWEEP_ANGLE;
+          const x = CX + r * Math.cos(angle);
+          const y = CY + r * Math.sin(angle);
+          const chipSize = 68 + 32 * currentP;
+          const opacity = Math.max(0.08, Math.sin(currentP * Math.PI));
+
+          element.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) scale(${chipSize / 100})`;
+          element.style.opacity = `${opacity}`;
+          element.style.zIndex = `${Math.floor(currentP * 10) + 5}`;
+        });
+      });
+    };
+
+    updateAvatars(0);
+    if (!animated) return;
+
+    let animationFrame = 0;
+    let startTimestamp: number | null = null;
+    const loopDuration = 16000;
+
+    const step = (timestamp: number) => {
+      if (startTimestamp === null) startTimestamp = timestamp;
+      const progress = ((timestamp - startTimestamp) % loopDuration) / loopDuration;
+      updateAvatars(progress);
+      animationFrame = requestAnimationFrame(step);
+    };
+
+    animationFrame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [animated, armAvatars]);
 
   return (
     <div
@@ -158,50 +204,27 @@ export const BlackholeCard: React.FC<TemplateCardProps> = ({
           aria-hidden="true"
         >
           <g>
-            {CORNER_ANGLES.map((baseAngle, armIdx) => {
-              const pointsPrimary: string[] = [];
-              const pointsSecondary: string[] = [];
-              const steps = 90;
-
-              for (let i = 0; i <= steps; i++) {
-                const t = 1 - i / steps; // 1 at outer corner, 0 at center
-                const r = R_START * t + R_END * (1 - t);
-                const angle = baseAngle + (1 - t) * SWEEP_ANGLE;
-
-                const x1 = CX + r * Math.cos(angle);
-                const y1 = CY + r * Math.sin(angle);
-                pointsPrimary.push(`${i === 0 ? 'M' : 'L'} ${x1.toFixed(1)} ${y1.toFixed(1)}`);
-
-                // Secondary parallel accent curve
-                const r2 = (R_START + 75) * t + (R_END + 35) * (1 - t);
-                const angle2 = baseAngle + (1 - t) * SWEEP_ANGLE + 0.12;
-                const x2 = CX + r2 * Math.cos(angle2);
-                const y2 = CY + r2 * Math.sin(angle2);
-                pointsSecondary.push(`${i === 0 ? 'M' : 'L'} ${x2.toFixed(1)} ${y2.toFixed(1)}`);
-              }
-
-              return (
-                <g key={armIdx}>
-                  <path
-                    d={pointsPrimary.join(' ')}
-                    fill="none"
-                    stroke={
-                      isDark ? 'rgba(234, 179, 8, 0.16)' : 'rgba(234, 179, 8, 0.22)'
-                    }
-                    strokeWidth="4"
-                  />
-                  <path
-                    d={pointsSecondary.join(' ')}
-                    fill="none"
-                    stroke={
-                      isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)'
-                    }
-                    strokeWidth="2.5"
-                    strokeDasharray="8 8"
-                  />
-                </g>
-              );
-            })}
+            {SPIRAL_PATHS.map((paths, armIdx) => (
+              <g key={armIdx}>
+                <path
+                  d={paths.primary}
+                  fill="none"
+                  stroke={
+                    isDark ? 'rgba(234, 179, 8, 0.16)' : 'rgba(234, 179, 8, 0.22)'
+                  }
+                  strokeWidth="4"
+                />
+                <path
+                  d={paths.secondary}
+                  fill="none"
+                  stroke={
+                    isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)'
+                  }
+                  strokeWidth="2.5"
+                  strokeDasharray="8 8"
+                />
+              </g>
+            ))}
           </g>
         </svg>
 
@@ -212,9 +235,7 @@ export const BlackholeCard: React.FC<TemplateCardProps> = ({
 
           return armList.map(({ user, idx }, itemIdx) => {
             const localOffset = itemIdx / armCount;
-            // Progression along the curve from outer corner (1) down to center (0)
-            const p = (localOffset + progress) % 1;
-            const currentP = 1 - p;
+            const currentP = 1 - localOffset;
 
             const r = R_START * currentP + R_END * (1 - currentP);
             const angle = baseAngle + (1 - currentP) * SWEEP_ANGLE;
@@ -223,20 +244,21 @@ export const BlackholeCard: React.FC<TemplateCardProps> = ({
             const y = CY + r * Math.sin(angle);
 
             const chipSize = 68 + 32 * currentP; // 68px inner to 100px outer (Enlarged)
-            const chipR = chipSize * 0.28;
             const opacity = Math.sin(currentP * Math.PI); // Fades gracefully at edges
 
             return (
               <div
                 key={`arm${armIdx}-${user.login}-${idx}`}
+                ref={(element) => { avatarRefs.current[idx] = element; }}
                 style={{
                   position: 'absolute',
-                  left: `${x}px`,
-                  top: `${y}px`,
-                  width: `${chipSize}px`,
-                  height: `${chipSize}px`,
-                  transform: 'translate(-50%, -50%)',
-                  borderRadius: `${chipR}px`,
+                  left: 0,
+                  top: 0,
+                  width: 100,
+                  height: 100,
+                  transform: `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) scale(${chipSize / 100})`,
+                  transformOrigin: 'center',
+                  borderRadius: 28,
                   overflow: 'hidden',
                   backgroundColor: chipBg,
                   border: `1.5px solid ${chipBorder}`,
@@ -260,7 +282,7 @@ export const BlackholeCard: React.FC<TemplateCardProps> = ({
                       width: '100%',
                       height: '100%',
                       objectFit: 'cover',
-                      borderRadius: `${chipR * 0.7}px`,
+                      borderRadius: '19.6px',
                     }}
                   />
                 ) : (
@@ -272,7 +294,7 @@ export const BlackholeCard: React.FC<TemplateCardProps> = ({
                       alignItems: 'center',
                       justifyContent: 'center',
                       fontWeight: 700,
-                      fontSize: `${chipSize * 0.38}px`,
+                      fontSize: '38px',
                       color: titleColor,
                     }}
                   >
